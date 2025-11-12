@@ -1,6 +1,6 @@
 {
   "name": "pump-investments",
-  "version": "3.0.25",
+  "version": "3.0.27",
   "private": true,
   "scripts": {
     "build": "rm -rf .next && next build",

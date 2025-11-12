@@ -31,6 +31,27 @@ interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: "3.0.27",
+    date: "June 2, 2025",
+    changes: [
+      {
+        type: "fixed",
+        description:
+          "Prevented duplicate WebSocket trades from being stored so tokens remain correctly grouped by mint.",
+      },
+      {
+        type: "improved",
+        description:
+          "Added on-demand token metadata loading that triggers only for tokens visible on the dashboard and caches responses.",
+      },
+      {
+        type: "improved",
+        description:
+          "Persisted fetched metadata locally to reuse cached details across re-renders and reduce repeated metadata requests.",
+      },
+    ],
+  },
+  {
     version: "3.0.26",
     date: "June 1, 2025",
     changes: [

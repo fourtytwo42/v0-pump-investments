@@ -59,7 +59,7 @@ interface TokenData {
   website?: string | null
   twitter?: string | null
   telegram?: string | null
-  king_of_the_hill_timestamp?: string | null
+  king_of_the_hill_timestamp?: number | null
   description?: string | null
 }
 
