@@ -317,6 +317,20 @@ export default function Dashboard() {
               </SelectContent>
             </Select>
 
+            <Select
+              value={settings.graduationFilter}
+              onValueChange={(value) => updateSettings("graduationFilter", value as "all" | "bonding" | "graduated")}
+            >
+              <SelectTrigger className="w-[140px]" data-onboarding="graduation-filter">
+                <SelectValue placeholder="Bonding Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="bonding">Bonding</SelectItem>
+                <SelectItem value="graduated">Graduated</SelectItem>
+              </SelectContent>
+            </Select>
+
             <Button
               variant="outline"
               size="icon"
@@ -459,24 +473,7 @@ export default function Dashboard() {
                 </div>
 
                 <div className="space-y-4 mt-6 border-t pt-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <Label className="text-base font-semibold">Market Cap Range</Label>
-                    <Select
-                      value={settings.graduationFilter}
-                      onValueChange={(value) =>
-                        updateSettings("graduationFilter", value as "all" | "bonding" | "graduated")
-                      }
-                    >
-                      <SelectTrigger className="h-8 w-32">
-                        <SelectValue placeholder="Bonding Status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All</SelectItem>
-                        <SelectItem value="bonding">Bonding</SelectItem>
-                        <SelectItem value="graduated">Graduated</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <Label className="text-base font-semibold">Market Cap Range</Label>
 
                   <RangeSlider
                     min={0}
