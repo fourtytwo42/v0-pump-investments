@@ -15,6 +15,12 @@ import {
 } from "@/lib/token-metadata-cache"
 import { normalizeTokenMetadata, type TokenMetadata } from "@/lib/token-metadata"
 
+function logMetadata(message: string, ...args: unknown[]) {
+  if (process.env.NEXT_PUBLIC_LOG_METADATA === "true") {
+    console.log(message, ...args)
+  }
+}
+
 export type { Trade }
 
 const RECONNECT_DELAY_MS = 5000
@@ -48,46 +54,49 @@ export function useWebSocketTrades(setAllTrades: React.Dispatch<React.SetStateAc
 
       const cached = hasCachedTokenMetadata(mint) ? getCachedTokenMetadata(mint) ?? null : undefined
       if (cached !== undefined) {
+        logMetadata("[metadata] websocket cache hit", mint, cached ? "value" : "null")
         return cached
       }
 
       if (metadataFetchByMintRef.current.has(mint)) {
+        logMetadata("[metadata] websocket joining inflight", mint)
         return metadataFetchByMintRef.current.get(mint) ?? null
       }
 
       const request = (async () => {
+        const fromPump = await fetchTokenMetadataWithCache(mint)
+        if (fromPump) {
+          logMetadata("[metadata] websocket received Pump.fun metadata", mint)
+          return fromPump
+        }
+
+        const normalizedUri = normalizeIpfsUri(metadataUri) ?? metadataUri
+        if (!normalizedUri) {
+          cacheTokenMetadata(mint, null)
+          return null
+        }
+
         try {
-          const fromPump = await fetchTokenMetadataWithCache(mint)
-          if (fromPump) {
-            return fromPump
+          logMetadata("[metadata] websocket fetching metadata URI", mint, normalizedUri)
+          const response = await fetch(normalizedUri, {
+            cache: "force-cache",
+            headers: { Accept: "application/json" },
+          })
+
+          if (!response.ok) {
+            throw new Error(`Metadata URI responded with status ${response.status}`)
           }
 
-          const normalizedUri = normalizeIpfsUri(metadataUri) ?? metadataUri
-          if (!normalizedUri) {
-            cacheTokenMetadata(mint, null)
-            return null
-          }
+          const raw = (await response.json()) as unknown
+          const metadata = normalizeTokenMetadata(raw)
 
-          try {
-            const response = await fetch(normalizedUri, {
-              cache: "force-cache",
-              headers: { Accept: "application/json" },
-            })
-
-            if (!response.ok) {
-              throw new Error(`Metadata URI responded with status ${response.status}`)
-            }
-
-            const raw = (await response.json()) as unknown
-            const metadata = normalizeTokenMetadata(raw)
-
-            cacheTokenMetadata(mint, metadata)
-            return metadata
-          } catch (error) {
-            console.debug(`[v0] Failed to fetch metadata for ${mint} from ${normalizedUri}:`, error)
-            cacheTokenMetadata(mint, null)
-            return null
-          }
+          cacheTokenMetadata(mint, metadata)
+          logMetadata("[metadata] websocket normalized URI metadata", mint, metadata ? "value" : "null")
+          return metadata
+        } catch (error) {
+          console.debug(`[metadata] Websocket metadata URI fetch failed for ${mint}:`, error)
+          cacheTokenMetadata(mint, null)
+          return null
         } finally {
           metadataFetchByMintRef.current.delete(mint)
         }
@@ -103,6 +112,7 @@ export function useWebSocketTrades(setAllTrades: React.Dispatch<React.SetStateAc
         return incomingTrade
       }
 
+      logMetadata("[metadata] websocket applying metadata to trade", incomingTrade.mint, incomingTrade.signature)
       return {
         ...incomingTrade,
         name: metadata.name ?? incomingTrade.name,
@@ -181,6 +191,8 @@ export function useWebSocketTrades(setAllTrades: React.Dispatch<React.SetStateAc
             return
           }
 
+          logMetadata("[metadata] websocket received message raw", event.data.slice(0, 200))
+
           let message: { type?: string; state?: string; trade?: Trade } | null = null
 
           try {
@@ -200,11 +212,13 @@ export function useWebSocketTrades(setAllTrades: React.Dispatch<React.SetStateAc
           }
 
           if (message.type === "trade" && message.trade) {
+            logMetadata("[metadata] websocket received proxied trade", message.trade.mint)
             void handleTrade(message.trade)
             return
           }
 
           if (message.type === "raw" && typeof message.payload === "string") {
+            logMetadata("[metadata] websocket decoding raw payload", message.payload.slice(0, 200))
             const decoded = decodePumpPayload(message.payload)
             if (!decoded) {
               return

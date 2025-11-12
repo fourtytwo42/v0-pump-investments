@@ -27,6 +27,18 @@ function tokenHasMetadata(token: TokenData): boolean {
   const hasTwitter = token.twitter && token.twitter.trim().length > 0
   const hasTelegram = token.telegram && token.telegram.trim().length > 0
 
+  if (process.env.NEXT_PUBLIC_LOG_METADATA === "true") {
+    console.log("[metadata] tokenHasMetadata", token.mint, {
+      hasName,
+      hasSymbol,
+      hasImage,
+      hasDescription,
+      hasWebsite,
+      hasTwitter,
+      hasTelegram,
+    })
+  }
+
   return Boolean(hasName || hasSymbol || hasImage || hasDescription || hasWebsite || hasTwitter || hasTelegram)
 }
 
@@ -265,6 +277,9 @@ export function useVisibleTokenMetadata({ paginatedTokens, setTokens, setAllTrad
           const { updated, changed: tradeChanged } = mergeMetadataIntoTrade(trade, metadata)
           if (tradeChanged) {
             changed = true
+            if (process.env.NEXT_PUBLIC_LOG_METADATA === "true") {
+              console.log("[metadata] applied metadata to trade", mint, trade.signature)
+            }
             return updated
           }
 
@@ -284,6 +299,9 @@ export function useVisibleTokenMetadata({ paginatedTokens, setTokens, setAllTrad
         }
 
         if (tokenHasMetadata(token)) {
+          if (process.env.NEXT_PUBLIC_LOG_METADATA === "true") {
+            console.log("[metadata] skipping fetch (token already has metadata)", token.mint)
+          }
           primeTokenMetadataCache(token.mint, {
             name: token.name,
             symbol: token.symbol,
@@ -303,15 +321,28 @@ export function useVisibleTokenMetadata({ paginatedTokens, setTokens, setAllTrad
           : undefined
 
         if (cached === null) {
+          if (process.env.NEXT_PUBLIC_LOG_METADATA === "true") {
+            console.log("[metadata] cached null (skip)", token.mint)
+          }
           continue
         }
 
         if (cached) {
+          if (process.env.NEXT_PUBLIC_LOG_METADATA === "true") {
+            console.log("[metadata] apply cached metadata", token.mint)
+          }
           applyMetadata(token.mint, cached)
           continue
         }
 
+        if (process.env.NEXT_PUBLIC_LOG_METADATA === "true") {
+          console.log("[metadata] fetching metadata for visible token", token.mint)
+        }
+
         const fetched = await fetchTokenMetadataWithCache(token.mint)
+        if (process.env.NEXT_PUBLIC_LOG_METADATA === "true") {
+          console.log("[metadata] fetch result", token.mint, fetched ? "value" : "null")
+        }
         if (fetched) {
           applyMetadata(token.mint, fetched)
         }
