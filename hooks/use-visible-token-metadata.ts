@@ -19,12 +19,15 @@ interface UseVisibleTokenMetadataParams {
 }
 
 function tokenHasMetadata(token: TokenData): boolean {
-  return Boolean(
-    (token.description && token.description.trim().length > 0) ||
-      (token.website && token.website.trim().length > 0) ||
-      (token.twitter && token.twitter.trim().length > 0) ||
-      (token.telegram && token.telegram.trim().length > 0),
-  )
+  const hasName = token.name && token.name.trim().length > 0 && token.name.trim() !== "Unknown"
+  const hasSymbol = token.symbol && token.symbol.trim().length > 0 && token.symbol.trim() !== "???"
+  const hasImage = token.image_uri && token.image_uri.trim().length > 0 && !token.image_uri.trim().endsWith(".json")
+  const hasDescription = token.description && token.description.trim().length > 0
+  const hasWebsite = token.website && token.website.trim().length > 0
+  const hasTwitter = token.twitter && token.twitter.trim().length > 0
+  const hasTelegram = token.telegram && token.telegram.trim().length > 0
+
+  return Boolean(hasName || hasSymbol || hasImage || hasDescription || hasWebsite || hasTwitter || hasTelegram)
 }
 
 function shouldReplaceName(current: string | undefined, incoming?: string | null): boolean {
