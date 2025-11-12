@@ -7,29 +7,25 @@ import { useEffect, useRef, useState } from "react"
 import { db, type StoredTrade } from "@/lib/db"
 import type { Trade } from "@/lib/pump-trades"
 import { convertPumpTradeToLocal, decodePumpPayload, normalizeIpfsUri } from "@/lib/pump-trades"
+import {
+  cacheTokenMetadata,
+  fetchTokenMetadataWithCache,
+  getCachedTokenMetadata,
+  hasCachedTokenMetadata,
+} from "@/lib/token-metadata-cache"
+import { normalizeTokenMetadata, type TokenMetadata } from "@/lib/token-metadata"
 
 export type { Trade }
 
 const RECONNECT_DELAY_MS = 5000
 const TRADE_RETENTION_MS = 60 * 60 * 1000
 
-type TokenMetadata = {
-  name?: string
-  symbol?: string
-  description?: string
-  image?: string
-  twitter?: string
-  telegram?: string
-  website?: string
-}
-
 export function useWebSocketTrades(setAllTrades: React.Dispatch<React.SetStateAction<Trade[]>>) {
   const [isConnected, setIsConnected] = useState<boolean>(false)
   const socketRef = useRef<WebSocket | null>(null)
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const signatureSetRef = useRef<Set<string>>(new Set())
-  const metadataCacheRef = useRef<Map<string, TokenMetadata>>(new Map())
-  const metadataFetchRef = useRef<Map<string, Promise<TokenMetadata | null>>>(new Map())
+  const metadataFetchByMintRef = useRef<Map<string, Promise<TokenMetadata | null>>>(new Map())
 
   useEffect(() => {
     let isUnmounting = false
@@ -45,128 +41,80 @@ export function useWebSocketTrades(setAllTrades: React.Dispatch<React.SetStateAc
       return `${protocol}://${host}:${port}`
     }
 
-    const fetchMetadata = async (metadataUri: string | null | undefined): Promise<TokenMetadata | null> => {
-      const normalized = normalizeIpfsUri(metadataUri)
-      if (!normalized) {
+    const fetchMetadataForMint = async (mint: string, metadataUri: string | null | undefined): Promise<TokenMetadata | null> => {
+      if (!mint) {
         return null
       }
 
-      if (metadataCacheRef.current.has(normalized)) {
-        return metadataCacheRef.current.get(normalized) ?? null
+      const cached = hasCachedTokenMetadata(mint) ? getCachedTokenMetadata(mint) ?? null : undefined
+      if (cached !== undefined) {
+        return cached
       }
 
-      if (metadataFetchRef.current.has(normalized)) {
-        return metadataFetchRef.current.get(normalized) ?? null
+      if (metadataFetchByMintRef.current.has(mint)) {
+        return metadataFetchByMintRef.current.get(mint) ?? null
       }
 
-      const controller = new AbortController()
-      const fetchPromise = (async () => {
+      const request = (async () => {
         try {
-          const response = await fetch(normalized, {
-            signal: controller.signal,
-            cache: "force-cache",
-            headers: { Accept: "application/json" },
-          })
+          const fromPump = await fetchTokenMetadataWithCache(mint)
+          if (fromPump) {
+            return fromPump
+          }
 
-          if (!response.ok) {
-            console.error("[v0] Metadata request failed:", normalized, response.status)
+          const normalizedUri = normalizeIpfsUri(metadataUri) ?? metadataUri
+          if (!normalizedUri) {
+            cacheTokenMetadata(mint, null)
             return null
           }
 
-          const data = (await response.json()) as Record<string, unknown>
-          const dataRecord = data as Record<string, unknown>
-          const rawExtensions =
-            (typeof data === "object" && data !== null
-              ? (dataRecord.extensions as Record<string, unknown> | undefined) ??
-                (dataRecord.extension as Record<string, unknown> | undefined) ??
-                (dataRecord.links as Record<string, unknown> | undefined) ??
-                (dataRecord.socials as Record<string, unknown> | undefined)
-              : undefined) || undefined
+          try {
+            const response = await fetch(normalizedUri, {
+              cache: "force-cache",
+              headers: { Accept: "application/json" },
+            })
 
-          const getDataString = (key: string): string | undefined => {
-            const value = dataRecord[key]
-            return typeof value === "string" && value.trim().length > 0 ? value.trim() : undefined
-          }
-
-          const getExtensionString = (key: string): string | undefined => {
-            if (!rawExtensions) return undefined
-            const value = rawExtensions[key]
-            return typeof value === "string" && value.trim().length > 0 ? value.trim() : undefined
-          }
-
-          const pickString = (...values: (string | undefined)[]): string | undefined => {
-            for (const value of values) {
-              if (typeof value === "string" && value.trim().length > 0) {
-                return value.trim()
-              }
+            if (!response.ok) {
+              throw new Error(`Metadata URI responded with status ${response.status}`)
             }
-            return undefined
-          }
 
-          const imageSource = pickString(
-            getDataString("image"),
-            getDataString("image_uri"),
-            getDataString("imageUrl"),
-            getDataString("imageUri"),
-            getExtensionString("image"),
-            getExtensionString("image_uri"),
-            getExtensionString("imageUrl"),
-            getExtensionString("imageUri"),
-          )
+            const raw = (await response.json()) as unknown
+            const metadata = normalizeTokenMetadata(raw)
 
-          const metadata: TokenMetadata = {
-            name: pickString(getDataString("name"), getDataString("title"), getExtensionString("name"), getExtensionString("title")),
-            symbol: pickString(getDataString("symbol"), getExtensionString("symbol")),
-            description: pickString(
-              getDataString("description"),
-              getDataString("summary"),
-              getDataString("details"),
-              getExtensionString("description"),
-            ),
-            image: normalizeIpfsUri(imageSource) ?? imageSource,
-            twitter: pickString(getDataString("twitter"), getDataString("x"), getExtensionString("twitter"), getExtensionString("twitter_username")),
-            telegram: pickString(getDataString("telegram"), getExtensionString("telegram"), getExtensionString("telegram_username")),
-            website: pickString(
-              getDataString("website"),
-              getDataString("external_url"),
-              getDataString("externalUrl"),
-              getExtensionString("website"),
-              getExtensionString("site"),
-            ),
+            cacheTokenMetadata(mint, metadata)
+            return metadata
+          } catch (error) {
+            console.debug(`[v0] Failed to fetch metadata for ${mint} from ${normalizedUri}:`, error)
+            cacheTokenMetadata(mint, null)
+            return null
           }
-
-          metadataCacheRef.current.set(normalized, metadata)
-          return metadata
-        } catch (error) {
-          if ((error as Error).name !== "AbortError") {
-            console.error("[v0] Metadata fetch error:", error)
-          }
-          return null
         } finally {
-          metadataFetchRef.current.delete(normalized)
+          metadataFetchByMintRef.current.delete(mint)
         }
       })()
 
-      metadataFetchRef.current.set(normalized, fetchPromise)
-      const result = await fetchPromise
-      return result
+      metadataFetchByMintRef.current.set(mint, request)
+      return request
     }
 
-    const enrichTrade = async (trade: Trade): Promise<Trade> => {
-      const metadata = await fetchMetadata(trade.metadata_uri)
+    const enrichTrade = async (incomingTrade: Trade): Promise<Trade> => {
+      const metadata = await fetchMetadataForMint(incomingTrade.mint, incomingTrade.metadata_uri)
       if (!metadata) {
-        return trade
+        return incomingTrade
       }
 
       return {
-        ...trade,
-        name: metadata.name ?? trade.name,
-        symbol: metadata.symbol ?? trade.symbol,
-        description: metadata.description ?? trade.description ?? null,
-        image_uri: metadata.image ?? trade.image_uri,
-        twitter: metadata.twitter ?? trade.twitter ?? null,
-        telegram: metadata.telegram ?? trade.telegram ?? null,
-        website: metadata.website ?? trade.website ?? null,
+        ...incomingTrade,
+        name: metadata.name ?? incomingTrade.name,
+        symbol: metadata.symbol ?? incomingTrade.symbol,
+        description: metadata.description ?? incomingTrade.description ?? null,
+        image_uri: metadata.image ?? incomingTrade.image_uri,
+        twitter: metadata.twitter ?? incomingTrade.twitter ?? null,
+        telegram: metadata.telegram ?? incomingTrade.telegram ?? null,
+        website: metadata.website ?? incomingTrade.website ?? null,
+        created_timestamp: incomingTrade.created_timestamp ?? metadata.createdTimestamp ?? undefined,
+        king_of_the_hill_timestamp:
+          incomingTrade.king_of_the_hill_timestamp ?? metadata.kingOfTheHillTimestamp ?? null,
       }
     }
 
