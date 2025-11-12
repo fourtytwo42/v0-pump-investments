@@ -2,14 +2,11 @@ import { isMetadataEmpty, normalizeTokenMetadata, type TokenMetadata } from "./t
 
 const metadataCache = new Map<string, TokenMetadata | null>()
 const inflightRequests = new Map<string, Promise<TokenMetadata | null>>()
+const lastAttemptTimestamps = new Map<string, number>()
 
-const METADATA_ENDPOINTS: ((mint: string) => string)[] = [
-  (mint) => `https://frontend-api.pump.fun/coins/${mint}`,
-  (mint) => `https://frontend-api.pump.fun/coins/metadata/${mint}`,
-  (mint) => `https://pump.fun/coin-metadata/${mint}`,
-]
-
+const METADATA_ENDPOINT = (mint: string) => `https://frontend-api.pump.fun/coins/${mint}`
 const REQUEST_TIMEOUT_MS = 12_000
+const RETRY_COOLDOWN_MS = 60_000
 
 function normalizeAndCache(mint: string, raw: unknown): TokenMetadata | null {
   if (!raw || typeof raw !== "object") {
@@ -70,40 +67,37 @@ export async function fetchTokenMetadataWithCache(mint: string): Promise<TokenMe
     return inflightRequests.get(mint) ?? null
   }
 
+  const lastAttempt = lastAttemptTimestamps.get(mint) ?? 0
+  if (Date.now() - lastAttempt < RETRY_COOLDOWN_MS) {
+    return null
+  }
+
   const request = (async () => {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
+
     try {
-      for (const endpointFactory of METADATA_ENDPOINTS) {
-        const controller = new AbortController()
-        const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
-        const url = endpointFactory(mint)
+      const response = await fetch(METADATA_ENDPOINT(mint), {
+        cache: "no-store",
+        signal: controller.signal,
+      })
 
-        try {
-          const response = await fetch(url, {
-            cache: "no-store",
-            signal: controller.signal,
-          })
-
-          if (!response.ok) {
-            continue
-          }
-
-          const raw = await response.json().catch(() => null)
-          const metadata = normalizeAndCache(mint, raw)
-          if (metadata) {
-            return metadata
-          }
-        } catch (error) {
-          if ((error as Error).name !== "AbortError") {
-            console.debug(`[v0] Metadata fetch failed for ${mint} via ${url}:`, error)
-          }
-        } finally {
-          clearTimeout(timeout)
-        }
+      if (!response.ok) {
+        metadataCache.set(mint, null)
+        return null
       }
 
+      const raw = await response.json().catch(() => null)
+      return normalizeAndCache(mint, raw)
+    } catch (error) {
+      if ((error as Error).name !== "AbortError") {
+        console.debug(`[v0] Metadata fetch failed for ${mint}:`, error)
+      }
       metadataCache.set(mint, null)
       return null
     } finally {
+      clearTimeout(timeout)
+      lastAttemptTimestamps.set(mint, Date.now())
       inflightRequests.delete(mint)
     }
   })()
@@ -115,4 +109,5 @@ export async function fetchTokenMetadataWithCache(mint: string): Promise<TokenMe
 export function clearTokenMetadataCache(): void {
   metadataCache.clear()
   inflightRequests.clear()
+  lastAttemptTimestamps.clear()
 }
