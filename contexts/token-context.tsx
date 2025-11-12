@@ -131,6 +131,18 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
+  useEffect(() => {
+    if (allTrades.length > 0) {
+      setIsLoading(false)
+    }
+  }, [allTrades])
+
+  useEffect(() => {
+    if (tokens.size > 0) {
+      setIsLoading(false)
+    }
+  }, [tokens])
+
   // Initialize data
   useEffect(() => {
     const initializeData = async () => {
