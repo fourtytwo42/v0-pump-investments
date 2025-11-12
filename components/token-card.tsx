@@ -56,7 +56,8 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
   const solPriceUsd = solPrice ?? 0
   const isGraduated = token.is_completed === true || token.is_bonding_curve === false
   const rawProgress = solPriceUsd > 0 ? (token.usd_market_cap / (solPriceUsd * BONDING_TARGET_SOL)) * 100 : 0
-  const progressPercent = isGraduated ? 100 : Math.min(Math.max(rawProgress, 0), 100)
+  const cappedProgress = Math.min(Math.max(rawProgress, 0), isGraduated ? 100 : 99)
+  const progressPercent = isGraduated ? 100 : cappedProgress
   const showBondingProgress =
     Number.isFinite(progressPercent) && progressPercent >= 0 && (token.is_bonding_curve !== null || !isGraduated)
 

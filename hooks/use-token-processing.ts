@@ -183,6 +183,11 @@ export function useTokenProcessing({
           const uniqueTraders = Array.from(uniqueTradersMap.get(mint) || new Set<string>())
           const uniqueTraderCount = uniqueTraders.length
 
+          const hasGraduatedTrade = trades.some(
+            (trade) => trade.is_bonding_curve === false || trade.is_completed === true,
+          )
+          const hasBondingTrade = trades.some((trade) => trade.is_bonding_curve === true)
+
           const createdTimestamp = (() => {
             if (latestTrade.created_timestamp) {
               return latestTrade.created_timestamp
@@ -194,27 +199,19 @@ export function useTokenProcessing({
             return Number.isFinite(earliest) ? earliest : undefined
           })()
 
-          const isCompleted = (() => {
-            if (latestTrade.is_completed !== undefined) {
-              return latestTrade.is_completed
-            }
-            if (latestTrade.is_bonding_curve === false) {
-              return true
-            }
-            const hasGraduatedTrade = trades.some((trade) => trade.is_completed === true || trade.is_bonding_curve === false)
-            return hasGraduatedTrade ? true : undefined
-          })()
+          const isCompleted = hasGraduatedTrade
+            ? true
+            : latestTrade.is_completed !== undefined
+              ? latestTrade.is_completed
+              : undefined
 
-          const isBondingCurve = (() => {
-            if (latestTrade.is_bonding_curve !== undefined && latestTrade.is_bonding_curve !== null) {
-              return latestTrade.is_bonding_curve
-            }
-            if (isCompleted === true) {
-              return false
-            }
-            const hasOnlyBondingTrades = trades.every((trade) => trade.is_bonding_curve !== false)
-            return hasOnlyBondingTrades ? true : null
-          })()
+          const isBondingCurve = hasGraduatedTrade
+            ? false
+            : latestTrade.is_bonding_curve !== undefined && latestTrade.is_bonding_curve !== null
+              ? latestTrade.is_bonding_curve
+              : hasBondingTrade
+                ? true
+                : null
 
           tokenMap.set(mint, {
             mint: latestTrade.mint,

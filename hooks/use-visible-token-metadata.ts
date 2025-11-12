@@ -134,14 +134,20 @@ function mergeMetadataIntoToken(token: TokenData, metadata: TokenMetadata): { up
   }
 
   if (typeof metadata.complete === "boolean" && updated.is_completed !== metadata.complete) {
-    updated.is_completed = metadata.complete
-    changed = true
+    if (metadata.complete === true || updated.is_completed === undefined) {
+      updated.is_completed = metadata.complete
+      changed = true
+    }
   }
 
   if (typeof metadata.complete === "boolean") {
-    const bondingState = metadata.complete ? false : updated.is_bonding_curve
-    if (bondingState !== updated.is_bonding_curve) {
-      updated.is_bonding_curve = bondingState ?? null
+    if (metadata.complete === true) {
+      if (updated.is_bonding_curve !== false) {
+        updated.is_bonding_curve = false
+        changed = true
+      }
+    } else if (updated.is_bonding_curve === undefined || updated.is_bonding_curve === null) {
+      updated.is_bonding_curve = true
       changed = true
     }
   }
@@ -215,14 +221,20 @@ function mergeMetadataIntoTrade(trade: Trade, metadata: TokenMetadata): { update
   }
 
   if (typeof metadata.complete === "boolean" && updated.is_completed !== metadata.complete) {
-    updated.is_completed = metadata.complete
-    changed = true
+    if (metadata.complete === true || updated.is_completed === undefined) {
+      updated.is_completed = metadata.complete
+      changed = true
+    }
   }
 
   if (typeof metadata.complete === "boolean") {
-    const bondingState = metadata.complete ? false : updated.is_bonding_curve
-    if (bondingState !== updated.is_bonding_curve) {
-      updated.is_bonding_curve = bondingState ?? null
+    if (metadata.complete === true) {
+      if (updated.is_bonding_curve !== false) {
+        updated.is_bonding_curve = false
+        changed = true
+      }
+    } else if (updated.is_bonding_curve === undefined || updated.is_bonding_curve === null) {
+      updated.is_bonding_curve = true
       changed = true
     }
   }
@@ -286,9 +298,13 @@ async function persistMetadataToDatabase(mint: string, metadata: TokenMetadata) 
       }
 
       if (typeof metadata.complete === "boolean") {
-        stored.is_completed = metadata.complete
+        if (metadata.complete === true || stored.is_completed === undefined) {
+          stored.is_completed = metadata.complete
+        }
         if (metadata.complete === true) {
           stored.is_bonding_curve = false
+        } else if (stored.is_bonding_curve === undefined || stored.is_bonding_curve === null) {
+          stored.is_bonding_curve = true
         }
       }
 
