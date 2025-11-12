@@ -115,9 +115,10 @@ function decodePumpPayload(rawPayload: string): PumpUnifiedTrade | null {
 
 function convertPumpTradeToLocal(pumpTrade: PumpUnifiedTrade): Trade {
   const timestampMs = typeof pumpTrade.timestamp === "string" ? new Date(pumpTrade.timestamp).getTime() : Date.now()
+  const mintAddress = (pumpTrade.mintAddress || "").trim()
 
   return {
-    mint: pumpTrade.mintAddress,
+    mint: mintAddress,
     name: pumpTrade.coinMeta?.name || "Unknown",
     symbol: pumpTrade.coinMeta?.symbol || "???",
     image_uri: pumpTrade.coinMeta?.uri || "",
@@ -312,6 +313,12 @@ export function useWebSocketTrades(setAllTrades: React.Dispatch<React.SetStateAc
         const filteredTrades = prevTrades.filter(
           (trade) => (trade.received_time || trade.timestamp * 1000) >= oneHourAgo,
         )
+
+        // Skip duplicates based on signature to ensure grouping by mint stays accurate
+        if (filteredTrades.some((trade) => trade.signature === newTrade.signature)) {
+          return filteredTrades
+        }
+
         return [...filteredTrades, newTrade]
       })
     }

@@ -80,7 +80,7 @@ export default function Header() {
             </span>
           </div>
           <Badge variant="outline" className="ml-1 hidden md:flex">
-            v3.0.26
+            v3.0.27
           </Badge>
         </div>
         <div className="flex items-center gap-2 md:gap-4">

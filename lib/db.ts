@@ -31,6 +31,7 @@ export interface StoredTrade {
   website?: string | null
   twitter?: string | null
   telegram?: string | null
+  description?: string | null
   king_of_the_hill_timestamp?: number | null
 }
 
