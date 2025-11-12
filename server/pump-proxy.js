@@ -331,6 +331,94 @@ function getMetadataFetchState(mint) {
   return initial
 }
 
+function mergeTradeWithMetadata(trade, metadataPayload) {
+  if (!metadataPayload || typeof metadataPayload !== "object") {
+    return trade
+  }
+
+  let updated = { ...trade }
+  let changed = false
+
+  const metadata = metadataPayload.metadata && typeof metadataPayload.metadata === "object" ? metadataPayload.metadata : null
+  const coin = metadataPayload.coin && typeof metadataPayload.coin === "object" ? metadataPayload.coin : null
+
+  const name = metadata?.name ?? coin?.name
+  if (typeof name === "string" && name.trim().length > 0 && name !== trade.name) {
+    updated.name = name
+    changed = true
+  }
+
+  const symbol = metadata?.symbol ?? coin?.symbol
+  if (typeof symbol === "string" && symbol.trim().length > 0 && symbol !== trade.symbol) {
+    updated.symbol = symbol
+    changed = true
+  }
+
+  const image = metadata?.image ?? coin?.image ?? metadata?.image_uri ?? coin?.image_uri
+  if (typeof image === "string" && image.trim().length > 0 && image !== trade.image_uri) {
+    updated.image_uri = image
+    changed = true
+  }
+
+  const description = metadata?.description ?? coin?.description
+  if (typeof description === "string" && description.trim().length > 0 && description !== trade.description) {
+    updated.description = description
+    changed = true
+  }
+
+  const website = metadata?.website ?? coin?.website
+  if (typeof website === "string" && website.trim().length > 0 && website !== trade.website) {
+    updated.website = website
+    changed = true
+  }
+
+  const twitter = metadata?.twitter ?? coin?.twitter
+  if (typeof twitter === "string" && twitter.trim().length > 0 && twitter !== trade.twitter) {
+    updated.twitter = twitter
+    changed = true
+  }
+
+  const telegram = metadata?.telegram ?? coin?.telegram
+  if (typeof telegram === "string" && telegram.trim().length > 0 && telegram !== trade.telegram) {
+    updated.telegram = telegram
+    changed = true
+  }
+
+  const createdTs = normalizeEpochMillis(
+    metadata?.createdTimestamp ??
+      metadata?.created_ts ??
+      metadata?.created_at ??
+      coin?.createdTimestamp ??
+      coin?.created_timestamp ??
+      coin?.createdTs ??
+      coin?.created_at ??
+      null,
+  )
+  if (createdTs && createdTs !== trade.created_timestamp) {
+    updated.created_timestamp = createdTs
+    changed = true
+  }
+
+  const kingTs = normalizeEpochMillis(
+    metadata?.kingOfTheHillTimestamp ??
+      metadata?.king_of_the_hill_timestamp ??
+      coin?.kingOfTheHillTimestamp ??
+      coin?.king_of_the_hill_timestamp ??
+      null,
+  )
+  if (typeof kingTs === "number" && kingTs !== trade.king_of_the_hill_timestamp) {
+    updated.king_of_the_hill_timestamp = kingTs
+    changed = true
+  }
+
+  if (metadataPayload.metadata_uri && metadataPayload.metadata_uri !== trade.metadata_uri) {
+    updated.metadata_uri = metadataPayload.metadata_uri
+    changed = true
+  }
+
+  return changed ? updated : trade
+}
+
 function clearMetadataFetchTimer(mint) {
   const state = metadataFetchState.get(mint)
   if (state?.timer) {
@@ -381,7 +469,8 @@ function flushTradeBuffer(mint) {
     tradeBuffers.delete(mint)
 
     for (const trade of tradesToSend) {
-      broadcast({ type: "trade", trade })
+      const enriched = mergeTradeWithMetadata(trade, payload)
+      broadcast({ type: "trade", trade: enriched })
     }
   }
 
@@ -397,7 +486,9 @@ function queueTradeForMint(trade, metadataUriHint) {
   rememberMetadataUriHint(mint, metadataUriHint)
 
   if (flushTradeBuffer(mint)) {
-    broadcast({ type: "trade", trade })
+    const payload = getCachedMetadataPayload(mint)
+    const enriched = mergeTradeWithMetadata(trade, payload)
+    broadcast({ type: "trade", trade: enriched })
     return
   }
 
@@ -437,6 +528,12 @@ function performMetadataFetch(mint) {
     if (result && result.success && metadataPayloadHasDetails(result.payload)) {
       storeMetadataInCache(mint, result.payload, { ttlMs: null, persist: true, fetchedAt: Date.now() })
       metadataFetchState.set(mint, { attempts: 0, timer: null })
+      const buffer = tradeBuffers.get(mint)
+      if (buffer && buffer.length > 0) {
+        for (let i = 0; i < buffer.length; i += 1) {
+          buffer[i] = mergeTradeWithMetadata(buffer[i], result.payload)
+        }
+      }
       broadcastMetadata(result.payload, { force: true })
       flushTradeBuffer(mint)
       return result.payload
