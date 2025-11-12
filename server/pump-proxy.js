@@ -1,4 +1,6 @@
 const WebSocket = require("ws")
+const fs = require("fs")
+const path = require("path")
 
 const NATS_URL = "wss://unified-prod.nats.realtime.pump.fun/"
 const NATS_HEADERS = {
@@ -23,6 +25,10 @@ const SUBJECTS = ["unifiedTradeEvent.processed", "unifiedTradeEvent.processed.*"
 const PROXY_PORT = Number(process.env.PUMP_PROXY_PORT || 4000)
 const RECONNECT_DELAY_MS = 2_000
 
+const DATA_DIRECTORY = process.env.PUMP_PROXY_DATA_DIR || path.join(__dirname, "data")
+const MINT_REGISTRY_PATH = path.join(DATA_DIRECTORY, "mint-registry.json")
+const REGISTRY_WRITE_DEBOUNCE_MS = 2_000
+
 const PUMP_FRONTEND_ENDPOINT = "https://frontend-api-v3.pump.fun/coins/"
 const PUMP_REQUEST_HEADERS = {
   accept: "application/json, text/plain, */*",
@@ -32,9 +38,12 @@ const PUMP_REQUEST_HEADERS = {
 }
 const METADATA_HEADERS = { Accept: "application/json" }
 const METADATA_CACHE_TTL_MS = Number(process.env.PUMP_PROXY_METADATA_TTL_MS || 15 * 60 * 1000)
+const METADATA_REBROADCAST_INTERVAL_MS = Number(process.env.PUMP_PROXY_METADATA_REBROADCAST_MS || 60 * 1000)
 
 const metadataCache = new Map()
 const metadataInflight = new Map()
+let registryWriteTimer = null
+const metadataBroadcastTimestamps = new Map()
 
 const fetchImpl = typeof fetch === "function" ? fetch : (...args) => import("node-fetch").then(({ default: fn }) => fn(...args))
 
@@ -74,6 +83,19 @@ function normalizeIpfsUri(uri) {
   return trimmed
 }
 
+function normalizeEpochMillis(value) {
+  if (value == null) {
+    return undefined
+  }
+
+  const numeric = Number(value)
+  if (!Number.isFinite(numeric) || numeric <= 0) {
+    return undefined
+  }
+
+  return numeric > 1_000_000_000_000 ? Math.round(numeric) : Math.round(numeric * 1000)
+}
+
 function sanitizeCoinDetails(coin) {
   if (!coin || typeof coin !== "object") {
     return null
@@ -82,15 +104,22 @@ function sanitizeCoinDetails(coin) {
   const imageCandidate = coin.image_uri || coin.imageUri || coin.image
   const imageUri = normalizeIpfsUri(imageCandidate)
 
-  const createdTs =
+  const createdTs = normalizeEpochMillis(
     coin.created_timestamp ??
-    coin.createdTimestamp ??
-    (typeof coin.created_at === "number" ? coin.created_at : undefined)
+      coin.createdTimestamp ??
+      coin.created_at ??
+      coin.createdTs ??
+      coin.created ??
+      null,
+  )
 
-  const kingTs =
+  const kingTs = normalizeEpochMillis(
     coin.king_of_the_hill_timestamp ??
-    coin.kingOfTheHillTimestamp ??
-    (typeof coin.koth_ts === "number" ? coin.koth_ts : undefined)
+      coin.kingOfTheHillTimestamp ??
+      coin.koth_ts ??
+      coin.kothTs ??
+      null,
+  )
 
   return {
     name: coin.name ?? null,
@@ -108,8 +137,29 @@ function sanitizeCoinDetails(coin) {
   }
 }
 
-function storeMetadataInCache(mint, payload, ttlMs = METADATA_CACHE_TTL_MS) {
-  metadataCache.set(mint, { payload, expiresAt: Date.now() + ttlMs })
+function storeMetadataInCache(mint, payload, options = {}) {
+  const { ttlMs = METADATA_CACHE_TTL_MS, persist = false, fetchedAt = Date.now() } = options
+
+  const previous = metadataCache.get(mint)
+  const hasUsefulData = Boolean(
+    payload &&
+      typeof payload === "object" &&
+      ((payload.metadata && Object.keys(payload.metadata).length > 0) ||
+        (payload.coin && Object.keys(payload.coin).length > 0)),
+  )
+
+  if (previous?.persistent && previous.payload && !hasUsefulData) {
+    return previous.payload
+  }
+
+  const persistent = persist || Boolean(previous?.persistent)
+  const expiresAt = persistent ? null : ttlMs == null ? null : Date.now() + ttlMs
+
+  metadataCache.set(mint, { payload, expiresAt, fetchedAt, persistent })
+
+  if (persistent) {
+    schedulePersistMintRegistry()
+  }
 }
 
 function getCachedMetadataPayload(mint) {
@@ -118,7 +168,7 @@ function getCachedMetadataPayload(mint) {
     return null
   }
 
-  if (cached.expiresAt <= Date.now()) {
+  if (cached.expiresAt !== null && cached.expiresAt <= Date.now()) {
     metadataCache.delete(mint)
     return null
   }
@@ -129,13 +179,120 @@ function getCachedMetadataPayload(mint) {
 function getAllCachedMetadataPayloads() {
   const payloads = []
   for (const [mint, entry] of metadataCache.entries()) {
-    if (!entry || entry.expiresAt <= Date.now()) {
+    if (!entry) {
+      metadataCache.delete(mint)
+      continue
+    }
+
+    if (entry.expiresAt !== null && entry.expiresAt <= Date.now()) {
       metadataCache.delete(mint)
       continue
     }
     payloads.push(entry.payload)
   }
   return payloads
+}
+
+function ensureDataDirectory() {
+  try {
+    if (!fs.existsSync(DATA_DIRECTORY)) {
+      fs.mkdirSync(DATA_DIRECTORY, { recursive: true })
+    }
+  } catch (error) {
+    console.error("[proxy] Failed to ensure data directory:", error)
+  }
+}
+
+function persistMintRegistryNow() {
+  try {
+    ensureDataDirectory()
+    const entries = []
+    for (const [mint, entry] of metadataCache.entries()) {
+      if (!entry || !entry.payload || !entry.persistent) {
+        continue
+      }
+
+      entries.push({
+        mint,
+        fetchedAt: entry.fetchedAt ?? Date.now(),
+        payload: entry.payload,
+      })
+    }
+
+    const registry = {
+      version: 1,
+      updatedAt: Date.now(),
+      mints: entries,
+    }
+
+    fs.writeFileSync(MINT_REGISTRY_PATH, JSON.stringify(registry, null, 2), "utf8")
+  } catch (error) {
+    console.error("[proxy] Failed to persist mint registry:", error)
+  }
+}
+
+function schedulePersistMintRegistry() {
+  if (registryWriteTimer) {
+    clearTimeout(registryWriteTimer)
+  }
+
+  registryWriteTimer = setTimeout(() => {
+    registryWriteTimer = null
+    persistMintRegistryNow()
+  }, REGISTRY_WRITE_DEBOUNCE_MS)
+}
+
+function loadMintRegistry() {
+  try {
+    ensureDataDirectory()
+    if (!fs.existsSync(MINT_REGISTRY_PATH)) {
+      return
+    }
+
+    const raw = fs.readFileSync(MINT_REGISTRY_PATH, "utf8")
+    if (!raw) {
+      return
+    }
+
+    const parsed = JSON.parse(raw)
+    if (!parsed || !Array.isArray(parsed.mints)) {
+      return
+    }
+
+    for (const entry of parsed.mints) {
+      if (!entry || typeof entry.mint !== "string" || !entry.payload) {
+        continue
+      }
+
+      storeMetadataInCache(entry.mint, entry.payload, {
+        ttlMs: null,
+        persist: false,
+        fetchedAt: entry.fetchedAt ?? Date.now(),
+      })
+      metadataBroadcastTimestamps.set(entry.mint, 0)
+    }
+
+    console.log(`[proxy] Loaded ${parsed.mints.length} cached mint metadata entries`)
+  } catch (error) {
+    console.error("[proxy] Failed to load mint registry:", error)
+  }
+}
+
+function broadcastMetadata(payload, options = {}) {
+  if (!payload || typeof payload.mint !== "string") {
+    return
+  }
+
+  const { force = false } = options
+  const mint = payload.mint
+  const lastBroadcast = metadataBroadcastTimestamps.get(mint) ?? 0
+
+  if (!force && Date.now() - lastBroadcast < METADATA_REBROADCAST_INTERVAL_MS) {
+    return
+  }
+
+  metadataBroadcastTimestamps.set(mint, Date.now())
+  broadcast(payload)
 }
 
 async function fetchJsonWithHeaders(url, defaultHeaders = {}, init = {}) {
@@ -198,7 +355,11 @@ async function fetchMetadataPayload(mint, metadataUriHint) {
   }
 
   const success = Boolean(metadataDocument || payload.coin)
-  storeMetadataInCache(mint, payload, success ? METADATA_CACHE_TTL_MS : 60_000)
+  storeMetadataInCache(mint, payload, {
+    ttlMs: success ? null : 60_000,
+    persist: success,
+    fetchedAt: Date.now(),
+  })
   return payload
 }
 
@@ -209,6 +370,7 @@ async function maybeFetchAndBroadcastMetadata(mint, metadataUriHint) {
 
   const cached = getCachedMetadataPayload(mint)
   if (cached) {
+    broadcastMetadata(cached)
     return cached
   }
 
@@ -219,7 +381,7 @@ async function maybeFetchAndBroadcastMetadata(mint, metadataUriHint) {
   const promise = fetchMetadataPayload(mint, metadataUriHint)
     .then((payload) => {
       if (payload) {
-        broadcast(payload)
+        broadcastMetadata(payload, { force: true })
       }
       return payload
     })
@@ -232,8 +394,8 @@ async function maybeFetchAndBroadcastMetadata(mint, metadataUriHint) {
         metadata: null,
         coin: null,
       }
-      storeMetadataInCache(mint, fallback, 60_000)
-      broadcast(fallback)
+      storeMetadataInCache(mint, fallback, { ttlMs: 60_000, persist: false, fetchedAt: Date.now() })
+      broadcastMetadata(fallback, { force: true })
       return fallback
     })
     .finally(() => {
@@ -289,6 +451,7 @@ function convertPumpTradeToLocal(pumpTrade) {
     typeof pumpTrade.timestamp === "string" ? new Date(pumpTrade.timestamp).getTime() : Date.now()
 
   const metadataUri = normalizeIpfsUri(pumpTrade.coinMeta?.uri)
+  const createdTimestamp = normalizeEpochMillis(pumpTrade.coinMeta?.createdTs ?? pumpTrade.coinMeta?.created_ts)
 
   return {
     mint: (pumpTrade.mintAddress || "").trim(),
@@ -309,7 +472,7 @@ function convertPumpTradeToLocal(pumpTrade) {
     virtual_sol_reserves: 0,
     virtual_token_reserves: 0,
     signature: pumpTrade.tx || "",
-    created_timestamp: pumpTrade.coinMeta?.createdTs,
+    created_timestamp: createdTimestamp ?? null,
     metadata_uri: metadataUri,
     website: null,
     twitter: null,
@@ -536,4 +699,17 @@ server.on("error", (error) => {
   console.error("[proxy] Server error:", error)
 })
 
+loadMintRegistry()
 ensureUpstream()
+
+function handleShutdown() {
+  persistMintRegistryNow()
+  process.exit(0)
+}
+
+process.on("beforeExit", () => {
+  persistMintRegistryNow()
+})
+
+process.on("SIGINT", handleShutdown)
+process.on("SIGTERM", handleShutdown)
