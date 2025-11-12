@@ -39,11 +39,17 @@ const PUMP_REQUEST_HEADERS = {
 const METADATA_HEADERS = { Accept: "application/json" }
 const METADATA_CACHE_TTL_MS = Number(process.env.PUMP_PROXY_METADATA_TTL_MS || 15 * 60 * 1000)
 const METADATA_REBROADCAST_INTERVAL_MS = Number(process.env.PUMP_PROXY_METADATA_REBROADCAST_MS || 60 * 1000)
+const METADATA_RETRY_BASE_DELAY_MS = Number(process.env.PUMP_PROXY_METADATA_RETRY_BASE_MS || 1_000)
+const METADATA_RETRY_MAX_DELAY_MS = Number(process.env.PUMP_PROXY_METADATA_RETRY_MAX_MS || 60_000)
+const METADATA_MAX_BUFFERED_TRADES = Number(process.env.PUMP_PROXY_MAX_BUFFERED_TRADES || 500)
 
 const metadataCache = new Map()
 const metadataInflight = new Map()
 let registryWriteTimer = null
 const metadataBroadcastTimestamps = new Map()
+const metadataFetchState = new Map()
+const metadataUriHints = new Map()
+const tradeBuffers = new Map()
 
 const fetchImpl = typeof fetch === "function" ? fetch : (...args) => import("node-fetch").then(({ default: fn }) => fn(...args))
 
@@ -96,6 +102,30 @@ function normalizeEpochMillis(value) {
   return numeric > 1_000_000_000_000 ? Math.round(numeric) : Math.round(numeric * 1000)
 }
 
+function metadataPayloadHasDetails(payload) {
+  if (!payload || typeof payload !== "object") {
+    return false
+  }
+
+  const metadata = payload.metadata
+  if (metadata && typeof metadata === "object" && Object.keys(metadata).length > 0) {
+    return true
+  }
+
+  const coin = payload.coin
+  if (!coin || typeof coin !== "object") {
+    return false
+  }
+
+  return Boolean(
+    (typeof coin.name === "string" && coin.name.trim().length > 0 && coin.name !== "Unknown") ||
+      (typeof coin.symbol === "string" && coin.symbol.trim().length > 0 && coin.symbol !== "???") ||
+      (typeof coin.image === "string" && coin.image.trim().length > 0) ||
+      (typeof coin.description === "string" && coin.description.trim().length > 0) ||
+      normalizeEpochMillis(coin.created_timestamp ?? coin.createdTimestamp ?? null),
+  )
+}
+
 function sanitizeCoinDetails(coin) {
   if (!coin || typeof coin !== "object") {
     return null
@@ -141,12 +171,7 @@ function storeMetadataInCache(mint, payload, options = {}) {
   const { ttlMs = METADATA_CACHE_TTL_MS, persist = false, fetchedAt = Date.now() } = options
 
   const previous = metadataCache.get(mint)
-  const hasUsefulData = Boolean(
-    payload &&
-      typeof payload === "object" &&
-      ((payload.metadata && Object.keys(payload.metadata).length > 0) ||
-        (payload.coin && Object.keys(payload.coin).length > 0)),
-  )
+  const hasUsefulData = metadataPayloadHasDetails(payload)
 
   if (previous?.persistent && previous.payload && !hasUsefulData) {
     return previous.payload
@@ -266,7 +291,7 @@ function loadMintRegistry() {
 
       storeMetadataInCache(entry.mint, entry.payload, {
         ttlMs: null,
-        persist: false,
+        persist: true,
         fetchedAt: entry.fetchedAt ?? Date.now(),
       })
       metadataBroadcastTimestamps.set(entry.mint, 0)
@@ -293,6 +318,146 @@ function broadcastMetadata(payload, options = {}) {
 
   metadataBroadcastTimestamps.set(mint, Date.now())
   broadcast(payload)
+}
+
+function getMetadataFetchState(mint) {
+  const state = metadataFetchState.get(mint)
+  if (state) {
+    return state
+  }
+
+  const initial = { attempts: 0, timer: null }
+  metadataFetchState.set(mint, initial)
+  return initial
+}
+
+function clearMetadataFetchTimer(mint) {
+  const state = metadataFetchState.get(mint)
+  if (state?.timer) {
+    clearTimeout(state.timer)
+    state.timer = null
+  }
+}
+
+function scheduleMetadataFetch(mint) {
+  const state = getMetadataFetchState(mint)
+  if (state.timer) {
+    return
+  }
+
+  const delay = state.attempts === 0 ? 0 : Math.min(
+    METADATA_RETRY_BASE_DELAY_MS * Math.pow(2, Math.max(0, state.attempts - 1)),
+    METADATA_RETRY_MAX_DELAY_MS,
+  )
+
+  state.timer = setTimeout(() => {
+    state.timer = null
+    performMetadataFetch(mint)
+  }, delay)
+
+  metadataFetchState.set(mint, state)
+}
+
+function rememberMetadataUriHint(mint, metadataUriHint) {
+  const normalized = normalizeIpfsUri(metadataUriHint)
+  if (normalized) {
+    metadataUriHints.set(mint, normalized)
+  }
+}
+
+function flushTradeBuffer(mint) {
+  const payload = getCachedMetadataPayload(mint)
+  if (!metadataPayloadHasDetails(payload)) {
+    return false
+  }
+
+  const buffer = tradeBuffers.get(mint)
+  const hadBufferedTrades = Boolean(buffer && buffer.length > 0)
+
+  broadcastMetadata(payload, { force: hadBufferedTrades })
+
+  if (hadBufferedTrades) {
+    const tradesToSend = buffer.splice(0, buffer.length)
+    tradeBuffers.delete(mint)
+
+    for (const trade of tradesToSend) {
+      broadcast({ type: "trade", trade })
+    }
+  }
+
+  return true
+}
+
+function queueTradeForMint(trade, metadataUriHint) {
+  const mint = trade.mint
+  if (!mint) {
+    return
+  }
+
+  rememberMetadataUriHint(mint, metadataUriHint)
+
+  if (flushTradeBuffer(mint)) {
+    broadcast({ type: "trade", trade })
+    return
+  }
+
+  if (!tradeBuffers.has(mint)) {
+    tradeBuffers.set(mint, [])
+  }
+
+  const buffer = tradeBuffers.get(mint)
+  if (buffer.length >= METADATA_MAX_BUFFERED_TRADES) {
+    buffer.shift()
+  }
+  buffer.push(trade)
+
+  scheduleMetadataFetch(mint)
+}
+
+function performMetadataFetch(mint) {
+  if (!mint) {
+    return
+  }
+
+  if (metadataInflight.has(mint)) {
+    return metadataInflight.get(mint)
+  }
+
+  clearMetadataFetchTimer(mint)
+
+  const state = getMetadataFetchState(mint)
+  state.attempts += 1
+  metadataFetchState.set(mint, state)
+
+  const metadataUriHint = metadataUriHints.get(mint) ?? null
+
+  const inflight = (async () => {
+    const result = await fetchMetadataPayload(mint, metadataUriHint)
+
+    if (result && result.success && metadataPayloadHasDetails(result.payload)) {
+      storeMetadataInCache(mint, result.payload, { ttlMs: null, persist: true, fetchedAt: Date.now() })
+      metadataFetchState.set(mint, { attempts: 0, timer: null })
+      broadcastMetadata(result.payload, { force: true })
+      flushTradeBuffer(mint)
+      return result.payload
+    }
+
+    if (result?.payload) {
+      storeMetadataInCache(mint, result.payload, { ttlMs: METADATA_CACHE_TTL_MS, persist: false, fetchedAt: Date.now() })
+    }
+
+    scheduleMetadataFetch(mint)
+    return result?.payload ?? null
+  })().catch((error) => {
+    console.error(`[proxy] Metadata fetch error for mint ${mint}:`, error)
+    scheduleMetadataFetch(mint)
+    return null
+  }).finally(() => {
+    metadataInflight.delete(mint)
+  })
+
+  metadataInflight.set(mint, inflight)
+  return inflight
 }
 
 async function fetchJsonWithHeaders(url, defaultHeaders = {}, init = {}) {
@@ -354,56 +519,8 @@ async function fetchMetadataPayload(mint, metadataUriHint) {
     coin: sanitizeCoinDetails(coinDetails),
   }
 
-  const success = Boolean(metadataDocument || payload.coin)
-  storeMetadataInCache(mint, payload, {
-    ttlMs: success ? null : 60_000,
-    persist: success,
-    fetchedAt: Date.now(),
-  })
-  return payload
-}
-
-async function maybeFetchAndBroadcastMetadata(mint, metadataUriHint) {
-  if (!mint) {
-    return null
-  }
-
-  const cached = getCachedMetadataPayload(mint)
-  if (cached) {
-    broadcastMetadata(cached)
-    return cached
-  }
-
-  if (metadataInflight.has(mint)) {
-    return metadataInflight.get(mint)
-  }
-
-  const promise = fetchMetadataPayload(mint, metadataUriHint)
-    .then((payload) => {
-      if (payload) {
-        broadcastMetadata(payload, { force: true })
-      }
-      return payload
-    })
-    .catch((error) => {
-      console.error(`[proxy] Metadata fetch failed for mint ${mint}:`, error)
-      const fallback = {
-        type: "metadata",
-        mint,
-        metadata_uri: normalizeIpfsUri(metadataUriHint),
-        metadata: null,
-        coin: null,
-      }
-      storeMetadataInCache(mint, fallback, { ttlMs: 60_000, persist: false, fetchedAt: Date.now() })
-      broadcastMetadata(fallback, { force: true })
-      return fallback
-    })
-    .finally(() => {
-      metadataInflight.delete(mint)
-    })
-
-  metadataInflight.set(mint, promise)
-  return promise
+  const success = metadataPayloadHasDetails(payload)
+  return { payload, success }
 }
 
 function decodePumpPayload(rawPayload) {
@@ -494,10 +611,8 @@ async function handleTradePayload(payload) {
       return
     }
 
-    broadcast({ type: "trade", trade })
-
     const metadataUriHint = decoded?.coinMeta?.uri || decoded?.coinMeta?.metadataUri || null
-    void maybeFetchAndBroadcastMetadata(trade.mint, metadataUriHint)
+    queueTradeForMint(trade, metadataUriHint)
   } catch (error) {
     console.error("[proxy] Failed to process trade payload:", error)
   }
