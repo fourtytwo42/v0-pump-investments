@@ -52,6 +52,7 @@ import { useSettings } from "@/hooks/use-settings"
 import { useTradeCleanup } from "@/hooks/use-trade-cleanup"
 import { usePiBotData } from "@/hooks/use-pi-bot-data"
 import { useAlertChecker } from "@/hooks/use-alert-checker"
+import { useVisibleTokenMetadata } from "@/hooks/use-visible-token-metadata"
 
 export default function Dashboard() {
   // Get values from context
@@ -149,6 +150,13 @@ export default function Dashboard() {
 
   // Use alert checker hook
   useAlertChecker(tokens)
+
+  // Load and cache metadata for tokens currently visible on the page
+  useVisibleTokenMetadata({
+    paginatedTokens: paginatedItems,
+    setTokens,
+    setAllTrades,
+  })
 
   // Check if onboarding should be shown
   useEffect(() => {

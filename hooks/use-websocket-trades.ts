@@ -115,9 +115,10 @@ function decodePumpPayload(rawPayload: string): PumpUnifiedTrade | null {
 
 function convertPumpTradeToLocal(pumpTrade: PumpUnifiedTrade): Trade {
   const timestampMs = typeof pumpTrade.timestamp === "string" ? new Date(pumpTrade.timestamp).getTime() : Date.now()
+  const mintAddress = (pumpTrade.mintAddress || "").trim()
 
   return {
-    mint: pumpTrade.mintAddress,
+    mint: mintAddress,
     name: pumpTrade.coinMeta?.name || "Unknown",
     symbol: pumpTrade.coinMeta?.symbol || "???",
     image_uri: pumpTrade.coinMeta?.uri || "",
@@ -150,6 +151,8 @@ export function useWebSocketTrades(setAllTrades: React.Dispatch<React.SetStateAc
   const pingIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const pendingMsgRef = useRef<{ size: number } | null>(null)
   const connectionStateRef = useRef<"connecting" | "waiting_info" | "sent_connect" | "ready">("connecting")
+  const tradesByMintRef = useRef<Map<string, Trade[]>>(new Map())
+  const signatureIndexRef = useRef<Set<string>>(new Set())
 
   useEffect(() => {
     console.log("[v0] Setting up Pump.fun NATS WebSocket connection (direct)")
@@ -293,8 +296,67 @@ export function useWebSocketTrades(setAllTrades: React.Dispatch<React.SetStateAc
       }
     }
 
-    const handleTrade = async (newTrade: Trade) => {
-      newTrade.received_time = Date.now()
+    const pruneAndReindexTrades = (cutoff: number) => {
+      const signatureIndex = signatureIndexRef.current
+      signatureIndex.clear()
+
+      for (const [mint, trades] of tradesByMintRef.current) {
+        const recentTrades = trades.filter((trade) => (trade.received_time || trade.timestamp * 1000) >= cutoff)
+
+        if (recentTrades.length === 0) {
+          tradesByMintRef.current.delete(mint)
+          continue
+        }
+
+        tradesByMintRef.current.set(mint, recentTrades)
+        for (const trade of recentTrades) {
+          if (trade.signature) {
+            signatureIndex.add(trade.signature)
+          }
+        }
+      }
+    }
+
+    const flattenSortedTrades = () => {
+      const aggregated: Trade[] = []
+      for (const trades of tradesByMintRef.current.values()) {
+        aggregated.push(...trades)
+      }
+
+      aggregated.sort((a, b) => {
+        const timeA = a.received_time ?? a.timestamp * 1000
+        const timeB = b.received_time ?? b.timestamp * 1000
+        return timeA - timeB
+      })
+
+      return aggregated
+    }
+
+    const handleTrade = async (incomingTrade: Trade) => {
+      const trimmedMint = incomingTrade.mint?.trim()
+      const trimmedSignature = incomingTrade.signature?.trim()
+
+      if (!trimmedMint || !trimmedSignature) {
+        return
+      }
+
+      const newTrade: Trade = {
+        ...incomingTrade,
+        mint: trimmedMint,
+        signature: trimmedSignature,
+        received_time: Date.now(),
+      }
+
+      const cutoff = Date.now() - 60 * 60 * 1000
+      pruneAndReindexTrades(cutoff)
+
+      if (signatureIndexRef.current.has(trimmedSignature)) {
+        return
+      }
+
+      const tradesForMint = tradesByMintRef.current.get(trimmedMint) ?? []
+      tradesByMintRef.current.set(trimmedMint, [...tradesForMint, newTrade])
+      signatureIndexRef.current.add(trimmedSignature)
 
       try {
         const storedTrade: StoredTrade = {
@@ -307,13 +369,7 @@ export function useWebSocketTrades(setAllTrades: React.Dispatch<React.SetStateAc
         console.error("[v0] Error storing trade:", error)
       }
 
-      setAllTrades((prevTrades) => {
-        const oneHourAgo = Date.now() - 60 * 60 * 1000
-        const filteredTrades = prevTrades.filter(
-          (trade) => (trade.received_time || trade.timestamp * 1000) >= oneHourAgo,
-        )
-        return [...filteredTrades, newTrade]
-      })
+      setAllTrades(flattenSortedTrades())
     }
 
     connect()
@@ -335,6 +391,8 @@ export function useWebSocketTrades(setAllTrades: React.Dispatch<React.SetStateAc
         socketRef.current = null
       }
 
+      tradesByMintRef.current.clear()
+      signatureIndexRef.current.clear()
       setIsConnected(false)
     }
   }, [setAllTrades])

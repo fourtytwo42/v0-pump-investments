@@ -31,6 +31,27 @@ interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: "3.0.28",
+    date: "June 3, 2025",
+    changes: [
+      {
+        type: "fixed",
+        description:
+          "Regrouped incoming WebSocket trades by mint with an in-memory index so per-token statistics stay accurate across updates.",
+      },
+      {
+        type: "fixed",
+        description:
+          "Skipped duplicate trade signatures entirely to keep historical records and on-screen data free of redundant entries.",
+      },
+      {
+        type: "improved",
+        description:
+          "Tightened visible-token metadata caching to reuse fetched details and avoid repeat requests while browsing between pages.",
+      },
+    ],
+  },
+  {
     version: "3.0.26",
     date: "June 1, 2025",
     changes: [
