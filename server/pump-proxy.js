@@ -151,6 +151,16 @@ function sanitizeCoinDetails(coin) {
       null,
   )
 
+  const completeValue = coin.complete ?? coin.completed ?? coin.isCompleted ?? null
+  const bondingCurve =
+    coin.bonding_curve || coin.bondingCurve || coin.poolAddress || coin.pool_address || coin.bonding || null
+  const associatedBondingCurve =
+    coin.associated_bonding_curve || coin.associatedBondingCurve || coin.associatedPool || null
+  const virtualSolReserves = Number(coin.virtual_sol_reserves ?? coin.virtualSolReserves ?? coin.virtualSol ?? null)
+  const virtualTokenReserves = Number(
+    coin.virtual_token_reserves ?? coin.virtualTokenReserves ?? coin.virtualToken ?? null,
+  )
+
   return {
     name: coin.name ?? null,
     symbol: coin.symbol ?? null,
@@ -164,6 +174,12 @@ function sanitizeCoinDetails(coin) {
     created_timestamp: createdTs ?? null,
     kingOfTheHillTimestamp: kingTs ?? null,
     king_of_the_hill_timestamp: kingTs ?? null,
+    complete: typeof completeValue === "boolean" ? completeValue : null,
+    completed: typeof completeValue === "boolean" ? completeValue : null,
+    bondingCurve,
+    associatedBondingCurve,
+    virtualSolReserves: Number.isFinite(virtualSolReserves) ? virtualSolReserves : null,
+    virtualTokenReserves: Number.isFinite(virtualTokenReserves) ? virtualTokenReserves : null,
   }
 }
 
@@ -413,6 +429,38 @@ function mergeTradeWithMetadata(trade, metadataPayload) {
 
   if (metadataPayload.metadata_uri && metadataPayload.metadata_uri !== trade.metadata_uri) {
     updated.metadata_uri = metadataPayload.metadata_uri
+    changed = true
+  }
+
+  const completeFlag =
+    metadata?.complete ??
+    metadata?.completed ??
+    metadata?.isCompleted ??
+    coin?.complete ??
+    coin?.completed ??
+    coin?.isCompleted ??
+    null
+  if (typeof completeFlag === "boolean" && updated.is_completed !== completeFlag) {
+    updated.is_completed = completeFlag
+    changed = true
+  }
+
+  const bondingCurve =
+    metadata?.bondingCurve ??
+    metadata?.bonding_curve ??
+    coin?.bondingCurve ??
+    coin?.bonding_curve ??
+    coin?.poolAddress ??
+    null
+  if (bondingCurve && bondingCurve !== updated.bonding_curve) {
+    updated.bonding_curve = bondingCurve
+    changed = true
+  }
+
+  const associatedBondingCurve =
+    metadata?.associatedBondingCurve ?? metadata?.associated_bonding_curve ?? coin?.associatedBondingCurve ?? coin?.associated_bonding_curve ?? null
+  if (associatedBondingCurve && associatedBondingCurve !== updated.associated_bonding_curve) {
+    updated.associated_bonding_curve = associatedBondingCurve
     changed = true
   }
 

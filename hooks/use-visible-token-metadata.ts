@@ -133,6 +133,24 @@ function mergeMetadataIntoToken(token: TokenData, metadata: TokenMetadata): { up
     changed = true
   }
 
+  if (typeof metadata.complete === "boolean" && updated.is_completed !== metadata.complete) {
+    updated.is_completed = metadata.complete
+    changed = true
+  }
+
+  if (metadata.bondingCurve && metadata.bondingCurve !== updated.bonding_curve) {
+    updated.bonding_curve = metadata.bondingCurve
+    changed = true
+  }
+
+  if (
+    metadata.associatedBondingCurve &&
+    metadata.associatedBondingCurve !== updated.associated_bonding_curve
+  ) {
+    updated.associated_bonding_curve = metadata.associatedBondingCurve
+    changed = true
+  }
+
   return { updated, changed }
 }
 
@@ -188,6 +206,24 @@ function mergeMetadataIntoTrade(trade: Trade, metadata: TokenMetadata): { update
     changed = true
   }
 
+  if (typeof metadata.complete === "boolean" && updated.is_completed !== metadata.complete) {
+    updated.is_completed = metadata.complete
+    changed = true
+  }
+
+  if (metadata.bondingCurve && metadata.bondingCurve !== updated.bonding_curve) {
+    updated.bonding_curve = metadata.bondingCurve
+    changed = true
+  }
+
+  if (
+    metadata.associatedBondingCurve &&
+    metadata.associatedBondingCurve !== updated.associated_bonding_curve
+  ) {
+    updated.associated_bonding_curve = metadata.associatedBondingCurve
+    changed = true
+  }
+
   return { updated, changed }
 }
 
@@ -232,9 +268,21 @@ async function persistMetadataToDatabase(mint: string, metadata: TokenMetadata) 
       ) {
         stored.king_of_the_hill_timestamp = metadata.kingOfTheHillTimestamp
       }
+
+      if (typeof metadata.complete === "boolean") {
+        stored.is_completed = metadata.complete
+      }
+
+      if (metadata.bondingCurve && !stored.bonding_curve) {
+        stored.bonding_curve = metadata.bondingCurve
+      }
+
+      if (metadata.associatedBondingCurve && !stored.associated_bonding_curve) {
+        stored.associated_bonding_curve = metadata.associatedBondingCurve
+      }
     })
   } catch (error) {
-    console.error(`[v0] Failed to persist metadata for mint ${mint}:`, error)
+    console.error("[metadata] Failed to persist metadata to database:", error)
   }
 }
 
@@ -312,6 +360,9 @@ export function useVisibleTokenMetadata({ paginatedTokens, setTokens, setAllTrad
             telegram: token.telegram ?? null,
             createdTimestamp: token.created_timestamp ?? null,
             kingOfTheHillTimestamp: token.king_of_the_hill_timestamp ?? null,
+            complete: token.is_completed ?? null,
+            bondingCurve: token.bonding_curve ?? null,
+            associatedBondingCurve: token.associated_bonding_curve ?? null,
           })
           continue
         }

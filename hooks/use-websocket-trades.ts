@@ -140,6 +140,24 @@ export function useWebSocketTrades(setAllTrades: React.Dispatch<React.SetStateAc
             tradeChanged = true
           }
 
+          if (typeof metadata.complete === "boolean" && next.is_completed !== metadata.complete) {
+            next.is_completed = metadata.complete
+            tradeChanged = true
+          }
+
+          if (metadata.bondingCurve && metadata.bondingCurve !== trade.bonding_curve) {
+            next.bonding_curve = metadata.bondingCurve
+            tradeChanged = true
+          }
+
+          if (
+            metadata.associatedBondingCurve &&
+            metadata.associatedBondingCurve !== trade.associated_bonding_curve
+          ) {
+            next.associated_bonding_curve = metadata.associatedBondingCurve
+            tradeChanged = true
+          }
+
           if (tradeChanged) {
             changed = true
             return next

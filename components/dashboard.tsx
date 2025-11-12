@@ -459,7 +459,24 @@ export default function Dashboard() {
                 </div>
 
                 <div className="space-y-4 mt-6 border-t pt-4">
-                  <Label className="text-base font-semibold">Market Cap Range</Label>
+                  <div className="flex items-center justify-between gap-3">
+                    <Label className="text-base font-semibold">Market Cap Range</Label>
+                    <Select
+                      value={settings.graduationFilter}
+                      onValueChange={(value) =>
+                        updateSettings("graduationFilter", value as "all" | "bonding" | "graduated")
+                      }
+                    >
+                      <SelectTrigger className="h-8 w-32">
+                        <SelectValue placeholder="Bonding Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All</SelectItem>
+                        <SelectItem value="bonding">Bonding</SelectItem>
+                        <SelectItem value="graduated">Graduated</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
                   <RangeSlider
                     min={0}

@@ -27,6 +27,7 @@ export interface DashboardSettings {
   maxTradeAmountFilter: number
   tradeRetentionMinutes: number // Keeping this in settings but removing UI, fixed at 60 minutes
   showBonkBotLogo: boolean
+  graduationFilter: "all" | "bonding" | "graduated"
 }
 
 export function useSettings(setOnboardingActive: (active: boolean) => void) {
@@ -53,6 +54,7 @@ export function useSettings(setOnboardingActive: (active: boolean) => void) {
     maxTradeAmountFilter: 5000,
     tradeRetentionMinutes: 60, // Fixed at 1 hour (60 minutes)
     showBonkBotLogo: false,
+    graduationFilter: "all",
   })
 
   // Function to update settings

@@ -23,6 +23,7 @@ export interface TokenData {
   unique_trader_count: number
   trades: Trade[]
   last_trade_time: number
+  last_trade_timestamp?: number
   creator: string
   creator_username: string
   total_supply: number
@@ -36,6 +37,9 @@ export interface TokenData {
   king_of_the_hill_timestamp?: number | null
   description?: string | null
   image_metadata_uri?: string | null
+  is_completed?: boolean
+  bonding_curve?: string | null
+  associated_bonding_curve?: string | null
 }
 
 interface UseTokenProcessingProps {
@@ -173,6 +177,7 @@ export function useTokenProcessing({
           })
 
           const lastTradeTime = trades.reduce((latest, trade) => Math.max(latest, trade.timestamp), 0)
+          const lastTradeTimestampMs = lastTradeTime > 0 ? lastTradeTime * 1000 : undefined
           const buyRatio = totalVolumeSOL > 0 ? buyVolumeSOL / totalVolumeSOL : 0
           const uniqueTraders = Array.from(uniqueTradersMap.get(mint) || new Set<string>())
           const uniqueTraderCount = uniqueTraders.length
@@ -205,6 +210,7 @@ export function useTokenProcessing({
             unique_trader_count: uniqueTraderCount,
             trades,
             last_trade_time: lastTradeTime,
+            last_trade_timestamp: lastTradeTimestampMs,
             creator: latestTrade.creator,
             creator_username: latestTrade.creator_username,
             total_supply: latestTrade.total_supply,
@@ -218,6 +224,9 @@ export function useTokenProcessing({
             king_of_the_hill_timestamp: latestTrade.king_of_the_hill_timestamp,
             description: latestTrade.description,
             image_metadata_uri: latestTrade.metadata_uri ?? null,
+            is_completed: latestTrade.is_completed ?? undefined,
+            bonding_curve: latestTrade.bonding_curve ?? null,
+            associated_bonding_curve: latestTrade.associated_bonding_curve ?? null,
           })
         })
 

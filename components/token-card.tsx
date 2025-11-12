@@ -11,31 +11,11 @@ import { useTokenContext } from "@/contexts/token-context"
 import { openAlertSettingsModal } from "./alert-settings-modal"
 import { db } from "@/lib/db"
 import { alertStatusCache } from "@/lib/alert-status-cache"
+import type { TokenData } from "@/hooks/use-token-processing"
 
 // Update the TokenCardProps interface to include the description field and BonkBot setting
 interface TokenCardProps {
-  token: {
-    mint: string
-    name: string
-    symbol: string
-    image_uri: string
-    usd_market_cap: number
-    market_cap: number
-    total_volume: number
-    buy_volume: number
-    sell_volume: number
-    unique_trader_count: number
-    last_trade_time: number
-    creator: string
-    creator_username: string
-    buy_sell_ratio: number
-    created_timestamp?: number
-    website?: string | null
-    twitter?: string | null
-    telegram?: string | null
-    king_of_the_hill_timestamp?: number | null
-    description?: string | null
-  }
+  token: TokenData
   size?: string
   showAlertSettings?: boolean
   showBonkBotLogo?: boolean // New prop for BonkBot logo
@@ -72,6 +52,13 @@ FavoriteStarIcon.displayName = "FavoriteStarIcon"
 
 function TokenCard({ token, size = "medium", showAlertSettings = false, showBonkBotLogo = false }: TokenCardProps) {
   const { solPrice, favorites, toggleFavorite } = useTokenContext()
+  const BONDING_TARGET_SOL = 415
+  const solPriceUsd = solPrice ?? 0
+  const isGraduated = token.is_completed ?? false
+  const rawProgress = solPriceUsd > 0 ? (token.usd_market_cap / (solPriceUsd * BONDING_TARGET_SOL)) * 100 : 0
+  const progressPercent = isGraduated ? 100 : Math.min(Math.max(rawProgress, 0), 100)
+  const showBondingProgress = Number.isFinite(progressPercent) && progressPercent >= 0
+
   const isFavorite = favorites.includes(token.mint)
 
   // Use global state for drawer to persist across re-renders
@@ -382,11 +369,11 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
   const hasDescription = token.description && token.description.trim() !== ""
 
   // Store the description in a ref to prevent re-renders
-  const descriptionRef = useRef<string | null>(token.description)
+  const descriptionRef = useRef<string | null>(token.description ?? null)
 
   // Update the ref if the description changes
   useEffect(() => {
-    descriptionRef.current = token.description
+    descriptionRef.current = token.description ?? null
   }, [token.description])
 
   return (
@@ -502,6 +489,20 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
               </div>
             )}
           </div>
+
+          {showBondingProgress && (
+            <div className="px-3 pb-2">
+              <div className="relative w-full h-2 rounded-full bg-muted overflow-hidden">
+                <div
+                  className={`h-full ${isGraduated ? "bg-green-500" : "bg-sky-500"}`}
+                  style={{ width: `${progressPercent}%` }}
+                />
+                <span className="absolute inset-0 flex items-center justify-center text-[10px] font-medium text-muted-foreground">
+                  {Math.round(progressPercent)}%
+                </span>
+              </div>
+            </div>
+          )}
 
           {/* Bottom section with age info - now with fixed height */}
           <div className="p-3 pt-2 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/30 mt-auto h-[60px]">

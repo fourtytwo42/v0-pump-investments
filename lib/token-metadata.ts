@@ -8,6 +8,9 @@ export interface TokenMetadata {
   telegram?: string | null
   createdTimestamp?: number | null
   kingOfTheHillTimestamp?: number | null
+  complete?: boolean | null
+  bondingCurve?: string | null
+  associatedBondingCurve?: string | null
 }
 
 const IPFS_PREFIX = "ipfs://"
@@ -182,6 +185,31 @@ export function normalizeTokenMetadata(raw: any): TokenMetadata {
     parseTimestamp(metadataSource?.king_of_the_hill_timestamp) ??
     parseTimestamp(metadataSource?.kothTs)
 
+  const completeValue =
+    raw?.complete ??
+    raw?.completed ??
+    raw?.isCompleted ??
+    metadataSource?.complete ??
+    metadataSource?.completed ??
+    metadataSource?.isCompleted ??
+    raw?.token?.completed ??
+    null
+
+  const bondingCurve = firstNonEmptyString(
+    raw?.bondingCurve,
+    raw?.bonding_curve,
+    metadataSource?.bondingCurve,
+    metadataSource?.bonding_curve,
+    raw?.token?.bondingCurve,
+  )
+
+  const associatedBondingCurve = firstNonEmptyString(
+    raw?.associated_bonding_curve,
+    raw?.associatedBondingCurve,
+    metadataSource?.associated_bonding_curve,
+    metadataSource?.associatedBondingCurve,
+  )
+
   return {
     name,
     symbol,
@@ -192,6 +220,9 @@ export function normalizeTokenMetadata(raw: any): TokenMetadata {
     telegram,
     createdTimestamp,
     kingOfTheHillTimestamp,
+    complete: typeof completeValue === "boolean" ? completeValue : null,
+    bondingCurve: bondingCurve ?? null,
+    associatedBondingCurve: associatedBondingCurve ?? null,
   }
 }
 
@@ -209,6 +240,9 @@ export function isMetadataEmpty(metadata: TokenMetadata | null | undefined): boo
     !metadata.twitter &&
     !metadata.telegram &&
     metadata.createdTimestamp == null &&
-    metadata.kingOfTheHillTimestamp == null
+    metadata.kingOfTheHillTimestamp == null &&
+    metadata.complete == null &&
+    !metadata.bondingCurve &&
+    !metadata.associatedBondingCurve
   )
 }

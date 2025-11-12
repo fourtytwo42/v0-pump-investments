@@ -62,6 +62,9 @@ export interface Trade {
   telegram?: string | null
   king_of_the_hill_timestamp?: number | null
   description?: string | null
+  is_completed?: boolean
+  bonding_curve?: string | null
+  associated_bonding_curve?: string | null
   [key: string]: unknown
 }
 
@@ -134,6 +137,17 @@ export function convertPumpTradeToLocal(pumpTrade: PumpUnifiedTrade): Trade {
     typeof pumpTrade.timestamp === "string" ? new Date(pumpTrade.timestamp).getTime() : Date.now()
 
   const metadataUri = normalizeIpfsUri(pumpTrade.coinMeta?.uri)
+  const metaComplete =
+    pumpTrade.coinMeta &&
+    typeof (pumpTrade.coinMeta as Record<string, unknown>).complete === "boolean"
+      ? ((pumpTrade.coinMeta as Record<string, unknown>).complete as boolean)
+      : undefined
+  const metaBondingCurve =
+    typeof pumpTrade.coinMeta?.bondingCurve === "string"
+      ? pumpTrade.coinMeta?.bondingCurve
+      : typeof (pumpTrade.coinMeta as Record<string, unknown>).bonding_curve === "string"
+        ? ((pumpTrade.coinMeta as Record<string, unknown>).bonding_curve as string)
+        : undefined
 
   return {
     mint: (pumpTrade.mintAddress || "").trim(),
@@ -161,5 +175,8 @@ export function convertPumpTradeToLocal(pumpTrade: PumpUnifiedTrade): Trade {
     telegram: null,
     king_of_the_hill_timestamp: pumpTrade.isBondingCurve ? null : timestampMs,
     description: null,
+    is_completed: metaComplete,
+    bonding_curve: metaBondingCurve ?? null,
+    associated_bonding_curve: null,
   }
 }

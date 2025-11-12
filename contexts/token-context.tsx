@@ -6,34 +6,7 @@ import { db } from "@/lib/db"
 import { toast } from "@/components/ui/use-toast"
 import { useWebSocketTrades } from "@/hooks/use-websocket-trades"
 import type { Trade } from "@/lib/pump-trades"
-
-interface TokenData {
-  mint: string
-  name: string
-  symbol: string
-  image_uri: string
-  usd_market_cap: number
-  market_cap: number
-  total_volume: number
-  buy_volume: number
-  sell_volume: number
-  unique_traders: string[]
-  unique_trader_count: number
-  trades: Trade[]
-  last_trade_time: number
-  creator: string
-  creator_username: string
-  total_supply: number
-  virtual_sol_reserves: number
-  virtual_token_reserves: number
-  buy_sell_ratio: number
-  created_timestamp?: number
-  website?: string | null
-  twitter?: string | null
-  telegram?: string | null
-  king_of_the_hill_timestamp?: number | null
-  description?: string | null
-}
+import type { TokenData } from "@/hooks/use-token-processing"
 
 // Define the context type
 interface TokenContextType {

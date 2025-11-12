@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react"
 import type { TokenData } from "./use-token-processing"
-import type { DashboardSettings } from "./DashboardSettings" // Import DashboardSettings
+import type { DashboardSettings } from "./use-settings"
 
 interface UseTokenFilteringProps {
   tokens: Map<string, TokenData>
@@ -52,6 +52,14 @@ export function useTokenFiltering({
 
       // Filter out external tokens if hideExternal is enabled
       if (settings.hideExternal && !token.mint.endsWith("pump")) {
+        return false
+      }
+
+      if (settings.graduationFilter === "bonding" && token.is_completed) {
+        return false
+      }
+
+      if (settings.graduationFilter === "graduated" && !token.is_completed) {
         return false
       }
 
@@ -151,6 +159,9 @@ export function useTokenFiltering({
         )
           return false
         if (settings.hideExternal && !token.mint.endsWith("pump")) return false
+
+        if (settings.graduationFilter === "bonding" && token.is_completed) return false
+        if (settings.graduationFilter === "graduated" && !token.is_completed) return false
 
         if (
           token.usd_market_cap < settings.minMarketCapFilter ||

@@ -35,7 +35,10 @@ export interface StoredTrade {
   telegram?: string | null
   description?: string | null
   king_of_the_hill_timestamp?: number | null
-  description?: string | null
+  is_completed?: boolean
+  bonding_curve?: string | null
+  associated_bonding_curve?: string | null
+  [key: string]: unknown
 }
 
 // New interface for token alerts
@@ -271,7 +274,8 @@ class PumpInvestmentsDB extends Dexie {
     if (favorites.length === 0) {
       // Clear cache
       alertStatusCache.clear()
-      return await this.alerts.clear()
+      await this.alerts.clear()
+      return 0
     } else {
       // Get all alerts
       const allAlerts = await this.alerts.toArray()
