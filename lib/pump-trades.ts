@@ -152,7 +152,7 @@ export function convertPumpTradeToLocal(pumpTrade: PumpUnifiedTrade): Trade {
   const tradeBondingFlag =
     typeof pumpTrade.isBondingCurve === "boolean" ? pumpTrade.isBondingCurve : undefined
   const completionFromTrade =
-    tradeBondingFlag === true ? false : tradeBondingFlag === false ? true : undefined
+    tradeBondingFlag === false ? true : tradeBondingFlag === true ? false : undefined
 
   return {
     mint: (pumpTrade.mintAddress || "").trim(),
@@ -180,9 +180,9 @@ export function convertPumpTradeToLocal(pumpTrade: PumpUnifiedTrade): Trade {
     telegram: null,
     king_of_the_hill_timestamp: pumpTrade.isBondingCurve ? null : timestampMs,
     description: null,
-    is_completed: metaComplete ?? completionFromTrade,
+    is_completed: metaComplete ?? completionFromTrade ?? false,
     bonding_curve: metaBondingCurve ?? null,
     associated_bonding_curve: null,
-    is_bonding_curve: tradeBondingFlag ?? null,
+    is_bonding_curve: tradeBondingFlag ?? true,
   }
 }
