@@ -6,7 +6,6 @@ import { useEffect } from "react"
 import type { Trade } from "./use-websocket-trades"
 import { db } from "@/lib/db"
 
-// Define the TokenData type for aggregated token information
 export interface TokenData {
   mint: string
   name: string
@@ -15,9 +14,12 @@ export interface TokenData {
   usd_market_cap: number
   market_cap: number
   total_volume: number
+  total_volume_usd: number
   buy_volume: number
+  buy_volume_usd: number
   sell_volume: number
-  unique_traders: string[] // Changed from Set to array
+  sell_volume_usd: number
+  unique_traders: string[]
   unique_trader_count: number
   trades: Trade[]
   last_trade_time: number
@@ -33,6 +35,7 @@ export interface TokenData {
   telegram?: string | null
   king_of_the_hill_timestamp?: number | null
   description?: string | null
+  image_metadata_uri?: string | null
 }
 
 interface UseTokenProcessingProps {
@@ -52,84 +55,75 @@ export function useTokenProcessing({
   setTokens,
   setRenderKey,
 }: UseTokenProcessingProps) {
-  // Calculate metrics when allTrades or timeRange changes
   useEffect(() => {
-    // Skip if no trades
     if (allTrades.length === 0) return
 
-    // Calculate time threshold based on selected time range
     const cutoff = Date.now() - Number.parseInt(timeRange) * 60 * 1000
 
-    // Get favorites from the database
+    const normalizeSolAndUsd = (solAmount: number, usdAmount: number): { sol: number; usd: number } => {
+      let safeSol = Number.isFinite(solAmount) && solAmount >= 0 ? solAmount : 0
+      const safeUsd = Number.isFinite(usdAmount) && usdAmount > 0 ? usdAmount : 0
+
+      if (safeSol > 1_000_000) {
+        safeSol = safeSol / 1_000_000_000
+      }
+
+      if (safeSol === 0 && safeUsd > 0 && solPrice > 0) {
+        safeSol = safeUsd / solPrice
+      }
+
+      const finalUsd = safeUsd > 0 ? safeUsd : safeSol * solPrice
+      return { sol: safeSol, usd: finalUsd }
+    }
+
     const loadFavoritesAndProcessTokens = async () => {
       try {
-        // Get favorites list
         const favoritesList = await db.getFavorites()
-
-        // Filter trades based on time range
         const relevantTrades = allTrades.filter((trade) => (trade.received_time || trade.timestamp * 1000) >= cutoff)
 
-        // Group trades by token mint and track unique traders per token
         const tokenTradesMap = new Map<string, Trade[]>()
         const uniqueTradersMap = new Map<string, Set<string>>()
-        const traderTradeAmountsMap = new Map<string, Map<string, number>>() // Map of token mint -> (trader -> total trade amount)
+        const traderTradeAmountsMap = new Map<string, Map<string, number>>()
 
-        // First pass: group trades and collect unique traders
         relevantTrades.forEach((trade) => {
           const mint = trade.mint
           const trader = trade.user
-          const tradeAmountUSD = (trade.sol_amount / 1e9) * solPrice // Convert lamports to SOL and then to USD
+          const { usd: tradeAmountUSD } = normalizeSolAndUsd(trade.sol_amount, trade.usd_amount)
 
-          // Group trades by token
           if (!tokenTradesMap.has(mint)) {
             tokenTradesMap.set(mint, [])
           }
-          tokenTradesMap.get(mint)?.push(trade)
+          tokenTradesMap.get(mint)!.push(trade)
 
-          // Track trader trade amounts per token
           if (!traderTradeAmountsMap.has(mint)) {
             traderTradeAmountsMap.set(mint, new Map<string, number>())
           }
           const traderAmounts = traderTradeAmountsMap.get(mint)!
           traderAmounts.set(trader, (traderAmounts.get(trader) || 0) + tradeAmountUSD)
 
-          // Only count traders who have traded more than the minimum trade amount
           if (tradeAmountUSD >= minTradeAmountFilter) {
-            // Track unique traders per token
             if (!uniqueTradersMap.has(mint)) {
               uniqueTradersMap.set(mint, new Set<string>())
             }
-            uniqueTradersMap.get(mint)?.add(trader)
+            uniqueTradersMap.get(mint)!.add(trader)
           }
         })
 
-        // Also include all trades for favorited tokens, regardless of time range
         if (favoritesList.length > 0) {
-          // For each favorite, ensure we have its trades
           for (const favoriteMint of favoritesList) {
-            // If we don't already have trades for this favorite from the recent time range
             if (!tokenTradesMap.has(favoriteMint)) {
-              // Find all trades for this favorite token
               const favoriteTrades = allTrades.filter((trade) => trade.mint === favoriteMint)
-
               if (favoriteTrades.length > 0) {
-                // Add these trades to our map
                 tokenTradesMap.set(favoriteMint, favoriteTrades)
 
-                // Process unique traders for this favorite
                 const uniqueTraders = new Set<string>()
                 const traderAmounts = new Map<string, number>()
 
                 favoriteTrades.forEach((trade) => {
-                  const trader = trade.user
-                  const tradeAmountUSD = (trade.sol_amount / 1e9) * solPrice
-
-                  // Track trader amounts
-                  traderAmounts.set(trader, (traderAmounts.get(trader) || 0) + tradeAmountUSD)
-
-                  // Only count traders who meet the minimum amount
+                  const { usd: tradeAmountUSD } = normalizeSolAndUsd(trade.sol_amount, trade.usd_amount)
+                  traderAmounts.set(trade.user, (traderAmounts.get(trade.user) || 0) + tradeAmountUSD)
                   if (tradeAmountUSD >= minTradeAmountFilter) {
-                    uniqueTraders.add(trader)
+                    uniqueTraders.add(trade.user)
                   }
                 })
 
@@ -140,50 +134,60 @@ export function useTokenProcessing({
           }
         }
 
-        // Second pass: build token data
         const tokenMap = new Map<string, TokenData>()
 
         tokenTradesMap.forEach((trades, mint) => {
           if (trades.length === 0) return
 
-          // Use the most recent trade for token metadata
           const latestTrade = trades.reduce(
             (latest, trade) => (trade.timestamp > latest.timestamp ? trade : latest),
             trades[0],
           )
 
-          // For favorites, calculate volumes based on the selected time range
           const isInFavorites = favoritesList.includes(mint)
           const tradesForVolumeCalc = isInFavorites
             ? trades.filter((trade) => (trade.received_time || trade.timestamp * 1000) >= cutoff)
             : trades
 
-          // Calculate total volume, buy volume, and sell volume
-          let totalVolume = 0
-          let buyVolume = 0
-          let sellVolume = 0
+          let totalVolumeSOL = 0
+          let buyVolumeSOL = 0
+          let sellVolumeSOL = 0
+          let totalVolumeUSD = 0
+          let buyVolumeUSD = 0
+          let sellVolumeUSD = 0
 
           tradesForVolumeCalc.forEach((trade) => {
-            const tradeVolume = trade.sol_amount / 1e9 // Convert lamports to SOL
-            totalVolume += tradeVolume
+            const { sol: tradeVolumeSOL, usd: tradeVolumeUSD } = normalizeSolAndUsd(
+              trade.sol_amount,
+              trade.usd_amount,
+            )
+            totalVolumeSOL += tradeVolumeSOL
+            totalVolumeUSD += tradeVolumeUSD
             if (trade.is_buy) {
-              buyVolume += tradeVolume
+              buyVolumeSOL += tradeVolumeSOL
+              buyVolumeUSD += tradeVolumeUSD
             } else {
-              sellVolume += tradeVolume
+              sellVolumeSOL += tradeVolumeSOL
+              sellVolumeUSD += tradeVolumeUSD
             }
           })
 
-          // Calculate last trade time
           const lastTradeTime = trades.reduce((latest, trade) => Math.max(latest, trade.timestamp), 0)
-
-          // Calculate buy/sell ratio
-          const buyRatio = totalVolume > 0 ? buyVolume / totalVolume : 0
-
-          // Get unique traders for this token (those who have traded more than the minimum amount)
+          const buyRatio = totalVolumeSOL > 0 ? buyVolumeSOL / totalVolumeSOL : 0
           const uniqueTraders = Array.from(uniqueTradersMap.get(mint) || new Set<string>())
           const uniqueTraderCount = uniqueTraders.length
 
-          // Create token data
+          const createdTimestamp = (() => {
+            if (latestTrade.created_timestamp) {
+              return latestTrade.created_timestamp
+            }
+            const earliest = trades.reduce((earliestValue, trade) => {
+              const candidate = trade.created_timestamp ?? trade.timestamp * 1000
+              return Math.min(earliestValue, candidate)
+            }, Number.POSITIVE_INFINITY)
+            return Number.isFinite(earliest) ? earliest : undefined
+          })()
+
           tokenMap.set(mint, {
             mint: latestTrade.mint,
             name: latestTrade.name,
@@ -191,12 +195,15 @@ export function useTokenProcessing({
             image_uri: latestTrade.image_uri,
             usd_market_cap: latestTrade.usd_market_cap,
             market_cap: latestTrade.market_cap,
-            total_volume: totalVolume,
-            buy_volume: buyVolume,
-            sell_volume: sellVolume,
+            total_volume: totalVolumeSOL,
+            total_volume_usd: totalVolumeUSD,
+            buy_volume: buyVolumeSOL,
+            buy_volume_usd: buyVolumeUSD,
+            sell_volume: sellVolumeSOL,
+            sell_volume_usd: sellVolumeUSD,
             unique_traders: uniqueTraders,
             unique_trader_count: uniqueTraderCount,
-            trades: trades,
+            trades,
             last_trade_time: lastTradeTime,
             creator: latestTrade.creator,
             creator_username: latestTrade.creator_username,
@@ -204,19 +211,17 @@ export function useTokenProcessing({
             virtual_sol_reserves: latestTrade.virtual_sol_reserves,
             virtual_token_reserves: latestTrade.virtual_token_reserves,
             buy_sell_ratio: buyRatio,
-            created_timestamp: latestTrade.created_timestamp,
+            created_timestamp: createdTimestamp,
             website: latestTrade.website,
             twitter: latestTrade.twitter,
             telegram: latestTrade.telegram,
             king_of_the_hill_timestamp: latestTrade.king_of_the_hill_timestamp,
-            description: latestTrade.description, // Include description from the latest trade
+            description: latestTrade.description,
+            image_metadata_uri: latestTrade.metadata_uri ?? null,
           })
         })
 
-        // Update tokens state
         setTokens(tokenMap)
-
-        // Force a re-render to ensure UI updates
         setRenderKey((prev) => prev + 1)
       } catch (error) {
         console.error("Error processing tokens:", error)

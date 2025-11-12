@@ -16,6 +16,7 @@ export interface StoredTrade {
   usd_market_cap: number
   market_cap: number
   sol_amount: number
+  usd_amount: number
   is_buy: boolean
   user: string
   creator: string
@@ -28,11 +29,13 @@ export interface StoredTrade {
   virtual_token_reserves: number
   signature: string
   created_timestamp?: number
+  metadata_uri?: string | null
   website?: string | null
   twitter?: string | null
   telegram?: string | null
   description?: string | null
   king_of_the_hill_timestamp?: number | null
+  description?: string | null
 }
 
 // New interface for token alerts

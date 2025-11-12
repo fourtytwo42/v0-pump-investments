@@ -5,35 +5,7 @@ import { createContext, useContext, useState, useEffect, useCallback, useMemo } 
 import { db } from "@/lib/db"
 import { toast } from "@/components/ui/use-toast"
 import { useWebSocketTrades } from "@/hooks/use-websocket-trades"
-
-// Define the types
-interface Trade {
-  mint: string
-  name: string
-  symbol: string
-  image_uri: string
-  usd_market_cap: number
-  market_cap: number
-  sol_amount: number
-  is_buy: boolean
-  user: string
-  creator: string
-  creator_username: string
-  token_amount: number
-  total_supply: number
-  timestamp: number
-  received_time?: number
-  virtual_sol_reserves: number
-  virtual_token_reserves: number
-  signature: string
-  created_timestamp?: number
-  website?: string | null
-  twitter?: string | null
-  telegram?: string | null
-  king_of_the_hill_timestamp?: number | null
-  description?: string | null
-  [key: string]: any
-}
+import type { Trade } from "@/lib/pump-trades"
 
 interface TokenData {
   mint: string

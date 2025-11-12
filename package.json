@@ -6,11 +6,13 @@
     "build": "rm -rf .next && next build",
     "dev": "next dev",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "pump-proxy": "node server/pump-proxy.js"
   },
   "dependencies": {
     "@ai-sdk/groq": "latest",
     "@emotion/is-prop-valid": "latest",
+    "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-dialog": "latest",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
     "@radix-ui/react-label": "^2.0.2",
@@ -41,6 +43,7 @@
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "use-sync-external-store": "latest",
+    "ws": "^8.18.3",
     "zod": "latest",
     "zustand": "latest"
   },
