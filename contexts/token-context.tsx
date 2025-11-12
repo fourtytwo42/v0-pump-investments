@@ -124,7 +124,14 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
         await loadFavorites()
         const storedTrades = await db.getRecentTrades()
         if (storedTrades.length > 0) {
-          setAllTrades(storedTrades as Trade[])
+          const normalized = storedTrades.map((stored) => ({
+            ...stored,
+            is_completed: stored.is_completed ?? false,
+            is_bonding_curve:
+              stored.is_bonding_curve ??
+              (stored.is_completed === true ? false : true),
+          })) as Trade[]
+          setAllTrades(normalized)
         }
         await fetchSolPrice()
       } catch (error) {

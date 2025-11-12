@@ -259,12 +259,20 @@ export function useWebSocketTrades(setAllTrades: React.Dispatch<React.SetStateAc
         return
       }
 
-      void fetchMetadataForMint(trimmedMint, incomingTrade.metadata_uri)
+      const normalizedTrade: Trade = {
+        ...incomingTrade,
+        is_completed: incomingTrade.is_completed ?? false,
+        is_bonding_curve:
+          incomingTrade.is_bonding_curve ??
+          (incomingTrade.is_completed === true ? false : true),
+      }
+
+      void fetchMetadataForMint(trimmedMint, normalizedTrade.metadata_uri)
 
       signatureSetRef.current.add(trimmedSignature)
 
       const newTrade: Trade = {
-        ...incomingTrade,
+        ...normalizedTrade,
         mint: trimmedMint,
         signature: trimmedSignature,
         received_time: Date.now(),
