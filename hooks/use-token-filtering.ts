@@ -55,11 +55,14 @@ export function useTokenFiltering({
         return false
       }
 
-      if (settings.graduationFilter === "bonding" && token.is_completed) {
+      const isGraduated = token.is_completed === true || token.is_bonding_curve === false
+      const isBonding = token.is_completed === false || token.is_bonding_curve === true
+
+      if (settings.graduationFilter === "bonding" && !isBonding) {
         return false
       }
 
-      if (settings.graduationFilter === "graduated" && !token.is_completed) {
+      if (settings.graduationFilter === "graduated" && !isGraduated) {
         return false
       }
 
@@ -160,8 +163,11 @@ export function useTokenFiltering({
           return false
         if (settings.hideExternal && !token.mint.endsWith("pump")) return false
 
-        if (settings.graduationFilter === "bonding" && token.is_completed) return false
-        if (settings.graduationFilter === "graduated" && !token.is_completed) return false
+        const isGraduated = token.is_completed === true || token.is_bonding_curve === false
+        const isBonding = token.is_completed === false || token.is_bonding_curve === true
+
+        if (settings.graduationFilter === "bonding" && !isBonding) return false
+        if (settings.graduationFilter === "graduated" && !isGraduated) return false
 
         if (
           token.usd_market_cap < settings.minMarketCapFilter ||

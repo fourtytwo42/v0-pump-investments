@@ -138,6 +138,14 @@ function mergeMetadataIntoToken(token: TokenData, metadata: TokenMetadata): { up
     changed = true
   }
 
+  if (typeof metadata.complete === "boolean") {
+    const bondingState = metadata.complete ? false : updated.is_bonding_curve
+    if (bondingState !== updated.is_bonding_curve) {
+      updated.is_bonding_curve = bondingState ?? null
+      changed = true
+    }
+  }
+
   if (metadata.bondingCurve && metadata.bondingCurve !== updated.bonding_curve) {
     updated.bonding_curve = metadata.bondingCurve
     changed = true
@@ -211,6 +219,14 @@ function mergeMetadataIntoTrade(trade: Trade, metadata: TokenMetadata): { update
     changed = true
   }
 
+  if (typeof metadata.complete === "boolean") {
+    const bondingState = metadata.complete ? false : updated.is_bonding_curve
+    if (bondingState !== updated.is_bonding_curve) {
+      updated.is_bonding_curve = bondingState ?? null
+      changed = true
+    }
+  }
+
   if (metadata.bondingCurve && metadata.bondingCurve !== updated.bonding_curve) {
     updated.bonding_curve = metadata.bondingCurve
     changed = true
@@ -271,6 +287,9 @@ async function persistMetadataToDatabase(mint: string, metadata: TokenMetadata) 
 
       if (typeof metadata.complete === "boolean") {
         stored.is_completed = metadata.complete
+        if (metadata.complete === true) {
+          stored.is_bonding_curve = false
+        }
       }
 
       if (metadata.bondingCurve && !stored.bonding_curve) {

@@ -40,6 +40,7 @@ export interface TokenData {
   is_completed?: boolean
   bonding_curve?: string | null
   associated_bonding_curve?: string | null
+  is_bonding_curve?: boolean | null
 }
 
 interface UseTokenProcessingProps {
@@ -193,6 +194,28 @@ export function useTokenProcessing({
             return Number.isFinite(earliest) ? earliest : undefined
           })()
 
+          const isCompleted = (() => {
+            if (latestTrade.is_completed !== undefined) {
+              return latestTrade.is_completed
+            }
+            if (latestTrade.is_bonding_curve === false) {
+              return true
+            }
+            const hasGraduatedTrade = trades.some((trade) => trade.is_completed === true || trade.is_bonding_curve === false)
+            return hasGraduatedTrade ? true : undefined
+          })()
+
+          const isBondingCurve = (() => {
+            if (latestTrade.is_bonding_curve !== undefined && latestTrade.is_bonding_curve !== null) {
+              return latestTrade.is_bonding_curve
+            }
+            if (isCompleted === true) {
+              return false
+            }
+            const hasOnlyBondingTrades = trades.every((trade) => trade.is_bonding_curve !== false)
+            return hasOnlyBondingTrades ? true : null
+          })()
+
           tokenMap.set(mint, {
             mint: latestTrade.mint,
             name: latestTrade.name,
@@ -224,9 +247,10 @@ export function useTokenProcessing({
             king_of_the_hill_timestamp: latestTrade.king_of_the_hill_timestamp,
             description: latestTrade.description,
             image_metadata_uri: latestTrade.metadata_uri ?? null,
-            is_completed: latestTrade.is_completed ?? undefined,
+            is_completed: isCompleted,
             bonding_curve: latestTrade.bonding_curve ?? null,
             associated_bonding_curve: latestTrade.associated_bonding_curve ?? null,
+            is_bonding_curve: isBondingCurve,
           })
         })
 

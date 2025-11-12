@@ -39,6 +39,7 @@ export interface StoredTrade {
   bonding_curve?: string | null
   associated_bonding_curve?: string | null
   [key: string]: unknown
+  is_bonding_curve?: boolean | null
 }
 
 // New interface for token alerts

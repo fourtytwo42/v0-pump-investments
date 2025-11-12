@@ -54,10 +54,11 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
   const { solPrice, favorites, toggleFavorite } = useTokenContext()
   const BONDING_TARGET_SOL = 415
   const solPriceUsd = solPrice ?? 0
-  const isGraduated = token.is_completed ?? false
+  const isGraduated = token.is_completed === true || token.is_bonding_curve === false
   const rawProgress = solPriceUsd > 0 ? (token.usd_market_cap / (solPriceUsd * BONDING_TARGET_SOL)) * 100 : 0
   const progressPercent = isGraduated ? 100 : Math.min(Math.max(rawProgress, 0), 100)
-  const showBondingProgress = Number.isFinite(progressPercent) && progressPercent >= 0
+  const showBondingProgress =
+    Number.isFinite(progressPercent) && progressPercent >= 0 && (token.is_bonding_curve !== null || !isGraduated)
 
   const isFavorite = favorites.includes(token.mint)
 

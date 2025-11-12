@@ -445,6 +445,14 @@ function mergeTradeWithMetadata(trade, metadataPayload) {
     changed = true
   }
 
+  if (typeof completeFlag === "boolean") {
+    const bondingState = completeFlag ? false : updated.is_bonding_curve
+    if (bondingState !== updated.is_bonding_curve) {
+      updated.is_bonding_curve = bondingState ?? null
+      changed = true
+    }
+  }
+
   const bondingCurve =
     metadata?.bondingCurve ??
     metadata?.bonding_curve ??
