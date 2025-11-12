@@ -38,7 +38,6 @@ const PUMP_REQUEST_HEADERS = {
 }
 const METADATA_HEADERS = { Accept: "application/json" }
 const METADATA_CACHE_TTL_MS = Number(process.env.PUMP_PROXY_METADATA_TTL_MS || 15 * 60 * 1000)
-const METADATA_REBROADCAST_INTERVAL_MS = Number(process.env.PUMP_PROXY_METADATA_REBROADCAST_MS || 60 * 1000)
 const METADATA_RETRY_BASE_DELAY_MS = Number(process.env.PUMP_PROXY_METADATA_RETRY_BASE_MS || 1_000)
 const METADATA_RETRY_MAX_DELAY_MS = Number(process.env.PUMP_PROXY_METADATA_RETRY_MAX_MS || 60_000)
 const METADATA_MAX_BUFFERED_TRADES = Number(process.env.PUMP_PROXY_MAX_BUFFERED_TRADES || 500)
@@ -46,7 +45,6 @@ const METADATA_MAX_BUFFERED_TRADES = Number(process.env.PUMP_PROXY_MAX_BUFFERED_
 const metadataCache = new Map()
 const metadataInflight = new Map()
 let registryWriteTimer = null
-const metadataBroadcastTimestamps = new Map()
 const metadataFetchState = new Map()
 const metadataUriHints = new Map()
 const tradeBuffers = new Map()
@@ -217,23 +215,6 @@ function getCachedMetadataPayload(mint) {
   return cached.payload
 }
 
-function getAllCachedMetadataPayloads() {
-  const payloads = []
-  for (const [mint, entry] of metadataCache.entries()) {
-    if (!entry) {
-      metadataCache.delete(mint)
-      continue
-    }
-
-    if (entry.expiresAt !== null && entry.expiresAt <= Date.now()) {
-      metadataCache.delete(mint)
-      continue
-    }
-    payloads.push(entry.payload)
-  }
-  return payloads
-}
-
 function ensureDataDirectory() {
   try {
     if (!fs.existsSync(DATA_DIRECTORY)) {
@@ -310,30 +291,12 @@ function loadMintRegistry() {
         persist: true,
         fetchedAt: entry.fetchedAt ?? Date.now(),
       })
-      metadataBroadcastTimestamps.set(entry.mint, 0)
     }
 
     console.log(`[proxy] Loaded ${parsed.mints.length} cached mint metadata entries`)
   } catch (error) {
     console.error("[proxy] Failed to load mint registry:", error)
   }
-}
-
-function broadcastMetadata(payload, options = {}) {
-  if (!payload || typeof payload.mint !== "string") {
-    return
-  }
-
-  const { force = false } = options
-  const mint = payload.mint
-  const lastBroadcast = metadataBroadcastTimestamps.get(mint) ?? 0
-
-  if (!force && Date.now() - lastBroadcast < METADATA_REBROADCAST_INTERVAL_MS) {
-    return
-  }
-
-  metadataBroadcastTimestamps.set(mint, Date.now())
-  broadcast(payload)
 }
 
 function getMetadataFetchState(mint) {
@@ -516,11 +479,7 @@ function flushTradeBuffer(mint) {
   }
 
   const buffer = tradeBuffers.get(mint)
-  const hadBufferedTrades = Boolean(buffer && buffer.length > 0)
-
-  broadcastMetadata(payload, { force: hadBufferedTrades })
-
-  if (hadBufferedTrades) {
+  if (buffer && buffer.length > 0) {
     const tradesToSend = buffer.splice(0, buffer.length)
     tradeBuffers.delete(mint)
 
@@ -590,7 +549,6 @@ function performMetadataFetch(mint) {
           buffer[i] = mergeTradeWithMetadata(buffer[i], result.payload)
         }
       }
-      broadcastMetadata(result.payload, { force: true })
       flushTradeBuffer(mint)
       return result.payload
     }
@@ -938,10 +896,6 @@ function handleClientConnection(client) {
   console.log("[proxy] Client connected. Total:", clients.size)
 
   client.send(JSON.stringify({ type: "status", state: upstreamReady ? "ready" : "connecting" }))
-
-  for (const payload of getAllCachedMetadataPayloads()) {
-    client.send(JSON.stringify(payload))
-  }
 
   client.on("close", () => {
     clients.delete(client)
