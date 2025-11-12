@@ -157,10 +157,21 @@ export function useWebSocketTrades(setAllTrades: React.Dispatch<React.SetStateAc
         return process.env.NEXT_PUBLIC_PUMP_PROXY_WS
       }
 
+      const hostname = window.location.hostname || "127.0.0.1"
+
+      if (hostname === "localhost" || hostname === "127.0.0.1") {
+        const protocol = window.location.protocol === "https:" ? "wss" : "ws"
+        const port = process.env.NEXT_PUBLIC_PUMP_PROXY_PORT || "4000"
+        return `${protocol}://localhost:${port}`
+      }
+
+      if (hostname === "pump.investments" || hostname.endsWith(".pump.investments")) {
+        return "wss://ws.pump.investments"
+      }
+
       const protocol = window.location.protocol === "https:" ? "wss" : "ws"
-      const host = window.location.hostname || "127.0.0.1"
       const port = process.env.NEXT_PUBLIC_PUMP_PROXY_PORT || "4000"
-      return `${protocol}://${host}:${port}`
+      return `${protocol}://${hostname}:${port}`
     }
 
     const fetchMetadataForMint = async (
