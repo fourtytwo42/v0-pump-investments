@@ -339,7 +339,7 @@ export function useVisibleTokenMetadata({ paginatedTokens, setTokens, setAllTrad
           console.log("[metadata] fetching metadata for visible token", token.mint)
         }
 
-        const fetched = await fetchTokenMetadataWithCache(token.mint)
+        const fetched = await fetchTokenMetadataWithCache(token.mint, token.image_metadata_uri ?? null)
         if (process.env.NEXT_PUBLIC_LOG_METADATA === "true") {
           console.log("[metadata] fetch result", token.mint, fetched ? "value" : "null")
         }

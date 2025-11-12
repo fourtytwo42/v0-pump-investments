@@ -13,7 +13,19 @@ import {
   getCachedTokenMetadata,
   hasCachedTokenMetadata,
 } from "@/lib/token-metadata-cache"
-import { normalizeTokenMetadata, type TokenMetadata } from "@/lib/token-metadata"
+import { normalizeTokenMetadata, type TokenMetadata as PumpTokenMetadata } from "@/lib/token-metadata"
+
+type ProxyMessage = {
+  type?: string
+  state?: string
+  trade?: Trade
+  mint?: string
+  metadata?: unknown
+  metadata_uri?: string | null
+  metadataUri?: string | null
+  coin?: unknown
+  payload?: string
+}
 
 function logMetadata(message: string, ...args: unknown[]) {
   if (process.env.NEXT_PUBLIC_LOG_METADATA === "true") {
@@ -25,16 +37,120 @@ export type { Trade }
 
 const RECONNECT_DELAY_MS = 5000
 const TRADE_RETENTION_MS = 60 * 60 * 1000
+const METADATA_WAIT_TIMEOUT_MS = 2500
 
 export function useWebSocketTrades(setAllTrades: React.Dispatch<React.SetStateAction<Trade[]>>) {
   const [isConnected, setIsConnected] = useState<boolean>(false)
   const socketRef = useRef<WebSocket | null>(null)
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const signatureSetRef = useRef<Set<string>>(new Set())
-  const metadataFetchByMintRef = useRef<Map<string, Promise<TokenMetadata | null>>>(new Map())
+  const metadataFetchByMintRef = useRef<Map<string, Promise<PumpTokenMetadata | null>>>(new Map())
+  const metadataWaitersRef = useRef<
+    Map<string, { resolve: (metadata: PumpTokenMetadata | null) => void; timeoutId: NodeJS.Timeout }>
+  >(new Map())
 
   useEffect(() => {
     let isUnmounting = false
+
+    const applyMetadataToExistingTrades = (
+      mint: string,
+      metadata: PumpTokenMetadata | null,
+      metadataUri: string | null,
+    ) => {
+      if (!metadata) {
+        return
+      }
+
+      logMetadata("[metadata] websocket applying metadata to cached trades", mint)
+
+      setAllTrades((prevTrades) => {
+        let changed = false
+
+        const updatedTrades = prevTrades.map((trade) => {
+          if (trade.mint !== mint) {
+            return trade
+          }
+
+          let tradeChanged = false
+          const next: Trade = { ...trade }
+
+          const safeName = metadata.name?.trim() || null
+          const safeSymbol = metadata.symbol?.trim() || null
+          const safeDescription = metadata.description?.trim() || null
+          const safeImage = metadata.image?.trim() || null
+          const safeWebsite = metadata.website?.trim() || null
+          const safeTwitter = metadata.twitter?.trim() || null
+          const safeTelegram = metadata.telegram?.trim() || null
+
+          if (safeName && safeName !== trade.name) {
+            next.name = safeName
+            tradeChanged = true
+          }
+
+          if (safeSymbol && safeSymbol !== trade.symbol) {
+            next.symbol = safeSymbol
+            tradeChanged = true
+          }
+
+          if (safeDescription && safeDescription !== trade.description) {
+            next.description = safeDescription
+            tradeChanged = true
+          }
+
+          if (safeImage && safeImage !== trade.image_uri) {
+            next.image_uri = safeImage
+            tradeChanged = true
+          }
+
+          if (safeWebsite && safeWebsite !== trade.website) {
+            next.website = safeWebsite
+            tradeChanged = true
+          }
+
+          if (safeTwitter && safeTwitter !== trade.twitter) {
+            next.twitter = safeTwitter
+            tradeChanged = true
+          }
+
+          if (safeTelegram && safeTelegram !== trade.telegram) {
+            next.telegram = safeTelegram
+            tradeChanged = true
+          }
+
+          if (
+            metadata.createdTimestamp !== undefined &&
+            metadata.createdTimestamp !== null &&
+            !trade.created_timestamp
+          ) {
+            next.created_timestamp = metadata.createdTimestamp ?? undefined
+            tradeChanged = true
+          }
+
+          if (
+            metadata.kingOfTheHillTimestamp !== undefined &&
+            metadata.kingOfTheHillTimestamp !== null &&
+            (trade.king_of_the_hill_timestamp === undefined || trade.king_of_the_hill_timestamp === null)
+          ) {
+            next.king_of_the_hill_timestamp = metadata.kingOfTheHillTimestamp ?? null
+            tradeChanged = true
+          }
+
+          if (metadataUri && metadataUri !== trade.metadata_uri) {
+            next.metadata_uri = metadataUri
+            tradeChanged = true
+          }
+
+          if (tradeChanged) {
+            changed = true
+            return next
+          }
+
+          return trade
+        })
+
+        return changed ? updatedTrades : prevTrades
+      })
+    }
 
     const resolveProxyUrl = () => {
       if (process.env.NEXT_PUBLIC_PUMP_PROXY_WS) {
@@ -47,85 +163,45 @@ export function useWebSocketTrades(setAllTrades: React.Dispatch<React.SetStateAc
       return `${protocol}://${host}:${port}`
     }
 
-    const fetchMetadataForMint = async (mint: string, metadataUri: string | null | undefined): Promise<TokenMetadata | null> => {
+    const fetchMetadataForMint = async (
+      mint: string,
+      metadataUri: string | null | undefined,
+    ): Promise<PumpTokenMetadata | null> => {
       if (!mint) {
         return null
       }
 
       const cached = hasCachedTokenMetadata(mint) ? getCachedTokenMetadata(mint) ?? null : undefined
       if (cached !== undefined) {
-        logMetadata("[metadata] websocket cache hit", mint, cached ? "value" : "null")
         return cached
       }
 
       if (metadataFetchByMintRef.current.has(mint)) {
-        logMetadata("[metadata] websocket joining inflight", mint)
         return metadataFetchByMintRef.current.get(mint) ?? null
       }
 
-      const request = (async () => {
-        const fromPump = await fetchTokenMetadataWithCache(mint)
-        if (fromPump) {
-          logMetadata("[metadata] websocket received Pump.fun metadata", mint)
-          return fromPump
-        }
+      const waitPromise = new Promise<PumpTokenMetadata | null>((resolve) => {
+        const timeoutId = setTimeout(async () => {
+          metadataWaitersRef.current.delete(mint)
+          metadataFetchByMintRef.current.delete(mint)
+          logMetadata("[metadata] websocket fallback to client fetch", mint)
 
-        const normalizedUri = normalizeIpfsUri(metadataUri) ?? metadataUri
-        if (!normalizedUri) {
-          cacheTokenMetadata(mint, null)
-          return null
-        }
-
-        try {
-          logMetadata("[metadata] websocket fetching metadata URI", mint, normalizedUri)
-          const response = await fetch(normalizedUri, {
-            cache: "force-cache",
-            headers: { Accept: "application/json" },
-          })
-
-          if (!response.ok) {
-            throw new Error(`Metadata URI responded with status ${response.status}`)
+          const fallback = await fetchTokenMetadataWithCache(mint, metadataUri ?? null)
+          if (fallback) {
+            cacheTokenMetadata(mint, fallback)
+            applyMetadataToExistingTrades(mint, fallback, normalizeIpfsUri(metadataUri) ?? null)
+          } else if (metadataUri) {
+            cacheTokenMetadata(mint, null)
           }
 
-          const raw = (await response.json()) as unknown
-          const metadata = normalizeTokenMetadata(raw)
+          resolve(fallback ?? null)
+        }, METADATA_WAIT_TIMEOUT_MS)
 
-          cacheTokenMetadata(mint, metadata)
-          logMetadata("[metadata] websocket normalized URI metadata", mint, metadata ? "value" : "null")
-          return metadata
-        } catch (error) {
-          console.debug(`[metadata] Websocket metadata URI fetch failed for ${mint}:`, error)
-          cacheTokenMetadata(mint, null)
-          return null
-        } finally {
-          metadataFetchByMintRef.current.delete(mint)
-        }
-      })()
+        metadataWaitersRef.current.set(mint, { resolve, timeoutId })
+      })
 
-      metadataFetchByMintRef.current.set(mint, request)
-      return request
-    }
-
-    const enrichTrade = async (incomingTrade: Trade): Promise<Trade> => {
-      const metadata = await fetchMetadataForMint(incomingTrade.mint, incomingTrade.metadata_uri)
-      if (!metadata) {
-        return incomingTrade
-      }
-
-      logMetadata("[metadata] websocket applying metadata to trade", incomingTrade.mint, incomingTrade.signature)
-      return {
-        ...incomingTrade,
-        name: metadata.name ?? incomingTrade.name,
-        symbol: metadata.symbol ?? incomingTrade.symbol,
-        description: metadata.description ?? incomingTrade.description ?? null,
-        image_uri: metadata.image ?? incomingTrade.image_uri,
-        twitter: metadata.twitter ?? incomingTrade.twitter ?? null,
-        telegram: metadata.telegram ?? incomingTrade.telegram ?? null,
-        website: metadata.website ?? incomingTrade.website ?? null,
-        created_timestamp: incomingTrade.created_timestamp ?? metadata.createdTimestamp ?? undefined,
-        king_of_the_hill_timestamp:
-          incomingTrade.king_of_the_hill_timestamp ?? metadata.kingOfTheHillTimestamp ?? null,
-      }
+      metadataFetchByMintRef.current.set(mint, waitPromise)
+      return waitPromise
     }
 
     const handleTrade = async (incomingTrade: Trade) => {
@@ -140,22 +216,23 @@ export function useWebSocketTrades(setAllTrades: React.Dispatch<React.SetStateAc
         return
       }
 
-      const enrichedTrade = await enrichTrade({ ...incomingTrade, mint: trimmedMint, signature: trimmedSignature })
+      void fetchMetadataForMint(trimmedMint, incomingTrade.metadata_uri)
 
       signatureSetRef.current.add(trimmedSignature)
 
       const newTrade: Trade = {
-        ...enrichedTrade,
+        ...incomingTrade,
         mint: trimmedMint,
         signature: trimmedSignature,
         received_time: Date.now(),
       }
 
       try {
+        const receivedTime = newTrade.received_time ?? Date.now()
         const storedTrade: StoredTrade = {
           ...newTrade,
           id: `${newTrade.mint}-${newTrade.timestamp}-${newTrade.signature}`,
-          received_time: newTrade.received_time,
+          received_time: receivedTime,
         }
         await db.addTrade(storedTrade)
       } catch (error) {
@@ -193,10 +270,10 @@ export function useWebSocketTrades(setAllTrades: React.Dispatch<React.SetStateAc
 
           logMetadata("[metadata] websocket received message raw", event.data.slice(0, 200))
 
-          let message: { type?: string; state?: string; trade?: Trade } | null = null
+          let message: ProxyMessage | null = null
 
           try {
-            message = JSON.parse(event.data)
+            message = JSON.parse(event.data) as ProxyMessage
           } catch (error) {
             console.error("[v0] Failed to parse proxy message:", error, event.data)
             return
@@ -214,6 +291,45 @@ export function useWebSocketTrades(setAllTrades: React.Dispatch<React.SetStateAc
           if (message.type === "trade" && message.trade) {
             logMetadata("[metadata] websocket received proxied trade", message.trade.mint)
             void handleTrade(message.trade)
+            return
+          }
+
+          if (message.type === "metadata" && typeof message.mint === "string") {
+            const mint = message.mint.trim()
+            if (!mint) {
+              return
+            }
+
+            const metadataUri = normalizeIpfsUri((message.metadata_uri ?? message.metadataUri) as string | null | undefined)
+            const rawMetadata =
+              message.metadata && typeof message.metadata === "object" ? (message.metadata as Record<string, unknown>) : null
+            const coinMetadata =
+              message.coin && typeof message.coin === "object" ? (message.coin as Record<string, unknown>) : null
+
+            let normalizedMetadata: PumpTokenMetadata | null = null
+            if (rawMetadata) {
+              normalizedMetadata = normalizeTokenMetadata(rawMetadata)
+            } else if (coinMetadata) {
+              normalizedMetadata = normalizeTokenMetadata(coinMetadata)
+            }
+
+            if (normalizedMetadata) {
+              cacheTokenMetadata(mint, normalizedMetadata)
+              applyMetadataToExistingTrades(mint, normalizedMetadata, metadataUri ?? null)
+            } else if (metadataUri) {
+              cacheTokenMetadata(mint, null)
+            }
+
+            const waiter = metadataWaitersRef.current.get(mint)
+            if (waiter) {
+              clearTimeout(waiter.timeoutId)
+              metadataWaitersRef.current.delete(mint)
+              metadataFetchByMintRef.current.delete(mint)
+              waiter.resolve(normalizedMetadata)
+            } else {
+              metadataFetchByMintRef.current.delete(mint)
+            }
+
             return
           }
 
@@ -276,6 +392,11 @@ export function useWebSocketTrades(setAllTrades: React.Dispatch<React.SetStateAc
       }
 
       signatureSetRef.current.clear()
+      for (const { timeoutId } of metadataWaitersRef.current.values()) {
+        clearTimeout(timeoutId)
+      }
+      metadataWaitersRef.current.clear()
+      metadataFetchByMintRef.current.clear()
       setIsConnected(false)
     }
   }, [setAllTrades])

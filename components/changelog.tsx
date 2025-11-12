@@ -31,6 +31,27 @@ interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: "3.0.29",
+    date: "November 12, 2025",
+    changes: [
+      {
+        type: "improved",
+        description:
+          "Moved Pump.fun coin metadata fetching into the proxy service with caching so clients avoid Cloudflare 530 errors.",
+      },
+      {
+        type: "improved",
+        description:
+          "Proxy now enriches every trade broadcast with the latest metadata payloads and shares cached entries when clients connect.",
+      },
+      {
+        type: "fixed",
+        description:
+          "Client WebSocket handler waits for proxy metadata before falling back to IPFS, keeping trade cards accurate without redundant requests.",
+      },
+    ],
+  },
+  {
     version: "3.0.28",
     date: "June 3, 2025",
     changes: [
