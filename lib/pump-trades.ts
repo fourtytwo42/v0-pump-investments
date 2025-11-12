@@ -136,7 +136,7 @@ export function convertPumpTradeToLocal(pumpTrade: PumpUnifiedTrade): Trade {
   const metadataUri = normalizeIpfsUri(pumpTrade.coinMeta?.uri)
 
   return {
-    mint: pumpTrade.mintAddress,
+    mint: (pumpTrade.mintAddress || "").trim(),
     name: pumpTrade.coinMeta?.name || "Unknown",
     symbol: pumpTrade.coinMeta?.symbol || "???",
     image_uri: "",
