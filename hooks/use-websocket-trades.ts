@@ -149,10 +149,10 @@ export function useWebSocketTrades(setAllTrades: React.Dispatch<React.SetStateAc
   const messageBufferRef = useRef<string>("")
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const pingIntervalRef = useRef<NodeJS.Timeout | null>(null)
-  const pendingMsgRef = useRef<{ size: number } | null>(null)
   const connectionStateRef = useRef<"connecting" | "waiting_info" | "sent_connect" | "ready">("connecting")
   const tradesByMintRef = useRef<Map<string, Trade[]>>(new Map())
   const signatureIndexRef = useRef<Set<string>>(new Set())
+  const subscribedSidRef = useRef<Set<string>>(new Set())
 
   useEffect(() => {
     console.log("[v0] Setting up Pump.fun NATS WebSocket connection (direct)")
@@ -165,103 +165,194 @@ export function useWebSocketTrades(setAllTrades: React.Dispatch<React.SetStateAc
       try {
         connectionStateRef.current = "waiting_info"
 
-        const socket = new WebSocket("wss://unified-prod.nats.realtime.pump.fun/")
+        const socket = new WebSocket("wss://unified-prod.nats.realtime.pump.fun/", ["nats"])
         socketRef.current = socket
+        messageBufferRef.current = ""
+        subscribedSidRef.current.clear()
 
         socket.onopen = () => {
           console.log("[v0] NATS WebSocket opened, waiting for INFO from server")
         }
 
-        socket.onmessage = (event) => {
-          const data = event.data as string
-          messageBufferRef.current += data
+        const reserveSid = (() => {
+          let current = 1
+          return () => String(current++)
+        })()
 
-          const lines = messageBufferRef.current.split("\r\n")
-
-          if (!messageBufferRef.current.endsWith("\r\n")) {
-            messageBufferRef.current = lines.pop() || ""
-          } else {
-            messageBufferRef.current = ""
+        const ensurePingTimer = () => {
+          if (pingIntervalRef.current) {
+            return
           }
 
-          for (let i = 0; i < lines.length; i++) {
-            const line = lines[i]
-            if (!line) continue
-
-            if (line.startsWith("INFO ")) {
-              console.log("[v0] Received INFO from server, sending CONNECT with credentials")
-
-              // Send CONNECT frame with static credentials
-              const connectPayload = JSON.stringify({
-                user: "subscriber",
-                pass: "OX745xvUbNQMuFqV",
-                no_responders: true,
-                protocol: 1,
-                verbose: false,
-                pedantic: false,
-                lang: "nats.ws",
-                version: "1.30.3",
-                headers: true,
-              })
-              socket.send(`CONNECT ${connectPayload}\r\n`)
-
-              // Immediately send PING after CONNECT
+          pingIntervalRef.current = setInterval(() => {
+            if (socket.readyState === WebSocket.OPEN) {
               socket.send("PING\r\n")
+            }
+          }, 30000)
+        }
 
-              connectionStateRef.current = "sent_connect"
-              continue
+        const handleControlLine = (line: string) => {
+          if (!line) {
+            return
+          }
+
+          if (line.startsWith("INFO ")) {
+            console.log("[v0] Received INFO from server, sending CONNECT with credentials")
+
+            const connectPayload = JSON.stringify({
+              user: "subscriber",
+              pass: "OX745xvUbNQMuFqV",
+              no_responders: true,
+              protocol: 1,
+              verbose: false,
+              pedantic: false,
+              lang: "nats.ws",
+              version: "1.30.3",
+              headers: true,
+            })
+
+            socket.send(`CONNECT ${connectPayload}\r\nPING\r\n`)
+            connectionStateRef.current = "sent_connect"
+            return
+          }
+
+          if (line.startsWith("+OK")) {
+            console.log("[v0] Received +OK, connection accepted")
+            return
+          }
+
+          if (line === "PING") {
+            socket.send("PONG\r\n")
+            return
+          }
+
+          if (line === "PONG") {
+            if (connectionStateRef.current === "sent_connect") {
+              console.log("[v0] Received initial PONG, registering subscriptions")
+              connectionStateRef.current = "ready"
+              setIsConnected(true)
+
+              const warmupSid = reserveSid()
+              const warmupSubject = `_WARMUP_UNIFIED_${Date.now()}`
+              socket.send(`SUB ${warmupSubject} ${warmupSid}\r\n`)
+              socket.send(`UNSUB ${warmupSid}\r\n`)
+
+              const processedSid = reserveSid()
+              const wildcardSid = reserveSid()
+
+              subscribedSidRef.current.add(processedSid)
+              subscribedSidRef.current.add(wildcardSid)
+
+              socket.send(`SUB unifiedTradeEvent.processed ${processedSid}\r\n`)
+              socket.send(`SUB unifiedTradeEvent.processed.* ${wildcardSid}\r\n`)
+              console.log("[v0] Subscribed to unified trade events", {
+                processedSid,
+                wildcardSid,
+              })
+
+              ensurePingTimer()
+            }
+            return
+          }
+
+          if (line.startsWith("-ERR")) {
+            console.error("[v0] Received error from NATS server:", line)
+            socket.close(4001, line)
+            return
+          }
+        }
+
+        const processPayload = (subject: string | undefined, sid: string | undefined, payload: string) => {
+          if (!subject || !sid) {
+            return
+          }
+
+          if (!subscribedSidRef.current.has(sid)) {
+            return
+          }
+
+          if (!subject.startsWith("unifiedTradeEvent.processed")) {
+            return
+          }
+
+          const decoded = decodePumpPayload(payload)
+          if (!decoded) {
+            console.error("[v0] Failed to decode payload:", payload.slice(0, 200))
+            return
+          }
+
+          console.log("[v0] Successfully decoded trade:", decoded.mintAddress, decoded.type)
+          const trade = convertPumpTradeToLocal(decoded)
+          handleTrade(trade)
+        }
+
+        socket.onmessage = (event) => {
+          if (typeof event.data !== "string") {
+            return
+          }
+
+          messageBufferRef.current += event.data
+
+          let buffer = messageBufferRef.current
+
+          const restoreBuffer = (lineWithNewline: string, remaining: string) => {
+            messageBufferRef.current = `${lineWithNewline}${remaining}`
+          }
+
+          while (buffer.length > 0) {
+            const newlineIndex = buffer.indexOf("\n")
+            if (newlineIndex === -1) {
+              break
             }
 
-            if (line.startsWith("+OK")) {
-              console.log("[v0] Received +OK, connection accepted")
-              continue
+            const lineWithNewline = buffer.slice(0, newlineIndex + 1)
+            let line = lineWithNewline
+            if (line.endsWith("\r\n")) {
+              line = line.slice(0, -2)
+            } else if (line.endsWith("\n")) {
+              line = line.slice(0, -1)
+            } else if (line.endsWith("\r")) {
+              line = line.slice(0, -1)
             }
 
-            if (line === "PING") {
-              socket.send("PONG\r\n")
-              continue
-            }
-
-            if (line === "PONG") {
-              if (connectionStateRef.current === "sent_connect") {
-                console.log("[v0] Received PONG, sending subscription")
-                connectionStateRef.current = "ready"
-                setIsConnected(true)
-
-                // Subscribe to unified trade events (no wildcard needed)
-                socket.send("SUB unifiedTradeEvent.processed sub0\r\n")
-                console.log("[v0] Subscribed to unifiedTradeEvent.processed")
-
-                // Start ping interval
-                pingIntervalRef.current = setInterval(() => {
-                  if (socket.readyState === WebSocket.OPEN) {
-                    socket.send("PING\r\n")
-                  }
-                }, 30000)
-              }
-              continue
-            }
+            buffer = buffer.slice(lineWithNewline.length)
 
             if (line.startsWith("MSG ")) {
               const parts = line.split(" ")
-              const payloadSize = Number.parseInt(parts[parts.length - 1], 10)
+              const subject = parts[1]
+              const sid = parts[2]
+              const hasReply = parts.length === 5
+              const sizeIndex = hasReply ? 4 : 3
+              const payloadSize = Number.parseInt(parts[sizeIndex], 10)
 
-              i++
-              if (i < lines.length) {
-                const payload = lines[i]
-                console.log("[v0] Received trade payload, size:", payload.length)
-
-                const decoded = decodePumpPayload(payload)
-                if (decoded) {
-                  console.log("[v0] Successfully decoded trade:", decoded.mintAddress, decoded.type)
-                  const trade = convertPumpTradeToLocal(decoded)
-                  handleTrade(trade)
-                } else {
-                  console.error("[v0] Failed to decode payload:", payload.slice(0, 200))
-                }
+              if (!Number.isFinite(payloadSize) || payloadSize < 0) {
+                continue
               }
+
+              if (buffer.length < payloadSize + 1) {
+                restoreBuffer(lineWithNewline, buffer)
+                return
+              }
+
+              const payload = buffer.slice(0, payloadSize)
+              buffer = buffer.slice(payloadSize)
+
+              if (buffer.startsWith("\r\n")) {
+                buffer = buffer.slice(2)
+              } else if (buffer.startsWith("\n")) {
+                buffer = buffer.slice(1)
+              } else if (buffer.startsWith("\r")) {
+                buffer = buffer.slice(1)
+              }
+
+              processPayload(subject, sid, payload)
+              continue
             }
+
+            handleControlLine(line)
           }
+
+          messageBufferRef.current = buffer
         }
 
         socket.onerror = (error) => {
@@ -393,6 +484,7 @@ export function useWebSocketTrades(setAllTrades: React.Dispatch<React.SetStateAc
 
       tradesByMintRef.current.clear()
       signatureIndexRef.current.clear()
+      subscribedSidRef.current.clear()
       setIsConnected(false)
     }
   }, [setAllTrades])
