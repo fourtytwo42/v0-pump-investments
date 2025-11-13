@@ -156,18 +156,30 @@ export function decodePumpPayload(rawPayload: string): PumpUnifiedTrade | null {
 
     working = working.replace(/\\"/g, '"')
 
+    const firstBrace = working.indexOf("{")
+    const lastBrace = working.lastIndexOf("}")
+
+    if (firstBrace > 0 && lastBrace > firstBrace) {
+      working = working.slice(firstBrace, lastBrace + 1)
+    } else if (lastBrace > 0) {
+      working = working.slice(0, lastBrace + 1)
+    }
+
     try {
       return JSON.parse(working) as PumpUnifiedTrade
     } catch {
-      const lastBrace = working.lastIndexOf("}")
-      if (lastBrace !== -1) {
-        return JSON.parse(working.slice(0, lastBrace + 1)) as PumpUnifiedTrade
+      if (lastBrace > 0) {
+        try {
+          return JSON.parse(working.slice(0, lastBrace + 1)) as PumpUnifiedTrade
+        } catch {
+          // ignore and fallback to null
+        }
       }
     }
 
     return null
   } catch (error) {
-    console.error("[pump] Failed to decode Pump payload:", error)
+    console.warn("[pump] Failed to decode Pump payload:", (error as Error).message)
     return null
   }
 }
