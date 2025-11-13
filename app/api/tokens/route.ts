@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { type TokenData, type TokenQueryOptions } from "@/types/token-data"
 import { Decimal } from "@prisma/client/runtime/library"
-import { fetchPumpCoin } from "@/lib/pump-coin"
+import { fetchPumpCoin, PUMP_HEADERS } from "@/lib/pump-coin"
 import { normalizeTokenMetadata } from "@/lib/token-metadata"
 import { normalizeIpfsUri } from "@/lib/pump-trades"
 
@@ -29,7 +29,13 @@ async function fetchMetadata(uri: string): Promise<{
   }
 
   try {
-    const response = await fetch(uri, { headers: { accept: "application/json" } })
+    const response = await fetch(uri, {
+      cache: "no-store",
+      headers: {
+        ...PUMP_HEADERS,
+        accept: "application/json",
+      },
+    })
     if (!response.ok) {
       throw new Error(`metadata fetch ${response.status}`)
     }

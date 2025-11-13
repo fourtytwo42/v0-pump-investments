@@ -1,34 +1,47 @@
+export const PUMP_HEADERS = {
+  accept: "application/json, text/plain, */*",
+  origin: "https://pump.fun",
+  referer: "https://pump.fun",
+  "user-agent": "PumpFunMockTrader/1.0 (+https://pump.fun)",
+}
+
+const FRONTEND_ENDPOINTS = [
+  "https://frontend-api-v3.pump.fun",
+  "https://frontend-api.pump.fun",
+]
+
 const COIN_CACHE = new Map<string, any | null>()
 const COIN_FETCH_PROMISES = new Map<string, Promise<any | null>>()
 
 async function requestPumpCoin(mint: string): Promise<any | null> {
-  const url = `https://frontend-api.pump.fun/coins/${mint}`
+  for (const baseUrl of FRONTEND_ENDPOINTS) {
+    const url = `${baseUrl}/coins/${mint}`
 
-  try {
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        accept: "application/json",
-      },
-    })
+    try {
+      const response = await fetch(url, {
+        cache: "no-store",
+        headers: PUMP_HEADERS,
+      })
 
-    if (!response.ok) {
-      if (response.status === 404) {
-        COIN_CACHE.set(mint, null)
-        return null
+      if (!response.ok) {
+        if (response.status === 404) {
+          COIN_CACHE.set(mint, null)
+          return null
+        }
+        console.warn(`[pump-coin] ${url} responded with ${response.status}`)
+        continue
       }
-      throw new Error(`pump.fun coin request failed with status ${response.status}`)
-    }
 
-    const json = await response.json()
-    COIN_CACHE.set(mint, json)
-    return json
-  } catch (error) {
-    console.warn(`[pump-coin] Failed to fetch coin ${mint}:`, (error as Error).message)
-    return null
-  } finally {
-    COIN_FETCH_PROMISES.delete(mint)
+      const json = await response.json()
+      COIN_CACHE.set(mint, json)
+      return json
+    } catch (error) {
+      console.warn(`[pump-coin] Failed to fetch coin ${mint} from ${baseUrl}:`, (error as Error).message)
+    }
   }
+
+  COIN_CACHE.set(mint, null)
+  return null
 }
 
 export async function fetchPumpCoin(mint: string | null | undefined): Promise<any | null> {

@@ -3,7 +3,7 @@ import { Decimal } from "@prisma/client/runtime/library"
 import WebSocket from "ws"
 import { decodePumpPayload, type PumpUnifiedTrade, normalizeIpfsUri } from "@/lib/pump-trades"
 import { normalizeTokenMetadata, isMetadataEmpty } from "@/lib/token-metadata"
-import { fetchPumpCoin } from "@/lib/pump-coin"
+import { fetchPumpCoin, PUMP_HEADERS } from "@/lib/pump-coin"
 
 function enforceConnectionLimit(url?: string): string | undefined {
   if (!url) return url
@@ -164,7 +164,11 @@ async function fetchMetadataFromUri(uri: string): Promise<any | null> {
     for (let attempt = 0; attempt < METADATA_FETCH_MAX_ATTEMPTS; attempt += 1) {
       try {
         const response = await fetch(uri, {
-          headers: { accept: "application/json" },
+          cache: "no-store",
+          headers: {
+            ...PUMP_HEADERS,
+            accept: "application/json",
+          },
           signal: controller.signal,
         })
 
@@ -331,6 +335,46 @@ async function processMetadataRetryQueue() {
 setInterval(() => {
   void processMetadataRetryQueue()
 }, METADATA_RETRY_INTERVAL_MS)
+
+async function seedMetadataRetryQueue(): Promise<void> {
+  try {
+    const candidates = await prisma.token.findMany({
+      where: {
+        OR: [
+          { imageUri: null },
+          { metadataUri: null },
+          { description: null },
+          { twitter: null },
+          { telegram: null },
+        ],
+      },
+      select: {
+        mintAddress: true,
+        name: true,
+        symbol: true,
+        imageUri: true,
+        metadataUri: true,
+      },
+      take: 5000,
+    })
+
+    for (const token of candidates) {
+      if (!token.mintAddress) continue
+
+      const likelyMintName = looksLikeMintPrefix(token.name, token.mintAddress)
+      const likelyMintSymbol = looksLikeMintPrefix(token.symbol, token.mintAddress)
+      const missingMetadata = !token.metadataUri || !token.imageUri
+
+      if (missingMetadata || likelyMintName || likelyMintSymbol) {
+        scheduleMetadataRetry(token.mintAddress)
+      }
+    }
+  } catch (error) {
+    console.warn("[ingest] Failed to seed metadata retry queue:", (error as Error).message)
+  }
+}
+
+void seedMetadataRetryQueue()
 
 interface PreparedTradeContext {
   trade: PumpUnifiedTrade
