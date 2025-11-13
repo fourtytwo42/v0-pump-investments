@@ -677,23 +677,35 @@ async function persistPreparedTrade(ctx: PreparedTradeContext): Promise<void> {
     },
   })
 
-  await prisma.trade.upsert({
-    where: { txSignature: trade.tx },
-    update: {},
-    create: {
-      tokenId: token.id,
-      txSignature: trade.tx,
-      userAddress: trade.userAddress ?? "unknown",
-      isBuy: ctx.isBuy,
-      amountSol: ctx.amountSol,
-      amountUsd: ctx.amountUsd,
-      baseAmount: ctx.baseAmountRaw,
-      priceSol: ctx.priceSol,
-      priceUsd: ctx.priceUsd,
-      timestamp: BigInt(ctx.timestampMs),
-      raw: trade as Prisma.InputJsonValue,
-    },
-  })
+  try {
+    await prisma.trade.upsert({
+      where: { txSignature: trade.tx },
+      update: {},
+      create: {
+        tokenId: token.id,
+        txSignature: trade.tx,
+        userAddress: trade.userAddress ?? "unknown",
+        isBuy: ctx.isBuy,
+        amountSol: ctx.amountSol,
+        amountUsd: ctx.amountUsd,
+        baseAmount: ctx.baseAmountRaw,
+        priceSol: ctx.priceSol,
+        priceUsd: ctx.priceUsd,
+        timestamp: BigInt(ctx.timestampMs),
+        raw: trade as Prisma.InputJsonValue,
+      },
+    })
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002" &&
+      trade.tx
+    ) {
+      // Duplicate trade already recorded; treat as success.
+    } else {
+      throw error
+    }
+  }
 }
 
 async function processTradeBatch(batch: PumpUnifiedTrade[]): Promise<void> {
