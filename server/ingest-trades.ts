@@ -1,7 +1,12 @@
 import { Prisma, PrismaClient } from "@prisma/client"
 import { Decimal } from "@prisma/client/runtime/library"
 import WebSocket from "ws"
-import { decodePumpPayload, type PumpUnifiedTrade, normalizeIpfsUri } from "@/lib/pump-trades"
+import {
+  decodePumpPayload,
+  type PumpUnifiedTrade,
+  getIpfsGatewayUrls,
+  normalizeIpfsUri,
+} from "@/lib/pump-trades"
 import { normalizeTokenMetadata, isMetadataEmpty } from "@/lib/token-metadata"
 import { fetchPumpCoin, PUMP_HEADERS } from "@/lib/pump-coin"
 
@@ -163,40 +168,52 @@ async function fetchMetadataFromUri(uri: string): Promise<any | null> {
     return metadataFetchPromises.get(uri)!
   }
 
-  const normalizedUri = normalizeIpfsUri(uri) ?? uri
+  const candidates = getIpfsGatewayUrls(uri)
+  const targets = candidates.length > 0 ? candidates : [normalizeIpfsUri(uri) ?? uri]
   const controller = new AbortController()
   const promise = (async () => {
-    for (let attempt = 0; attempt < METADATA_FETCH_MAX_ATTEMPTS; attempt += 1) {
-      try {
-        const response = await fetch(normalizedUri, {
-          cache: "no-store",
-          headers: {
-            ...PUMP_HEADERS,
-            accept: "application/json",
-          },
-          signal: controller.signal,
-        })
+    let lastError: Error | null = null
 
-        if (!response.ok) {
-          throw new Error(`metadata fetch failed with status ${response.status}`)
-        }
+    for (const target of targets) {
+      for (let attempt = 0; attempt < METADATA_FETCH_MAX_ATTEMPTS; attempt += 1) {
+        try {
+          const response = await fetch(target, {
+            cache: "no-store",
+            headers: {
+              ...PUMP_HEADERS,
+              accept: "application/json",
+            },
+            signal: controller.signal,
+          })
 
-        const json = await response.json()
-        metadataCache.set(uri, json)
-        return json
-      } catch (error) {
-        const delayMs = METADATA_RETRY_BASE_DELAY_MS * 2 ** attempt
-        if (attempt === METADATA_FETCH_MAX_ATTEMPTS - 1) {
-          console.warn(`[ingest] Failed to fetch metadata from ${normalizedUri}:`, (error as Error).message)
-          return null
+          if (!response.ok) {
+            throw new Error(`metadata fetch failed with status ${response.status}`)
+          }
+
+          const json = await response.json()
+          metadataCache.set(uri, json)
+          return json
+        } catch (error) {
+          lastError = error as Error
+          const delayMs = METADATA_RETRY_BASE_DELAY_MS * 2 ** attempt
+          if (attempt < METADATA_FETCH_MAX_ATTEMPTS - 1) {
+            await delay(delayMs)
+          } else {
+            break
+          }
         }
-        await delay(delayMs)
       }
     }
+
+    if (lastError) {
+      console.warn(`[ingest] Failed to fetch metadata from ${uri}:`, lastError.message)
+    }
+
     return null
   })().finally(() => {
     metadataFetchPromises.delete(uri)
-  })()
+    controller.abort()
+  })
 
   metadataFetchPromises.set(uri, promise)
   return promise

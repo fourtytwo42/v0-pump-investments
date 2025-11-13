@@ -69,14 +69,53 @@ export interface Trade {
   [key: string]: unknown
 }
 
-export function normalizeIpfsUri(uri: string | null | undefined): string | null {
-  if (!uri) return null
+const IPFS_GATEWAYS = [
+  "https://pump.mypinata.cloud/ipfs/",
+  "https://cloudflare-ipfs.com/ipfs/",
+  "https://ipfs.io/ipfs/",
+  "https://gateway.pinata.cloud/ipfs/",
+  "https://w3s.link/ipfs/",
+  "https://nftstorage.link/ipfs/",
+  "https://dweb.link/ipfs/",
+]
+
+function extractIpfsPath(uri: string): string | null {
   const trimmed = uri.trim()
-  if (trimmed.length === 0) return null
+  if (!trimmed) return null
+
   if (trimmed.startsWith("ipfs://")) {
-    return trimmed.replace("ipfs://", "https://pump.mypinata.cloud/ipfs/")
+    return trimmed.slice("ipfs://".length)
   }
-  return trimmed
+
+  const ipfsMatch = trimmed.match(/^https?:\/\/[^/]+\/ipfs\/(.+)$/i)
+  if (ipfsMatch && ipfsMatch[1]) {
+    return ipfsMatch[1]
+  }
+
+  return null
+}
+
+export function getIpfsGatewayUrls(uri: string | null | undefined): string[] {
+  if (!uri) return []
+  const trimmed = uri.trim()
+  if (!trimmed) return []
+
+  const ipfsPath = extractIpfsPath(trimmed)
+  if (!ipfsPath) {
+    return [trimmed]
+  }
+
+  const normalizedPath = ipfsPath.replace(/^\/+/, "")
+  return IPFS_GATEWAYS.map((gateway) => `${gateway}${normalizedPath}`)
+}
+
+export function resolveIpfsUri(uri: string | null | undefined): string | null {
+  const candidates = getIpfsGatewayUrls(uri)
+  return candidates.length > 0 ? candidates[0] : null
+}
+
+export function normalizeIpfsUri(uri: string | null | undefined): string | null {
+  return resolveIpfsUri(uri)
 }
 
 function tryBase64Decode(value: string): string | null {
