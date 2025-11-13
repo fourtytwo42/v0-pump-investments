@@ -4,16 +4,13 @@ import type React from "react"
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react"
 import { db } from "@/lib/db"
 import { toast } from "@/components/ui/use-toast"
-import { useWebSocketTrades } from "@/hooks/use-websocket-trades"
-import type { Trade } from "@/lib/pump-trades"
-import type { TokenData } from "@/hooks/use-token-processing"
+import type { TokenData } from "@/types/token-data"
+import type { TokenQueryOptions } from "@/lib/token-query"
 
-// Define the context type
 interface TokenContextType {
   tokens: Map<string, TokenData>
+  visibleTokens: TokenData[]
   setTokens: React.Dispatch<React.SetStateAction<Map<string, TokenData>>>
-  allTrades: Trade[]
-  setAllTrades: React.Dispatch<React.SetStateAction<Trade[]>>
   favorites: string[]
   toggleFavorite: (mint: string) => Promise<void>
   isLoading: boolean
@@ -22,29 +19,43 @@ interface TokenContextType {
   setShowFavorites: React.Dispatch<React.SetStateAction<boolean>>
   isPaused: boolean
   setIsPaused: React.Dispatch<React.SetStateAction<boolean>>
-  renderKey: number
-  setRenderKey: React.Dispatch<React.SetStateAction<number>>
+  totalPages: number
+  totalCount: number
+  queryOptions: TokenQueryOptions
+  setTokenQueryOptions: (options: TokenQueryOptions) => void
   isConnected: boolean
 }
 
-// Create the context with a default value
 const TokenContext = createContext<TokenContextType | undefined>(undefined)
 
-// Create a provider component
+const DEFAULT_QUERY_OPTIONS: TokenQueryOptions = {
+  page: 1,
+  pageSize: 12,
+  sortBy: "marketCap",
+  sortOrder: "desc",
+  timeRangeMinutes: 10,
+  filters: {
+    hideExternal: false,
+    hideKOTH: false,
+    graduationFilter: "all",
+    minTradeAmount: 0,
+    favoritesOnly: false,
+  },
+}
+
 export function TokenProvider({ children }: { children: React.ReactNode }) {
   const [tokens, setTokens] = useState<Map<string, TokenData>>(new Map())
-  const [allTrades, setAllTrades] = useState<Trade[]>([])
+  const [visibleTokens, setVisibleTokens] = useState<TokenData[]>([])
   const [favorites, setFavorites] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [solPrice, setSolPrice] = useState<number>(175)
   const [showFavorites, setShowFavorites] = useState<boolean>(false)
   const [isPaused, setIsPaused] = useState<boolean>(false)
-  const [renderKey, setRenderKey] = useState<number>(0)
+  const [queryOptions, setQueryOptions] = useState<TokenQueryOptions>(DEFAULT_QUERY_OPTIONS)
+  const [totalPages, setTotalPages] = useState<number>(1)
+  const [totalCount, setTotalCount] = useState<number>(0)
+  const [isConnected, setIsConnected] = useState<boolean>(false)
 
-  // Call useWebSocketTrades here
-  const { isConnected } = useWebSocketTrades(setAllTrades)
-
-  // Load favorites from Dexie
   const loadFavorites = useCallback(async () => {
     try {
       const favs = await db.getFavorites()
@@ -59,7 +70,6 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  // Toggle favorite function
   const toggleFavorite = useCallback(
     async (mint: string) => {
       try {
@@ -91,7 +101,6 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
     [loadFavorites],
   )
 
-  // Fetch SOL price
   const fetchSolPrice = useCallback(async () => {
     try {
       const response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd")
@@ -100,60 +109,111 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
         setSolPrice(data.solana.usd)
       }
     } catch (error) {
-      // Silent error handling
+      console.warn("Failed to fetch SOL price:", (error as Error).message)
     }
   }, [])
 
-  useEffect(() => {
-    if (allTrades.length > 0) {
-      setIsLoading(false)
-    }
-  }, [allTrades])
+  const setTokenQueryOptions = useCallback((options: TokenQueryOptions) => {
+    setQueryOptions((previous) => {
+      const previousSerialized = JSON.stringify(previous)
+      const nextSerialized = JSON.stringify(options)
+      return previousSerialized === nextSerialized ? previous : options
+    })
+  }, [])
 
   useEffect(() => {
-    if (tokens.size > 0) {
-      setIsLoading(false)
-    }
-  }, [tokens])
-
-  // Initialize data
-  useEffect(() => {
-    const initializeData = async () => {
+    const initialize = async () => {
       setIsLoading(true)
       try {
         await loadFavorites()
-        const storedTrades = await db.getRecentTrades()
-        if (storedTrades.length > 0) {
-          const normalized = storedTrades.map((stored) => ({
-            ...stored,
-            is_completed: stored.is_completed ?? false,
-            is_bonding_curve:
-              stored.is_bonding_curve ??
-              (stored.is_completed === true ? false : true),
-          })) as Trade[]
-          setAllTrades(normalized)
-        }
         await fetchSolPrice()
       } catch (error) {
-        console.error("Error initializing data:", error)
+        console.error("Error initializing token context:", error)
       } finally {
         setIsLoading(false)
       }
     }
-    initializeData()
+
+    initialize()
     const solPriceInterval = setInterval(fetchSolPrice, 60000)
     return () => {
       clearInterval(solPriceInterval)
     }
   }, [loadFavorites, fetchSolPrice])
 
-  // Memoize the context value to prevent unnecessary re-renders
+  useEffect(() => {
+    let cancelled = false
+    let inFlight = false
+    let intervalId: NodeJS.Timeout | null = null
+
+    const fetchSnapshot = async () => {
+      if (cancelled || inFlight) return
+      inFlight = true
+      try {
+        const response = await fetch("/api/tokens", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...queryOptions,
+            favoriteMints: favorites,
+          }),
+        })
+
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`)
+        }
+
+        const payload = (await response.json()) as {
+          tokens: TokenData[]
+          totalPages: number
+          total: number
+        }
+
+        if (cancelled) {
+          return
+        }
+
+        const tokenMap = new Map<string, TokenData>()
+        for (const token of payload.tokens) {
+          tokenMap.set(token.mint, token)
+        }
+
+        setTokens(tokenMap)
+        setVisibleTokens(payload.tokens)
+        setTotalPages(payload.totalPages)
+        setTotalCount(payload.total)
+        setIsLoading(false)
+        setIsConnected(true)
+      } catch (error) {
+        if (!cancelled) {
+          console.error("[TokenProvider] Failed to fetch tokens:", error)
+          setIsLoading(false)
+          setIsConnected(false)
+        }
+      } finally {
+        inFlight = false
+      }
+    }
+
+    setIsLoading(true)
+    fetchSnapshot()
+    intervalId = setInterval(fetchSnapshot, 500)
+
+    return () => {
+      cancelled = true
+      if (intervalId) {
+        clearInterval(intervalId)
+      }
+    }
+  }, [queryOptions, favorites])
+
   const value = useMemo(
     () => ({
       tokens,
+      visibleTokens,
       setTokens,
-      allTrades,
-      setAllTrades,
       favorites,
       toggleFavorite,
       isLoading,
@@ -162,28 +222,32 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
       setShowFavorites,
       isPaused,
       setIsPaused,
-      renderKey,
-      setRenderKey,
-      isConnected, // Add isConnected here
+      totalPages,
+      totalCount,
+      queryOptions,
+      setTokenQueryOptions,
+      isConnected,
     }),
     [
       tokens,
-      allTrades,
+      visibleTokens,
       favorites,
       toggleFavorite,
       isLoading,
       solPrice,
       showFavorites,
       isPaused,
-      renderKey,
-      isConnected, // Add isConnected to dependencies
+      totalPages,
+      totalCount,
+      queryOptions,
+      setTokenQueryOptions,
+      isConnected,
     ],
   )
 
   return <TokenContext.Provider value={value}>{children}</TokenContext.Provider>
 }
 
-// Create a custom hook for using this context
 export function useTokenContext() {
   const context = useContext(TokenContext)
   if (context === undefined) {

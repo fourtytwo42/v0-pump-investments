@@ -18,6 +18,7 @@ yarn-error.log*
 
 # env files
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -26,3 +27,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 server/data/
+prisma/dev.db
+dev.db

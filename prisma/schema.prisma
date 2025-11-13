@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Token {
+  id                     String   @id @default(cuid())
+  mintAddress            String   @unique @map("mint_address")
+  symbol                 String
+  name                   String
+  imageUri               String?  @map("image_uri")
+  metadataUri            String?  @map("metadata_uri")
+  twitter                String?
+  telegram               String?
+  website                String?
+  description            String?
+  creatorAddress         String   @map("creator_address")
+  createdTimestamp       BigInt   @map("created_timestamp")
+  kingOfTheHillTimestamp BigInt?  @map("king_of_the_hill_timestamp")
+  completed              Boolean  @default(false) @map("completed")
+  bondingCurve           String?  @map("bonding_curve")
+  associatedBondingCurve String?  @map("associated_bonding_curve")
+  updatedAt              DateTime @default(now()) @updatedAt @map("updated_at")
+
+  price  TokenPrice?
+  trades Trade[]
+
+  @@index([completed, kingOfTheHillTimestamp])
+  @@index([createdTimestamp])
+  @@map("tokens")
+}
+
+model TokenPrice {
+  tokenId            String   @id @map("token_id")
+  priceSol           Decimal  @map("price_sol")
+  priceUsd           Decimal  @map("price_usd")
+  marketCapUsd       Decimal  @map("market_cap_usd")
+  lastTradeTimestamp BigInt   @map("last_trade_timestamp")
+  updatedAt          DateTime @default(now()) @updatedAt @map("updated_at")
+  token              Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@map("token_prices")
+}
+
+model Trade {
+  id          Int      @id @default(autoincrement())
+  tokenId     String   @map("token_id")
+  txSignature String   @unique @map("tx_signature")
+  userAddress String   @map("user_address")
+  isBuy       Boolean  @map("is_buy")
+  amountSol   Decimal  @map("amount_sol")
+  amountUsd   Decimal  @map("amount_usd")
+  baseAmount  Decimal  @map("base_amount")
+  priceSol    Decimal  @map("price_sol")
+  priceUsd    Decimal  @map("price_usd")
+  timestamp   BigInt
+  createdAt   DateTime @default(now()) @map("created_at")
+  raw         Json?
+  token       Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@index([tokenId, timestamp])
+  @@index([timestamp])
+  @@map("trades")
+}

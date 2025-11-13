@@ -11,7 +11,8 @@ import { useTokenContext } from "@/contexts/token-context"
 import { openAlertSettingsModal } from "./alert-settings-modal"
 import { db } from "@/lib/db"
 import { alertStatusCache } from "@/lib/alert-status-cache"
-import type { TokenData } from "@/hooks/use-token-processing"
+import type { TokenData } from "@/types/token-data"
+import { getCachedTokenImage, setCachedTokenImage } from "@/lib/token-image-cache"
 
 // Update the TokenCardProps interface to include the description field and BonkBot setting
 interface TokenCardProps {
@@ -23,6 +24,7 @@ interface TokenCardProps {
 
 // Global state to track drawer states - this persists across re-renders
 const drawerStates = new Map<string, boolean>()
+const FALLBACK_IMAGE = "/digital-token.png"
 
 // Create a separate component for the bell icon to isolate its rendering
 const AlertBellIcon = React.memo(
@@ -378,6 +380,31 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
     descriptionRef.current = token.description ?? null
   }, [token.description])
 
+  const handleImageError = useCallback(
+    (event: React.SyntheticEvent<HTMLImageElement>) => {
+      event.preventDefault()
+      const cached = getCachedTokenImage(token.mint)
+      if (cached && cached !== imageSrc) {
+        setImageSrc(cached)
+        return
+      }
+      if (imageSrc !== FALLBACK_IMAGE) {
+        setImageSrc(FALLBACK_IMAGE)
+      }
+    },
+    [token.mint, imageSrc],
+  )
+
+  const handleImageLoad = useCallback(
+    (result: { naturalWidth: number; naturalHeight: number; currentSrc: string }) => {
+      const { currentSrc } = result
+      if (currentSrc && currentSrc !== FALLBACK_IMAGE) {
+        setCachedTokenImage(token.mint, currentSrc)
+      }
+    },
+    [token.mint],
+  )
+
   return (
     <div className="relative">
       <Card
@@ -398,15 +425,13 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
           <div className="p-3 pb-2 flex items-center gap-3 h-[100px]">
             <div className="relative flex-shrink-0 w-[80px] h-[80px] flex items-center justify-center">
               <NextImage
-                src={token.image_uri || "/placeholder.svg?height=80&width=80&query=token"}
+                src={imageSrc}
                 alt={token.name}
                 width={imageSize}
                 height={imageSize}
                 className="rounded-md object-contain max-h-full max-w-full"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement
-                  target.src = "/digital-token.png"
-                }}
+                onError={handleImageError}
+                onLoadingComplete={handleImageLoad}
               />
             </div>
             <div className="flex-1 min-w-0 overflow-hidden">
@@ -446,7 +471,7 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
           )}
 
           {/* Middle section - financial data */}
-          <div className="p-3 flex-1 overflow-y-auto relative">
+          <div className="p-3 flex-1 overflow-y-auto relative scrollbar-hidden">
             <div className="grid grid-cols-2 gap-x-4 gap-y-2">
               <div>
                 <p className="text-xs text-muted-foreground">Market Cap</p>
@@ -476,7 +501,7 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
 
             {/* Description drawer overlay - positioned absolutely over the financial data */}
             {hasDescription && isDrawerOpen && (
-              <div className="absolute inset-0 bg-white dark:bg-gray-900 p-3 overflow-y-auto z-10 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
+              <div className="absolute inset-0 bg-white dark:bg-gray-900 p-3 overflow-y-auto scrollbar-hidden z-10 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
                 <div className="flex justify-between items-center mb-2">
                   <h4 className="font-medium text-sm text-primary">Description</h4>
                   <button
@@ -492,8 +517,9 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
             )}
           </div>
 
-          {showBondingProgress && (
-            <div className="px-3 pb-2">
+          {/* Bottom section with age info - now with fixed height */}
+          <div className="p-3 pt-2 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/30 mt-auto space-y-2">
+            {showBondingProgress && (
               <div className="relative w-full h-2 rounded-full bg-muted overflow-hidden">
                 <div
                   className={`h-full ${isGraduated ? "bg-green-500" : "bg-sky-500"}`}
@@ -503,11 +529,8 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
                   {Math.round(progressPercent)}%
                 </span>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Bottom section with age info - now with fixed height */}
-          <div className="p-3 pt-2 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/30 mt-auto h-[60px]">
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-xs text-muted-foreground">Token Age</p>

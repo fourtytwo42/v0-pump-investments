@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
-import type { TokenData } from "./use-token-processing"
+import type { TokenData } from "@/types/token-data"
 
 export function usePiBotData({
   paginatedTokens,

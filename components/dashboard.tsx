@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
@@ -45,36 +45,31 @@ import {
 
 // Import custom hooks
 // import { useWebSocketTrades } from "@/hooks/use-websocket-trades"; // Removed as it's in TokenProvider
-import { useTokenProcessing } from "@/hooks/use-token-processing"
-import { useTokenFiltering } from "@/hooks/use-token-filtering"
-import { usePagination } from "@/hooks/use-pagination"
 import { useSettings } from "@/hooks/use-settings"
-import { useTradeCleanup } from "@/hooks/use-trade-cleanup"
 import { usePiBotData } from "@/hooks/use-pi-bot-data"
 import { useAlertChecker } from "@/hooks/use-alert-checker"
-import { useVisibleTokenMetadata } from "@/hooks/use-visible-token-metadata"
 
 export default function Dashboard() {
   // Get values from context
   const {
     tokens,
-    setTokens,
-    allTrades,
-    setAllTrades,
+    visibleTokens,
     solPrice,
     isLoading,
     showFavorites,
     setShowFavorites,
     isPaused,
     setIsPaused,
-    renderKey,
-    setRenderKey,
+    totalPages,
+    queryOptions,
+    setTokenQueryOptions,
     favorites, // Access favorites from the context
   } = useTokenContext()
 
   // Use localStorage for timeRange and sortBy to persist user preferences
   const [timeRange, setTimeRange] = useLocalStorage<string>("pump-investments-time-range", "10")
   const [sortBy, setSortBy] = useLocalStorage<string>("pump-investments-sort-by", "marketCap")
+  const [currentPage, setCurrentPage] = useState<number>(queryOptions.page ?? 1)
 
   // Onboarding state
   const { isOnboardingActive, setOnboardingActive } = useOnboardingStore()
@@ -85,64 +80,110 @@ export default function Dashboard() {
   // Use settings hook
   const { settings, updateSettings, updateSettingsBatch, restartOnboarding } = useSettings(setOnboardingActive) // Added updateSettingsBatch
 
-  // Use token processing hook
-  useTokenProcessing({
-    allTrades,
-    timeRange,
-    solPrice,
-    minTradeAmountFilter: settings.minTradeAmountFilter,
-    setTokens,
-    setRenderKey,
-  })
-
-  // Use token filtering hook
-  const sortedTokens = useTokenFiltering({
-    tokens,
+  // Reset pagination when filter or sort criteria changes (unless paused)
+  useEffect(() => {
+    if (!isPaused) {
+      setCurrentPage(1)
+    }
+  }, [
     sortBy,
-    settings,
+    timeRange,
+    settings.tokensPerPage,
+    settings.hideKOTH,
+    settings.hideExternal,
+    settings.graduationFilter,
+    settings.minMarketCap,
+    settings.maxMarketCap,
+    settings.minTotalVolume,
+    settings.maxTotalVolume,
+    settings.minBuyVolume,
+    settings.maxBuyVolume,
+    settings.minSellVolume,
+    settings.maxSellVolume,
+    settings.minUniqueTraders,
+    settings.maxUniqueTraders,
+    settings.minMarketCapFilter,
+    settings.maxMarketCapFilter,
+    settings.minUniqueTraderCountFilter,
+    settings.maxUniqueTraderCountFilter,
+    settings.minTradeAmountFilter,
+    settings.maxTradeAmountFilter,
     showFavorites,
-    favorites,
     isPaused,
-    renderKey,
-  })
+  ])
 
-  // Use pagination hook with explicit dependencies for page reset
-  const { currentPage, setCurrentPage, totalPages, paginatedItems } = usePagination({
-    items: sortedTokens,
-    itemsPerPage: settings.tokensPerPage,
-    isPaused,
-    dependencies: [
+  // Keep local page in sync with provider state
+  useEffect(() => {
+    if (queryOptions.page !== currentPage) {
+      setCurrentPage(queryOptions.page)
+    }
+  }, [queryOptions.page])
+
+  // Ensure current page never exceeds total pages
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages === 0 ? 1 : totalPages)
+    }
+  }, [currentPage, totalPages])
+
+  const computedQueryOptions = useMemo(() => {
+    const safeTimeRange = Number(timeRange)
+
+    return {
+      page: currentPage,
+      pageSize: settings.tokensPerPage,
       sortBy,
-      settings.minMarketCap,
-      settings.maxMarketCap,
-      settings.minTotalVolume,
-      settings.maxTotalVolume,
-      settings.minBuyVolume,
-      settings.maxBuyVolume,
-      settings.minSellVolume,
-      settings.maxSellVolume,
-      settings.minUniqueTraders,
-      settings.maxUniqueTraders,
-      settings.hideKOTH,
-      settings.hideExternal,
-      settings.minMarketCapFilter,
-      settings.minUniqueTraderCountFilter,
-      settings.maxUniqueTraderCountFilter,
-      settings.minTradeAmountFilter,
-      settings.maxTradeAmountFilter,
-      showFavorites,
-    ],
-  })
+      sortOrder: "desc" as const,
+      timeRangeMinutes: Number.isFinite(safeTimeRange) ? safeTimeRange : 10,
+      filters: {
+        hideKOTH: settings.hideKOTH,
+        hideExternal: settings.hideExternal,
+        graduationFilter: settings.graduationFilter,
+        minMarketCap: settings.minMarketCapFilter,
+        maxMarketCap: settings.maxMarketCapFilter,
+        minTotalVolume: settings.minTotalVolume,
+        maxTotalVolume: settings.maxTotalVolume,
+        minBuyVolume: settings.minBuyVolume,
+        maxBuyVolume: settings.maxBuyVolume,
+        minSellVolume: settings.minSellVolume,
+        maxSellVolume: settings.maxSellVolume,
+        minUniqueTraders: settings.minUniqueTraderCountFilter,
+        maxUniqueTraders: settings.maxUniqueTraderCountFilter,
+        minTradeAmount: settings.minTradeAmountFilter,
+        maxTradeAmount: settings.maxTradeAmountFilter,
+        favoritesOnly: showFavorites,
+      },
+    }
+  }, [
+    currentPage,
+    settings.tokensPerPage,
+    sortBy,
+    timeRange,
+    settings.hideKOTH,
+    settings.hideExternal,
+    settings.graduationFilter,
+    settings.minMarketCapFilter,
+    settings.maxMarketCapFilter,
+    settings.minTotalVolume,
+    settings.maxTotalVolume,
+    settings.minBuyVolume,
+    settings.maxBuyVolume,
+    settings.minSellVolume,
+    settings.maxSellVolume,
+    settings.minUniqueTraderCountFilter,
+    settings.maxUniqueTraderCountFilter,
+    settings.minTradeAmountFilter,
+    settings.maxTradeAmountFilter,
+    showFavorites,
+  ])
 
-  // Use trade cleanup hook
-  useTradeCleanup({
-    tradeRetentionMinutes: settings.tradeRetentionMinutes,
-    setAllTrades,
-  })
+  useEffect(() => {
+    setTokenQueryOptions(computedQueryOptions)
+  }, [computedQueryOptions, setTokenQueryOptions])
 
   // Use PI Bot data hook
   usePiBotData({
-    paginatedTokens: paginatedItems,
+    paginatedTokens: visibleTokens,
     solPrice,
     timeRange,
     sortBy,
@@ -150,13 +191,6 @@ export default function Dashboard() {
 
   // Use alert checker hook
   useAlertChecker(tokens)
-
-  // Load and cache metadata for tokens currently visible on the page
-  useVisibleTokenMetadata({
-    paginatedTokens: paginatedItems,
-    setTokens,
-    setAllTrades,
-  })
 
   // Check if onboarding should be shown
   useEffect(() => {
@@ -178,9 +212,9 @@ export default function Dashboard() {
   }, [favorites])
 
   const tokenCards = useMemo(() => {
-    return paginatedItems.map((token, index) => (
+    return visibleTokens.map((token, index) => (
       <div
-        key={`${token.mint}-${renderKey}`}
+        key={`${token.mint}-${index}`}
         data-onboarding={index === 4 ? "token-card" : undefined}
         id={index === 4 ? "featured-token-card" : undefined}
       >
@@ -192,7 +226,7 @@ export default function Dashboard() {
         />
       </div>
     ))
-  }, [paginatedItems, renderKey, showFavorites, settings.showBonkBotLogo])
+  }, [visibleTokens, settings.showBonkBotLogo, showFavorites])
 
   if (isLoading) {
     return (
@@ -639,7 +673,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {tokenCards}
 
-          {sortedTokens.length === 0 && (
+          {visibleTokens.length === 0 && (
             <div className="col-span-full text-center py-12">
               <h3 className="text-xl font-semibold mb-2">No tokens found</h3>
               {showFavorites && favorites.length === 0 ? (

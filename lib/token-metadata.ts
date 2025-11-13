@@ -127,7 +127,6 @@ export function normalizeTokenMetadata(raw: any): TokenMetadata {
     metadataSource?.image_url,
     metadataSource?.image_uri,
     metadataSource?.imageUri,
-    raw?.uri,
   )
 
   const description = firstNonEmptyString(
