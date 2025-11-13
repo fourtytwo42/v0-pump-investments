@@ -228,7 +228,9 @@ export default function Dashboard() {
     ))
   }, [visibleTokens, settings.showBonkBotLogo, showFavorites])
 
-  if (isLoading) {
+  const showInitialLoading = isLoading && visibleTokens.length === 0
+
+  if (showInitialLoading) {
     return (
       <div className="flex flex-col min-h-screen">
         <Header />
