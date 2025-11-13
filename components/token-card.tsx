@@ -387,15 +387,17 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
 
   useEffect(() => {
     if (token.image_uri) {
-      setImageSrc(token.image_uri)
-      setCachedTokenImage(token.mint, token.image_uri)
+      const normalized = token.image_uri
+      setImageSrc(normalized)
+      setCachedTokenImage(token.mint, normalized)
+      return
+    }
+
+    const cached = getCachedTokenImage(token.mint)
+    if (cached) {
+      setImageSrc(cached)
     } else {
-      const cached = getCachedTokenImage(token.mint)
-      if (cached) {
-        setImageSrc(cached)
-      } else {
-        setImageSrc(FALLBACK_IMAGE)
-      }
+      setImageSrc(FALLBACK_IMAGE)
     }
   }, [token.image_uri, token.mint])
 
@@ -405,11 +407,11 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
       const cached = getCachedTokenImage(token.mint)
       if (cached) {
         setImageSrc(cached)
-      } else {
+      } else if (imageSrc !== FALLBACK_IMAGE) {
         setImageSrc(FALLBACK_IMAGE)
       }
     },
-    [token.mint],
+    [token.mint, imageSrc],
   )
 
   const handleImageLoad = useCallback(

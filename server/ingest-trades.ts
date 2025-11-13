@@ -151,6 +151,10 @@ async function getSolPriceUsd(): Promise<number> {
 }
 
 async function fetchMetadataFromUri(uri: string): Promise<any | null> {
+  if (!uri) {
+    return null
+  }
+
   if (metadataCache.has(uri)) {
     return metadataCache.get(uri)
   }
@@ -159,11 +163,12 @@ async function fetchMetadataFromUri(uri: string): Promise<any | null> {
     return metadataFetchPromises.get(uri)!
   }
 
+  const normalizedUri = normalizeIpfsUri(uri) ?? uri
   const controller = new AbortController()
   const promise = (async () => {
     for (let attempt = 0; attempt < METADATA_FETCH_MAX_ATTEMPTS; attempt += 1) {
       try {
-        const response = await fetch(uri, {
+        const response = await fetch(normalizedUri, {
           cache: "no-store",
           headers: {
             ...PUMP_HEADERS,
@@ -181,9 +186,8 @@ async function fetchMetadataFromUri(uri: string): Promise<any | null> {
         return json
       } catch (error) {
         const delayMs = METADATA_RETRY_BASE_DELAY_MS * 2 ** attempt
-        const message = (error as Error).message
         if (attempt === METADATA_FETCH_MAX_ATTEMPTS - 1) {
-          console.warn(`[ingest] Failed to fetch metadata from ${uri}:`, message)
+          console.warn(`[ingest] Failed to fetch metadata from ${normalizedUri}:`, (error as Error).message)
           return null
         }
         await delay(delayMs)
@@ -227,9 +231,8 @@ async function refreshTokenMetadata(mint: string): Promise<boolean> {
 
     const coinRecord = coinInfo as Record<string, unknown>
 
-    let normalizedMetadataUri = normalizeIpfsUri(
-      firstString(coinRecord.metadataUri, coinRecord.metadata_uri, coinRecord.uri) ?? null,
-    )
+    const rawMetadataUri = firstString(coinRecord.metadataUri, coinRecord.metadata_uri, coinRecord.uri) ?? null
+    let normalizedMetadataUri = rawMetadataUri ? normalizeIpfsUri(rawMetadataUri) : null
 
     const coinMetadata = normalizeTokenMetadata(
       (coinRecord.metadata as Record<string, unknown> | undefined) ?? coinRecord,
@@ -239,8 +242,9 @@ async function refreshTokenMetadata(mint: string): Promise<boolean> {
       ...coinMetadata,
     }
 
-    if (normalizedMetadataUri) {
-      const remoteMetadataRaw = await fetchMetadataFromUri(normalizedMetadataUri)
+    const metadataFetchUri = rawMetadataUri ?? normalizedMetadataUri
+    if (metadataFetchUri) {
+      const remoteMetadataRaw = await fetchMetadataFromUri(metadataFetchUri)
       if (remoteMetadataRaw && typeof remoteMetadataRaw === "object") {
         const remoteMetadata = normalizeTokenMetadata(remoteMetadataRaw)
         combinedMetadata = {
@@ -249,7 +253,7 @@ async function refreshTokenMetadata(mint: string): Promise<boolean> {
         }
       }
     } else if (tokenRecord.metadataUri) {
-      normalizedMetadataUri = tokenRecord.metadataUri
+      normalizedMetadataUri = normalizeIpfsUri(tokenRecord.metadataUri) ?? tokenRecord.metadataUri
     }
 
     const normalizedImage = combinedMetadata.image ? normalizeIpfsUri(combinedMetadata.image) : null
@@ -439,21 +443,18 @@ async function prepareTradeContext(
   const createdTs = trade.coinMeta?.createdTs ?? timestampMs
 
   const coinMetaRecord = (trade.coinMeta as Record<string, unknown> | undefined) ?? {}
-  let normalizedMetadataUri = normalizeIpfsUri(
-    firstString(
+  const rawMetadataUri = firstString(
     coinMetaRecord.uri,
     coinMetaRecord.metadata_uri,
     coinMetaRecord.metadataUri,
-    ) ?? null,
-  )
+  ) ?? null
 
+  let normalizedMetadataUri = rawMetadataUri ? normalizeIpfsUri(rawMetadataUri) : null
   let metadata = normalizeTokenMetadata(coinMetaRecord)
-  let remoteMetadataRaw: Record<string, unknown> | null = null
 
-  if (normalizedMetadataUri) {
-    const remote = await fetchMetadataFromUri(normalizedMetadataUri)
+  if (rawMetadataUri) {
+    const remote = await fetchMetadataFromUri(rawMetadataUri)
     if (remote && typeof remote === "object") {
-      remoteMetadataRaw = remote as Record<string, unknown>
       const remoteMetadata = normalizeTokenMetadata(remote)
       metadata = {
         ...metadata,
@@ -463,14 +464,6 @@ async function prepareTradeContext(
   }
 
   let imageUri = metadata.image ? normalizeIpfsUri(metadata.image) : null
-
-  if (
-    (!imageUri || (normalizedMetadataUri && imageUri === normalizedMetadataUri)) &&
-    remoteMetadataRaw &&
-    typeof remoteMetadataRaw.image === "string"
-  ) {
-    imageUri = normalizeIpfsUri(remoteMetadataRaw.image as string)
-  }
 
   const imageMatchesMetadataUri =
     Boolean(normalizedMetadataUri) && Boolean(imageUri) && normalizedMetadataUri === imageUri
@@ -510,13 +503,12 @@ async function prepareTradeContext(
         coinRecord.image,
         normalizedCoinMetadata.image ?? undefined,
       )
-      const normalizedCoinImage = coinImageCandidate ? normalizeIpfsUri(coinImageCandidate) : null
 
       if (
-        normalizedCoinImage &&
+        coinImageCandidate &&
         (!imageUri || imageMatchesMetadataUri)
       ) {
-        imageUri = normalizedCoinImage
+        imageUri = normalizeIpfsUri(coinImageCandidate) ?? imageUri
       }
     }
   }

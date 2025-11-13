@@ -24,12 +24,18 @@ async function fetchMetadata(uri: string): Promise<{
   telegram?: string | null
   website?: string | null
 }> {
+  if (!uri) {
+    return {}
+  }
+
   if (metadataCache.has(uri)) {
     return metadataCache.get(uri) ?? {}
   }
 
+  const normalizedUri = normalizeIpfsUri(uri) ?? uri
+
   try {
-    const response = await fetch(uri, {
+    const response = await fetch(normalizedUri, {
       cache: "no-store",
       headers: {
         ...PUMP_HEADERS,
@@ -51,7 +57,7 @@ async function fetchMetadata(uri: string): Promise<{
     metadataCache.set(uri, normalized)
     return normalized
   } catch (error) {
-    console.warn("[api/tokens] metadata fetch failed", uri, (error as Error).message)
+    console.warn("[api/tokens] metadata fetch failed", normalizedUri, (error as Error).message)
     metadataCache.set(uri, {})
     return {}
   }
@@ -386,13 +392,16 @@ export async function POST(request: Request) {
       const lastTradeTimestamp = metrics?.lastTradeTimestamp ?? 0
       const buySellRatio = totalVolumeSol > 0 ? buyVolumeSol / totalVolumeSol : 0
 
+      const normalizedImageUri = normalizeIpfsUri(token.imageUri ?? null) ?? ""
+      const normalizedMetadataUri = normalizeIpfsUri(token.metadataUri ?? null) ?? null
+
       aggregatedTokens.push({
         mint: token.mintAddress,
         name: token.name,
         symbol: token.symbol,
-        image_uri: token.imageUri ?? "",
-        image_metadata_uri: token.metadataUri ?? null,
-        metadata_uri: token.metadataUri ?? null,
+        image_uri: normalizedImageUri,
+        image_metadata_uri: normalizedMetadataUri,
+        metadata_uri: normalizedMetadataUri,
         description: token.description ?? null,
         usd_market_cap: marketCapUsd,
         market_cap: marketCapSol,

@@ -44,26 +44,16 @@ const DEFAULT_QUERY_OPTIONS: TokenQueryOptions = {
   },
 }
 
-const CLIENT_COIN_ENDPOINTS = ["/api/pump-coin"]
+const METADATA_ENDPOINT = "/api/tokens"
 
-interface ClientCoinMetadata {
-  name?: string | null
-  symbol?: string | null
-  imageUri?: string | null
-  metadataUri?: string | null
-  description?: string | null
-  twitter?: string | null
-  telegram?: string | null
-  website?: string | null
-  completed?: boolean | null
-  kingOfTheHillTimestamp?: number | null
-  bondingCurve?: string | null
-  associatedBondingCurve?: string | null
-}
-
-interface ClientCoinResponse {
-  source?: string
-  metadata?: ClientCoinMetadata
+interface RemoteMetadataResponse {
+  mintAddress: string
+  name: string | null
+  symbol: string | null
+  imageUri: string | null
+  twitter: string | null
+  telegram: string | null
+  website: string | null
 }
 
 function looksLikeMintPrefix(value: string | null | undefined, mint: string): boolean {
@@ -251,34 +241,24 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
     }
   }, [queryOptions, favorites])
 
-  const fetchCoinClient = useCallback(async (mint: string): Promise<ClientCoinResponse | null> => {
-    for (const base of CLIENT_COIN_ENDPOINTS) {
-      const url = `${base}/${encodeURIComponent(mint)}`
-      try {
-        const response = await fetch(url, {
-          method: "GET",
-          mode: "cors",
-          headers: {
-            accept: "application/json, text/plain, */*",
-          },
-          cache: "no-store",
-        })
-        if (!response.ok) {
-          if (response.status === 404) {
-            const payload = (await response.json()) as ClientCoinResponse | { error?: string }
-            if (payload && typeof payload === "object" && "metadata" in payload) {
-              return payload as ClientCoinResponse
-            }
-            return null
-          }
-          continue
-        }
-        return (await response.json()) as ClientCoinResponse
-      } catch (error) {
-        console.warn("[TokenProvider] client coin fetch failed", mint, (error as Error).message)
+  const fetchRemoteMetadata = useCallback(async (mint: string): Promise<RemoteMetadataResponse | null> => {
+    const url = `${METADATA_ENDPOINT}/${encodeURIComponent(mint)}/metadata`
+    try {
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          accept: "application/json",
+        },
+        cache: "no-store",
+      })
+      if (!response.ok) {
+        return null
       }
+      return (await response.json()) as RemoteMetadataResponse
+    } catch (error) {
+      console.warn("[TokenProvider] metadata fetch failed", mint, (error as Error).message)
+      return null
     }
-    return null
   }, [])
 
   const hydrateFromClient = useCallback(
@@ -289,19 +269,12 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
       retries.set(mint, attempt)
 
       try {
-        const response = await fetchCoinClient(mint)
-        if (!response || typeof response !== "object") {
+        const metadata = await fetchRemoteMetadata(mint)
+        if (!metadata) {
           return
         }
 
-        const metadata = response.metadata ?? {}
-
-        const normalizedMetadataUri = metadata.metadataUri
-          ? normalizeIpfsUri(metadata.metadataUri) ?? metadata.metadataUri
-          : null
-        const normalizedImage = metadata.imageUri
-          ? normalizeIpfsUri(metadata.imageUri) ?? metadata.imageUri
-          : null
+        const normalizedImage = normalizeIpfsUri(metadata.imageUri)
 
         let appliedUpdates: Partial<TokenData> | null = null
 
@@ -310,11 +283,6 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
           if (!existing) return prev
 
           const updates: Partial<TokenData> = {}
-
-          if (normalizedMetadataUri && (!existing.metadata_uri || existing.metadata_uri === "")) {
-            updates.metadata_uri = normalizedMetadataUri
-            updates.image_metadata_uri = normalizedMetadataUri
-          }
 
           if (
             normalizedImage &&
@@ -331,10 +299,6 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
             updates.symbol = metadata.symbol
           }
 
-          if (metadata.description && !existing.description) {
-            updates.description = metadata.description
-          }
-
           if (metadata.twitter && !existing.twitter) {
             updates.twitter = metadata.twitter
           }
@@ -345,27 +309,6 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
 
           if (metadata.website && !existing.website) {
             updates.website = metadata.website
-          }
-
-          if (typeof metadata.completed === "boolean" && existing.is_completed !== metadata.completed) {
-            updates.is_completed = metadata.completed
-            updates.is_bonding_curve = metadata.completed ? false : existing.is_bonding_curve
-          }
-
-          if (
-            metadata.kingOfTheHillTimestamp &&
-            !existing.king_of_the_hill_timestamp &&
-            Number.isFinite(metadata.kingOfTheHillTimestamp)
-          ) {
-            updates.king_of_the_hill_timestamp = Number(metadata.kingOfTheHillTimestamp)
-          }
-
-          if (metadata.bondingCurve && !existing.bonding_curve) {
-            updates.bonding_curve = metadata.bondingCurve
-          }
-
-          if (metadata.associatedBondingCurve && !existing.associated_bonding_curve) {
-            updates.associated_bonding_curve = metadata.associatedBondingCurve
           }
 
           if (Object.keys(updates).length === 0) {
@@ -387,7 +330,7 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
         metadataPendingRef.current.delete(mint)
       }
     },
-    [fetchCoinClient, setTokens, setVisibleTokens],
+    [fetchRemoteMetadata, setTokens, setVisibleTokens],
   )
 
   useEffect(() => {
