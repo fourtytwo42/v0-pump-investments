@@ -31,6 +31,20 @@ interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: "3.0.30",
+    date: "November 13, 2025",
+    changes: [
+      {
+        type: "improved",
+        description: "Replaced bespoke metadata fetch stack with the AutoTrader-style pump API client and server metadata route for consistent data.",
+      },
+      {
+        type: "fixed",
+        description: "Front-end now hydrates missing token info through the new /api/tokens/[mint]/metadata endpoint instead of fallback coin proxy.",
+      }
+    ],
+  },
+  {
     version: "3.0.29",
     date: "November 12, 2025",
     changes: [
