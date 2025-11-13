@@ -77,6 +77,75 @@ const metadataRetryQueue = new Set<string>()
 const metadataRetryAttempts = new Map<string, number>()
 let isProcessingMetadataQueue = false
 
+interface MetadataRequestJob {
+  target: string
+  init: RequestInit
+  resolve: (response: Response) => void
+  reject: (error: Error) => void
+}
+
+const metadataRequestQueue: MetadataRequestJob[] = []
+let metadataActiveRequests = 0
+let lastMetadataRequestAt = 0
+let metadataDynamicDelayMs = 0
+
+const METADATA_MAX_CONCURRENCY = 2
+const METADATA_MIN_INTERVAL_MS = 150
+const METADATA_BACKOFF_STEP_MS = 100
+const METADATA_BACKOFF_DECAY_MS = 25
+const METADATA_BACKOFF_MAX_MS = 2000
+function adjustMetadataDelay(onError: boolean) {
+  if (onError) {
+    metadataDynamicDelayMs = Math.min(metadataDynamicDelayMs + METADATA_BACKOFF_STEP_MS, METADATA_BACKOFF_MAX_MS)
+  } else {
+    metadataDynamicDelayMs = Math.max(0, metadataDynamicDelayMs - METADATA_BACKOFF_DECAY_MS)
+  }
+}
+
+async function processMetadataRequest(job: MetadataRequestJob) {
+  metadataActiveRequests += 1
+  try {
+    const now = Date.now()
+    const elapsed = now - lastMetadataRequestAt
+    const requiredSpacing = METADATA_MIN_INTERVAL_MS + metadataDynamicDelayMs
+    if (elapsed < requiredSpacing) {
+      await delay(requiredSpacing - elapsed)
+    }
+
+    lastMetadataRequestAt = Date.now()
+
+    const response = await fetch(job.target, job.init)
+    if (response.status >= 500 || response.status === 429 || response.status === 403) {
+      adjustMetadataDelay(true)
+    } else {
+      adjustMetadataDelay(false)
+    }
+    job.resolve(response)
+  } catch (error) {
+    adjustMetadataDelay(true)
+    job.reject(error as Error)
+  } finally {
+    metadataActiveRequests -= 1
+    void drainMetadataRequestQueue()
+  }
+}
+
+async function drainMetadataRequestQueue() {
+  while (metadataActiveRequests < METADATA_MAX_CONCURRENCY && metadataRequestQueue.length > 0) {
+    const job = metadataRequestQueue.shift()
+    if (!job) break
+    void processMetadataRequest(job)
+  }
+}
+
+function enqueueMetadataRequest(target: string, init: RequestInit): Promise<Response> {
+  return new Promise((resolve, reject) => {
+    metadataRequestQueue.push({ target, init, resolve, reject })
+    void drainMetadataRequestQueue()
+  })
+}
+
+
 const METADATA_FETCH_MAX_ATTEMPTS = 3
 const METADATA_RETRY_MAX_ATTEMPTS = 5
 const METADATA_RETRY_INTERVAL_MS = 15_000
@@ -177,7 +246,7 @@ async function fetchMetadataFromUri(uri: string): Promise<any | null> {
     for (const target of targets) {
       for (let attempt = 0; attempt < METADATA_FETCH_MAX_ATTEMPTS; attempt += 1) {
         try {
-          const response = await fetch(target, {
+          const response = await enqueueMetadataRequest(target, {
             cache: "no-store",
             headers: {
               ...PUMP_HEADERS,
@@ -468,17 +537,6 @@ async function prepareTradeContext(
 
   let normalizedMetadataUri = rawMetadataUri ? normalizeIpfsUri(rawMetadataUri) : null
   let metadata = normalizeTokenMetadata(coinMetaRecord)
-
-  if (rawMetadataUri) {
-    const remote = await fetchMetadataFromUri(rawMetadataUri)
-    if (remote && typeof remote === "object") {
-      const remoteMetadata = normalizeTokenMetadata(remote)
-      metadata = {
-        ...metadata,
-        ...remoteMetadata,
-      }
-    }
-  }
 
   let imageUri = metadata.image ? normalizeIpfsUri(metadata.image) : null
 
