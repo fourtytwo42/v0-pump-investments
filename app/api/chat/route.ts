@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     }
 
     const { text } = await generateText({
-      model: groq("llama3-8b-8192"),
+      model: groq("openai/gpt-oss-20b"),
       prompt,
       system: systemPrompt,
       maxTokens: 3000, // Increased from 1000 to 3000

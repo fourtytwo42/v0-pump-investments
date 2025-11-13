@@ -14,8 +14,19 @@ const metadataCache = new Map<
     twitter?: string | null
     telegram?: string | null
     website?: string | null
+    name?: string | null
+    symbol?: string | null
   }
 >()
+
+
+function looksLikeMintPrefix(value: string | null | undefined, mint: string): boolean {
+  if (!value) return true
+  const cleaned = value.replace(/[^A-Za-z0-9]/g, "").toUpperCase()
+  if (!cleaned) return true
+  if (cleaned.length < 3) return false
+  return mint.toUpperCase().startsWith(cleaned)
+}
 
 async function fetchMetadata(uri: string): Promise<{
   image?: string | null
@@ -23,6 +34,8 @@ async function fetchMetadata(uri: string): Promise<{
   twitter?: string | null
   telegram?: string | null
   website?: string | null
+  name?: string | null
+  symbol?: string | null
 }> {
   if (!uri) {
     return {}
@@ -53,7 +66,10 @@ async function fetchMetadata(uri: string): Promise<{
     const telegram = typeof json?.telegram === "string" ? json.telegram : null
     const website = typeof json?.website === "string" ? json.website : null
 
-    const normalized = { image, description, twitter, telegram, website }
+    const name = typeof json?.name === "string" ? json.name : null
+      const symbol = typeof json?.symbol === "string" ? json.symbol : null
+
+      const normalized = { image, description, twitter, telegram, website, name, symbol }
     metadataCache.set(uri, normalized)
     return normalized
   } catch (error) {
@@ -459,6 +475,12 @@ export async function POST(request: Request) {
             if (remoteMetadata.image && (!token.image_uri || token.image_uri === token.metadata_uri)) {
               token.image_uri = normalizeIpfsUri(remoteMetadata.image) ?? token.image_uri
             }
+            if (remoteMetadata.name && looksLikeMintPrefix(token.name, token.mint)) {
+              token.name = remoteMetadata.name
+            }
+            if (remoteMetadata.symbol && looksLikeMintPrefix(token.symbol, token.mint)) {
+              token.symbol = remoteMetadata.symbol
+            }
             token.description = token.description ?? remoteMetadata.description ?? null
             token.twitter = token.twitter ?? remoteMetadata.twitter ?? null
             token.telegram = token.telegram ?? remoteMetadata.telegram ?? null
@@ -490,6 +512,12 @@ export async function POST(request: Request) {
                   if (remoteMetadata.image && (!token.image_uri || token.image_uri === normalizedUri)) {
                     token.image_uri = normalizeIpfsUri(remoteMetadata.image) ?? token.image_uri
                   }
+                  if (remoteMetadata.name && looksLikeMintPrefix(token.name, token.mint)) {
+                    token.name = remoteMetadata.name
+                  }
+                  if (remoteMetadata.symbol && looksLikeMintPrefix(token.symbol, token.mint)) {
+                    token.symbol = remoteMetadata.symbol
+                  }
                   token.description = token.description ?? remoteMetadata.description ?? null
                   token.twitter = token.twitter ?? remoteMetadata.twitter ?? null
                   token.telegram = token.telegram ?? remoteMetadata.telegram ?? null
@@ -504,6 +532,12 @@ export async function POST(request: Request) {
             )
             if (normalizedCoinMetadata.image && !token.image_uri) {
               token.image_uri = normalizeIpfsUri(normalizedCoinMetadata.image) ?? token.image_uri
+            }
+            if (normalizedCoinMetadata.name && looksLikeMintPrefix(token.name, token.mint)) {
+              token.name = normalizedCoinMetadata.name
+            }
+            if (normalizedCoinMetadata.symbol && looksLikeMintPrefix(token.symbol, token.mint)) {
+              token.symbol = normalizedCoinMetadata.symbol
             }
             token.description = token.description ?? normalizedCoinMetadata.description ?? null
             token.twitter = token.twitter ?? normalizedCoinMetadata.twitter ?? null
