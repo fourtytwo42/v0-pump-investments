@@ -252,6 +252,7 @@ function sortTokens(tokens: AggregatedToken[], sortBy: string, sortOrder: "asc" 
 }
 
 const MIN_TIME_RANGE_MINUTES = 30
+const MAX_LOOKBACK_MINUTES = 6 * 60
 
 export async function POST(request: Request) {
   try {
@@ -263,7 +264,7 @@ export async function POST(request: Request) {
     const sortOrder = (body.sortOrder ?? "desc") as "asc" | "desc"
     const requestedTimeRangeMinutes = Number(body.timeRangeMinutes ?? 10)
     const timeRangeMinutes = Number.isFinite(requestedTimeRangeMinutes)
-      ? Math.max(requestedTimeRangeMinutes, MIN_TIME_RANGE_MINUTES)
+      ? Math.min(Math.max(requestedTimeRangeMinutes, MIN_TIME_RANGE_MINUTES), MAX_LOOKBACK_MINUTES)
       : MIN_TIME_RANGE_MINUTES
     const filters: TokenQueryFilters = {
       hideExternal: body.filters?.hideExternal ?? false,
