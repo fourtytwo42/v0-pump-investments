@@ -7,7 +7,6 @@
     "dev": "next dev",
     "lint": "next lint",
     "start": "next start",
-    "pump-proxy": "node server/pump-proxy.js",
     "prisma:generate": "prisma generate",
     "db:push": "prisma db push",
     "ingest": "tsx --tsconfig tsconfig.json server/ingest-trades.ts"
