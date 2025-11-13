@@ -251,6 +251,8 @@ function sortTokens(tokens: AggregatedToken[], sortBy: string, sortOrder: "asc" 
   })
 }
 
+const MIN_TIME_RANGE_MINUTES = 30
+
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as Partial<TokenQueryRequest>
@@ -259,7 +261,10 @@ export async function POST(request: Request) {
     const pageSize = Number(body.pageSize ?? 12)
     const sortBy = body.sortBy ?? "marketCap"
     const sortOrder = (body.sortOrder ?? "desc") as "asc" | "desc"
-    const timeRangeMinutes = Number(body.timeRangeMinutes ?? 10)
+    const requestedTimeRangeMinutes = Number(body.timeRangeMinutes ?? 10)
+    const timeRangeMinutes = Number.isFinite(requestedTimeRangeMinutes)
+      ? Math.max(requestedTimeRangeMinutes, MIN_TIME_RANGE_MINUTES)
+      : MIN_TIME_RANGE_MINUTES
     const filters: TokenQueryFilters = {
       hideExternal: body.filters?.hideExternal ?? false,
       hideKOTH: body.filters?.hideKOTH ?? false,
