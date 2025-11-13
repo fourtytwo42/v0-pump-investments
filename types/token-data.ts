@@ -13,7 +13,6 @@ export interface TokenData {
   buy_volume_usd: number
   sell_volume: number
   sell_volume_usd: number
-  unique_traders: string[]
   unique_trader_count: number
   trades: any[]
   last_trade_time: number

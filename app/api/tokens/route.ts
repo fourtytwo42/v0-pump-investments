@@ -2,6 +2,9 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { type TokenData, type TokenQueryOptions } from "@/types/token-data"
 import { Decimal } from "@prisma/client/runtime/library"
+import { fetchPumpCoin } from "@/lib/pump-coin"
+import { normalizeTokenMetadata } from "@/lib/token-metadata"
+import { normalizeIpfsUri } from "@/lib/pump-trades"
 
 const metadataCache = new Map<
   string,
@@ -169,7 +172,6 @@ interface AggregatedToken {
   buy_volume_usd: number
   sell_volume: number
   sell_volume_usd: number
-  unique_traders: string[]
   unique_trader_count: number
   last_trade_time: number
   last_trade_timestamp?: number
@@ -359,11 +361,15 @@ export async function POST(request: Request) {
       const minTradeAmountThreshold = filters.minTradeAmount ?? 0
       const maxTradeAmountThreshold = filters.maxTradeAmount ?? Number.POSITIVE_INFINITY
 
-      const filteredTraders = metrics?.userTotals
-        ? Array.from(metrics.userTotals.entries())
-            .filter(([, totalUsd]) => totalUsd >= minTradeAmountThreshold && totalUsd <= maxTradeAmountThreshold)
-            .map(([user]) => user)
-        : []
+      let uniqueTraderCount = 0
+
+      if (metrics?.userTotals) {
+        for (const totalUsd of metrics.userTotals.values()) {
+          if (totalUsd >= minTradeAmountThreshold && totalUsd <= maxTradeAmountThreshold) {
+            uniqueTraderCount += 1
+          }
+        }
+      }
 
       const totalVolumeSol = metrics?.totalVolumeSol ?? 0
       const totalVolumeUsd = metrics?.totalVolumeUsd ?? 0
@@ -398,8 +404,7 @@ export async function POST(request: Request) {
         buy_volume_usd: buyVolumeUsd,
         sell_volume: sellVolumeSol,
         sell_volume_usd: sellVolumeUsd,
-        unique_traders: filteredTraders,
-        unique_trader_count: filteredTraders.length,
+        unique_trader_count: uniqueTraderCount,
         last_trade_time: Math.floor(lastTradeTimestamp / 1000),
         last_trade_timestamp: lastTradeTimestamp,
         created_timestamp: createdTs,
@@ -428,6 +433,73 @@ export async function POST(request: Request) {
         buildTokenRecord(token)
       }
     })
+
+    await Promise.all(
+      aggregatedTokens.map(async (token) => {
+        let metadataWasHydrated = false
+
+        if (token.metadata_uri) {
+          const remoteMetadata = await fetchMetadata(token.metadata_uri)
+          if (remoteMetadata) {
+            if (remoteMetadata.image && (!token.image_uri || token.image_uri === token.metadata_uri)) {
+              token.image_uri = normalizeIpfsUri(remoteMetadata.image) ?? token.image_uri
+            }
+            token.description = token.description ?? remoteMetadata.description ?? null
+            token.twitter = token.twitter ?? remoteMetadata.twitter ?? null
+            token.telegram = token.telegram ?? remoteMetadata.telegram ?? null
+            token.website = token.website ?? remoteMetadata.website ?? null
+            metadataWasHydrated = true
+          }
+        }
+
+        if (
+          !metadataWasHydrated ||
+          !token.metadata_uri ||
+          !token.image_uri ||
+          token.image_uri === token.metadata_uri ||
+          (!token.description && !token.twitter && !token.telegram)
+        ) {
+          const coinInfo = await fetchPumpCoin(token.mint)
+          if (coinInfo && typeof coinInfo === "object") {
+            const coinMetadataUri =
+              coinInfo.metadataUri ?? coinInfo.metadata_uri ?? coinInfo.uri ?? token.metadata_uri ?? null
+
+            if (!token.metadata_uri && typeof coinMetadataUri === "string") {
+              const normalizedUri = normalizeIpfsUri(coinMetadataUri)
+              if (normalizedUri) {
+                token.metadata_uri = normalizedUri
+                token.image_metadata_uri = normalizedUri
+
+                const remoteMetadata = await fetchMetadata(normalizedUri)
+                if (remoteMetadata) {
+                  if (remoteMetadata.image && (!token.image_uri || token.image_uri === normalizedUri)) {
+                    token.image_uri = normalizeIpfsUri(remoteMetadata.image) ?? token.image_uri
+                  }
+                  token.description = token.description ?? remoteMetadata.description ?? null
+                  token.twitter = token.twitter ?? remoteMetadata.twitter ?? null
+                  token.telegram = token.telegram ?? remoteMetadata.telegram ?? null
+                  token.website = token.website ?? remoteMetadata.website ?? null
+                  metadataWasHydrated = true
+                }
+              }
+            }
+
+            const normalizedCoinMetadata = normalizeTokenMetadata(
+              (coinInfo as Record<string, unknown>).metadata ?? (coinInfo as Record<string, unknown>),
+            )
+            if (normalizedCoinMetadata.image && !token.image_uri) {
+              token.image_uri = normalizeIpfsUri(normalizedCoinMetadata.image) ?? token.image_uri
+            }
+            token.description = token.description ?? normalizedCoinMetadata.description ?? null
+            token.twitter = token.twitter ?? normalizedCoinMetadata.twitter ?? null
+            token.telegram = token.telegram ?? normalizedCoinMetadata.telegram ?? null
+            token.website = token.website ?? normalizedCoinMetadata.website ?? null
+          }
+        }
+
+        token.image_uri = token.image_uri ?? ""
+      }),
+    )
 
     const filteredTokens = aggregatedTokens.filter((token) => passesFilters(token, filters, favoriteMints))
     const sortedTokens = sortTokens(filteredTokens, sortBy, sortOrder)

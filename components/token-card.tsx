@@ -61,7 +61,10 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
   const cappedProgress = Math.min(Math.max(rawProgress, 0), isGraduated ? 100 : 99)
   const progressPercent = isGraduated ? 100 : cappedProgress
   const showBondingProgress =
-    Number.isFinite(progressPercent) && progressPercent >= 0 && (token.is_bonding_curve !== null || !isGraduated)
+    token.is_completed !== true &&
+    Number.isFinite(progressPercent) &&
+    progressPercent >= 0 &&
+    token.is_bonding_curve !== false
 
   const isFavorite = favorites.includes(token.mint)
 
@@ -380,26 +383,41 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
     descriptionRef.current = token.description ?? null
   }, [token.description])
 
+  const [imageSrc, setImageSrc] = useState(FALLBACK_IMAGE)
+
+  useEffect(() => {
+    if (token.image_uri) {
+      setImageSrc(token.image_uri)
+      setCachedTokenImage(token.mint, token.image_uri)
+    } else {
+      const cached = getCachedTokenImage(token.mint)
+      if (cached) {
+        setImageSrc(cached)
+      } else {
+        setImageSrc(FALLBACK_IMAGE)
+      }
+    }
+  }, [token.image_uri, token.mint])
+
   const handleImageError = useCallback(
     (event: React.SyntheticEvent<HTMLImageElement>) => {
       event.preventDefault()
       const cached = getCachedTokenImage(token.mint)
-      if (cached && cached !== imageSrc) {
+      if (cached) {
         setImageSrc(cached)
-        return
-      }
-      if (imageSrc !== FALLBACK_IMAGE) {
+      } else {
         setImageSrc(FALLBACK_IMAGE)
       }
     },
-    [token.mint, imageSrc],
+    [token.mint],
   )
 
   const handleImageLoad = useCallback(
-    (result: { naturalWidth: number; naturalHeight: number; currentSrc: string }) => {
-      const { currentSrc } = result
-      if (currentSrc && currentSrc !== FALLBACK_IMAGE) {
-        setCachedTokenImage(token.mint, currentSrc)
+    (img: HTMLImageElement) => {
+      const loadedSrc = img.currentSrc || img.src
+      if (loadedSrc) {
+        setCachedTokenImage(token.mint, loadedSrc)
+        setImageSrc(loadedSrc)
       }
     },
     [token.mint],
@@ -471,7 +489,7 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
           )}
 
           {/* Middle section - financial data */}
-          <div className="p-3 flex-1 overflow-y-auto relative scrollbar-hidden">
+          <div className="p-3 flex-1 overflow-visible relative">
             <div className="grid grid-cols-2 gap-x-4 gap-y-2">
               <div>
                 <p className="text-xs text-muted-foreground">Market Cap</p>

@@ -1,12 +1,9 @@
 import { Prisma, PrismaClient } from "@prisma/client"
 import { Decimal } from "@prisma/client/runtime/library"
 import WebSocket from "ws"
-import {
-  decodePumpPayload,
-  type PumpUnifiedTrade,
-  normalizeIpfsUri,
-} from "@/lib/pump-trades"
-import { normalizeTokenMetadata } from "@/lib/token-metadata"
+import { decodePumpPayload, type PumpUnifiedTrade, normalizeIpfsUri } from "@/lib/pump-trades"
+import { normalizeTokenMetadata, isMetadataEmpty } from "@/lib/token-metadata"
+import { fetchPumpCoin } from "@/lib/pump-coin"
 
 function enforceConnectionLimit(url?: string): string | undefined {
   if (!url) return url
@@ -71,6 +68,36 @@ let solPriceCache = {
 
 const metadataCache = new Map<string, any>()
 const metadataFetchPromises = new Map<string, Promise<any>>()
+const metadataRetryQueue = new Set<string>()
+const metadataRetryAttempts = new Map<string, number>()
+let isProcessingMetadataQueue = false
+
+const METADATA_FETCH_MAX_ATTEMPTS = 3
+const METADATA_RETRY_MAX_ATTEMPTS = 5
+const METADATA_RETRY_INTERVAL_MS = 15_000
+const METADATA_RETRY_BATCH_SIZE = 10
+const METADATA_RETRY_BASE_DELAY_MS = 250
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+function looksLikeMintPrefix(value: string | null | undefined, mint: string): boolean {
+  if (!value) return true
+  const cleaned = value.replace(/[^A-Za-z0-9]/g, "").toUpperCase()
+  if (!cleaned) return true
+  if (cleaned.length < 3) return false
+  return mint.toUpperCase().startsWith(cleaned)
+}
+
+function scheduleMetadataRetry(mint: string) {
+  if (!mint) return
+  if (metadataRetryQueue.has(mint)) return
+  const attempts = metadataRetryAttempts.get(mint) ?? 0
+  if (attempts >= METADATA_RETRY_MAX_ATTEMPTS) return
+  metadataRetryAttempts.set(mint, attempts + 1)
+  metadataRetryQueue.add(mint)
+}
 
 function toDecimal(value: unknown, fallback = "0"): Decimal {
   if (value === null || value === undefined) {
@@ -134,30 +161,176 @@ async function fetchMetadataFromUri(uri: string): Promise<any | null> {
 
   const controller = new AbortController()
   const promise = (async () => {
-    try {
-      const response = await fetch(uri, {
-        headers: { accept: "application/json" },
-        signal: controller.signal,
-      })
+    for (let attempt = 0; attempt < METADATA_FETCH_MAX_ATTEMPTS; attempt += 1) {
+      try {
+        const response = await fetch(uri, {
+          headers: { accept: "application/json" },
+          signal: controller.signal,
+        })
 
-      if (!response.ok) {
-        throw new Error(`metadata fetch failed with status ${response.status}`)
+        if (!response.ok) {
+          throw new Error(`metadata fetch failed with status ${response.status}`)
+        }
+
+        const json = await response.json()
+        metadataCache.set(uri, json)
+        return json
+      } catch (error) {
+        const delayMs = METADATA_RETRY_BASE_DELAY_MS * 2 ** attempt
+        const message = (error as Error).message
+        if (attempt === METADATA_FETCH_MAX_ATTEMPTS - 1) {
+          console.warn(`[ingest] Failed to fetch metadata from ${uri}:`, message)
+          return null
+        }
+        await delay(delayMs)
       }
-
-      const json = await response.json()
-      metadataCache.set(uri, json)
-      return json
-    } catch (error) {
-      console.warn(`[ingest] Failed to fetch metadata from ${uri}:`, (error as Error).message)
-      return null
-    } finally {
-      metadataFetchPromises.delete(uri)
     }
+    return null
+  })().finally(() => {
+    metadataFetchPromises.delete(uri)
   })()
 
   metadataFetchPromises.set(uri, promise)
   return promise
 }
+
+async function fetchCoinInfoWithRetry(mint: string, attempts = METADATA_FETCH_MAX_ATTEMPTS): Promise<any | null> {
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    const coin = await fetchPumpCoin(mint)
+    if (coin) {
+      return coin
+    }
+    const delayMs = METADATA_RETRY_BASE_DELAY_MS * 2 ** attempt
+    await delay(delayMs)
+  }
+  return null
+}
+
+async function refreshTokenMetadata(mint: string): Promise<boolean> {
+  try {
+    const tokenRecord = await prisma.token.findUnique({
+      where: { mintAddress: mint },
+    })
+
+    if (!tokenRecord) {
+      return true
+    }
+
+    const coinInfo = await fetchCoinInfoWithRetry(mint)
+    if (!coinInfo) {
+      return false
+    }
+
+    const coinRecord = coinInfo as Record<string, unknown>
+
+    let normalizedMetadataUri = normalizeIpfsUri(
+      firstString(coinRecord.metadataUri, coinRecord.metadata_uri, coinRecord.uri) ?? null,
+    )
+
+    const coinMetadata = normalizeTokenMetadata(
+      (coinRecord.metadata as Record<string, unknown> | undefined) ?? coinRecord,
+    )
+
+    let combinedMetadata = {
+      ...coinMetadata,
+    }
+
+    if (normalizedMetadataUri) {
+      const remoteMetadataRaw = await fetchMetadataFromUri(normalizedMetadataUri)
+      if (remoteMetadataRaw && typeof remoteMetadataRaw === "object") {
+        const remoteMetadata = normalizeTokenMetadata(remoteMetadataRaw)
+        combinedMetadata = {
+          ...combinedMetadata,
+          ...remoteMetadata,
+        }
+      }
+    } else if (tokenRecord.metadataUri) {
+      normalizedMetadataUri = tokenRecord.metadataUri
+    }
+
+    const normalizedImage = combinedMetadata.image ? normalizeIpfsUri(combinedMetadata.image) : null
+
+    const updates: Prisma.TokenUpdateInput = {}
+
+    const nameCandidate = combinedMetadata.name ?? null
+    const symbolCandidate = combinedMetadata.symbol ?? null
+
+    if (nameCandidate && looksLikeMintPrefix(tokenRecord.name, mint)) {
+      updates.name = nameCandidate
+    }
+
+    if (symbolCandidate && looksLikeMintPrefix(tokenRecord.symbol, mint)) {
+      updates.symbol = symbolCandidate
+    }
+
+    if (normalizedMetadataUri && tokenRecord.metadataUri !== normalizedMetadataUri) {
+      updates.metadataUri = normalizedMetadataUri
+    }
+
+    if (
+      normalizedImage &&
+      (!tokenRecord.imageUri || tokenRecord.imageUri === tokenRecord.metadataUri || tokenRecord.imageUri === normalizedMetadataUri)
+    ) {
+      updates.imageUri = normalizedImage
+    }
+
+    if (combinedMetadata.description && !tokenRecord.description) {
+      updates.description = combinedMetadata.description
+    }
+
+    if (combinedMetadata.website && !tokenRecord.website) {
+      updates.website = combinedMetadata.website
+    }
+
+    if (combinedMetadata.twitter && !tokenRecord.twitter) {
+      updates.twitter = combinedMetadata.twitter
+    }
+
+    if (combinedMetadata.telegram && !tokenRecord.telegram) {
+      updates.telegram = combinedMetadata.telegram
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return false
+    }
+
+    await prisma.token.update({
+      where: { mintAddress: mint },
+      data: updates,
+    })
+
+    return true
+  } catch (error) {
+    console.warn(`[ingest] Metadata refresh failed for ${mint}:`, (error as Error).message)
+    return false
+  }
+}
+
+async function processMetadataRetryQueue() {
+  if (isProcessingMetadataQueue || metadataRetryQueue.size === 0) {
+    return
+  }
+
+  isProcessingMetadataQueue = true
+  try {
+    const batch = Array.from(metadataRetryQueue).slice(0, METADATA_RETRY_BATCH_SIZE)
+    for (const mint of batch) {
+      metadataRetryQueue.delete(mint)
+      const success = await refreshTokenMetadata(mint)
+      if (success) {
+        metadataRetryAttempts.delete(mint)
+      } else {
+        scheduleMetadataRetry(mint)
+      }
+    }
+  } finally {
+    isProcessingMetadataQueue = false
+  }
+}
+
+setInterval(() => {
+  void processMetadataRetryQueue()
+}, METADATA_RETRY_INTERVAL_MS)
 
 interface PreparedTradeContext {
   trade: PumpUnifiedTrade
@@ -222,12 +395,13 @@ async function prepareTradeContext(
   const createdTs = trade.coinMeta?.createdTs ?? timestampMs
 
   const coinMetaRecord = (trade.coinMeta as Record<string, unknown> | undefined) ?? {}
-  const directMetadataUri = firstString(
+  let normalizedMetadataUri = normalizeIpfsUri(
+    firstString(
     coinMetaRecord.uri,
     coinMetaRecord.metadata_uri,
     coinMetaRecord.metadataUri,
+    ) ?? null,
   )
-  const normalizedMetadataUri = directMetadataUri ? normalizeIpfsUri(directMetadataUri) : null
 
   let metadata = normalizeTokenMetadata(coinMetaRecord)
   let remoteMetadataRaw: Record<string, unknown> | null = null
@@ -252,6 +426,55 @@ async function prepareTradeContext(
     typeof remoteMetadataRaw.image === "string"
   ) {
     imageUri = normalizeIpfsUri(remoteMetadataRaw.image as string)
+  }
+
+  const imageMatchesMetadataUri =
+    Boolean(normalizedMetadataUri) && Boolean(imageUri) && normalizedMetadataUri === imageUri
+
+  const shouldFetchCoinInfo =
+    Boolean(trade.mintAddress) &&
+    (!normalizedMetadataUri || isMetadataEmpty(metadata) || !imageUri || imageMatchesMetadataUri)
+
+  if (shouldFetchCoinInfo && trade.mintAddress) {
+    const coinInfo = await fetchPumpCoin(trade.mintAddress)
+
+    if (coinInfo && typeof coinInfo === "object") {
+      const coinRecord = coinInfo as Record<string, unknown>
+
+      const coinMetadataUri = firstString(
+        coinRecord.metadataUri,
+        coinRecord.metadata_uri,
+        coinRecord.uri,
+      )
+
+      if (!normalizedMetadataUri && typeof coinMetadataUri === "string") {
+        normalizedMetadataUri = normalizeIpfsUri(coinMetadataUri)
+      }
+
+      const normalizedCoinMetadata = normalizeTokenMetadata(
+        (coinRecord.metadata as Record<string, unknown> | undefined) ?? coinRecord,
+      )
+
+      metadata = {
+        ...normalizedCoinMetadata,
+        ...metadata,
+      }
+
+      const coinImageCandidate = firstString(
+        coinRecord.imageUri,
+        coinRecord.image_uri,
+        coinRecord.image,
+        normalizedCoinMetadata.image ?? undefined,
+      )
+      const normalizedCoinImage = coinImageCandidate ? normalizeIpfsUri(coinImageCandidate) : null
+
+      if (
+        normalizedCoinImage &&
+        (!imageUri || imageMatchesMetadataUri)
+      ) {
+        imageUri = normalizedCoinImage
+      }
+    }
   }
 
   const symbolFromName = (name?: string | null) =>
@@ -372,6 +595,16 @@ async function persistPreparedTrade(ctx: PreparedTradeContext): Promise<void> {
         kingOfTheHillTimestamp: null,
       },
     })
+  }
+
+  const needsMetadataRetry =
+    !ctx.metadataUri ||
+    !ctx.imageUri ||
+    looksLikeMintPrefix(ctx.fallbackName, trade.mintAddress) ||
+    looksLikeMintPrefix(ctx.fallbackSymbol, trade.mintAddress)
+
+  if (needsMetadataRetry) {
+    scheduleMetadataRetry(trade.mintAddress)
   }
 
   await prisma.tokenPrice.upsert({
