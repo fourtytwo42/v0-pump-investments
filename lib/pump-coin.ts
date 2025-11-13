@@ -14,6 +14,8 @@ const COIN_CACHE = new Map<string, any | null>()
 const COIN_FETCH_PROMISES = new Map<string, Promise<any | null>>()
 
 async function requestPumpCoin(mint: string): Promise<any | null> {
+  let lastError: Error | null = null
+
   for (const baseUrl of FRONTEND_ENDPOINTS) {
     const url = `${baseUrl}/coins/${mint}`
 
@@ -23,11 +25,11 @@ async function requestPumpCoin(mint: string): Promise<any | null> {
         headers: PUMP_HEADERS,
       })
 
-      if (!response.ok) {
-        if (response.status === 404) {
-          COIN_CACHE.set(mint, null)
-          return null
-        }
+        if (!response.ok) {
+          if (response.status === 404) {
+            return null
+          }
+        lastError = new Error(`pump.fun coin request failed with status ${response.status}`)
         console.warn(`[pump-coin] ${url} responded with ${response.status}`)
         continue
       }
@@ -36,11 +38,15 @@ async function requestPumpCoin(mint: string): Promise<any | null> {
       COIN_CACHE.set(mint, json)
       return json
     } catch (error) {
+      lastError = error as Error
       console.warn(`[pump-coin] Failed to fetch coin ${mint} from ${baseUrl}:`, (error as Error).message)
     }
   }
 
-  COIN_CACHE.set(mint, null)
+  if (lastError) {
+    console.warn(`[pump-coin] All endpoints failed for ${mint}:`, lastError.message)
+  }
+
   return null
 }
 
@@ -50,7 +56,11 @@ export async function fetchPumpCoin(mint: string | null | undefined): Promise<an
   }
 
   if (COIN_CACHE.has(mint)) {
-    return COIN_CACHE.get(mint) ?? null
+    const cached = COIN_CACHE.get(mint)
+    if (cached != null) {
+      return cached
+    }
+    COIN_CACHE.delete(mint)
   }
 
   if (COIN_FETCH_PROMISES.has(mint)) {

@@ -1,11 +1,12 @@
 "use client"
 
 import type React from "react"
-import { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react"
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from "react"
 import { db } from "@/lib/db"
 import { toast } from "@/components/ui/use-toast"
 import type { TokenData } from "@/types/token-data"
 import type { TokenQueryOptions } from "@/lib/token-query"
+import { normalizeIpfsUri } from "@/lib/pump-trades"
 
 interface TokenContextType {
   tokens: Map<string, TokenData>
@@ -43,6 +44,45 @@ const DEFAULT_QUERY_OPTIONS: TokenQueryOptions = {
   },
 }
 
+const CLIENT_COIN_ENDPOINTS = ["/api/pump-coin"]
+
+interface ClientCoinMetadata {
+  name?: string | null
+  symbol?: string | null
+  imageUri?: string | null
+  metadataUri?: string | null
+  description?: string | null
+  twitter?: string | null
+  telegram?: string | null
+  website?: string | null
+  completed?: boolean | null
+  kingOfTheHillTimestamp?: number | null
+  bondingCurve?: string | null
+  associatedBondingCurve?: string | null
+}
+
+interface ClientCoinResponse {
+  source?: string
+  metadata?: ClientCoinMetadata
+}
+
+function looksLikeMintPrefix(value: string | null | undefined, mint: string): boolean {
+  if (!value) return true
+  const cleaned = value.replace(/[^A-Za-z0-9]/g, "").toUpperCase()
+  if (!cleaned) return true
+  if (cleaned.length < 3) return false
+  return mint.toUpperCase().startsWith(cleaned)
+}
+
+function shouldHydrateOnClient(token: TokenData): boolean {
+  if (!token) return false
+  if (!token.image_uri) return true
+  if (looksLikeMintPrefix(token.name, token.mint)) return true
+  if (looksLikeMintPrefix(token.symbol, token.mint)) return true
+  if (!token.description && !token.twitter && !token.telegram) return true
+  return false
+}
+
 export function TokenProvider({ children }: { children: React.ReactNode }) {
   const [tokens, setTokens] = useState<Map<string, TokenData>>(new Map())
   const [visibleTokens, setVisibleTokens] = useState<TokenData[]>([])
@@ -55,6 +95,8 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
   const [totalPages, setTotalPages] = useState<number>(1)
   const [totalCount, setTotalCount] = useState<number>(0)
   const [isConnected, setIsConnected] = useState<boolean>(false)
+  const metadataPendingRef = useRef<Set<string>>(new Set())
+  const metadataRetryRef = useRef<Map<string, number>>(new Map())
 
   const loadFavorites = useCallback(async () => {
     try {
@@ -208,6 +250,160 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
       }
     }
   }, [queryOptions, favorites])
+
+  const fetchCoinClient = useCallback(async (mint: string): Promise<ClientCoinResponse | null> => {
+    for (const base of CLIENT_COIN_ENDPOINTS) {
+      const url = `${base}/${encodeURIComponent(mint)}`
+      try {
+        const response = await fetch(url, {
+          method: "GET",
+          mode: "cors",
+          headers: {
+            accept: "application/json, text/plain, */*",
+          },
+          cache: "no-store",
+        })
+        if (!response.ok) {
+          if (response.status === 404) {
+            const payload = (await response.json()) as ClientCoinResponse | { error?: string }
+            if (payload && typeof payload === "object" && "metadata" in payload) {
+              return payload as ClientCoinResponse
+            }
+            return null
+          }
+          continue
+        }
+        return (await response.json()) as ClientCoinResponse
+      } catch (error) {
+        console.warn("[TokenProvider] client coin fetch failed", mint, (error as Error).message)
+      }
+    }
+    return null
+  }, [])
+
+  const hydrateFromClient = useCallback(
+    async (mint: string) => {
+      const pending = metadataPendingRef.current
+      const retries = metadataRetryRef.current
+      const attempt = (retries.get(mint) ?? 0) + 1
+      retries.set(mint, attempt)
+
+      try {
+        const response = await fetchCoinClient(mint)
+        if (!response || typeof response !== "object") {
+          return
+        }
+
+        const metadata = response.metadata ?? {}
+
+        const normalizedMetadataUri = metadata.metadataUri
+          ? normalizeIpfsUri(metadata.metadataUri) ?? metadata.metadataUri
+          : null
+        const normalizedImage = metadata.imageUri
+          ? normalizeIpfsUri(metadata.imageUri) ?? metadata.imageUri
+          : null
+
+        let appliedUpdates: Partial<TokenData> | null = null
+
+        setTokens((prev) => {
+          const existing = prev.get(mint)
+          if (!existing) return prev
+
+          const updates: Partial<TokenData> = {}
+
+          if (normalizedMetadataUri && (!existing.metadata_uri || existing.metadata_uri === "")) {
+            updates.metadata_uri = normalizedMetadataUri
+            updates.image_metadata_uri = normalizedMetadataUri
+          }
+
+          if (
+            normalizedImage &&
+            (!existing.image_uri || existing.image_uri === existing.metadata_uri || existing.image_uri === "")
+          ) {
+            updates.image_uri = normalizedImage
+          }
+
+          if (metadata.name && looksLikeMintPrefix(existing.name, mint)) {
+            updates.name = metadata.name
+          }
+
+          if (metadata.symbol && looksLikeMintPrefix(existing.symbol, mint)) {
+            updates.symbol = metadata.symbol
+          }
+
+          if (metadata.description && !existing.description) {
+            updates.description = metadata.description
+          }
+
+          if (metadata.twitter && !existing.twitter) {
+            updates.twitter = metadata.twitter
+          }
+
+          if (metadata.telegram && !existing.telegram) {
+            updates.telegram = metadata.telegram
+          }
+
+          if (metadata.website && !existing.website) {
+            updates.website = metadata.website
+          }
+
+          if (typeof metadata.completed === "boolean" && existing.is_completed !== metadata.completed) {
+            updates.is_completed = metadata.completed
+            updates.is_bonding_curve = metadata.completed ? false : existing.is_bonding_curve
+          }
+
+          if (
+            metadata.kingOfTheHillTimestamp &&
+            !existing.king_of_the_hill_timestamp &&
+            Number.isFinite(metadata.kingOfTheHillTimestamp)
+          ) {
+            updates.king_of_the_hill_timestamp = Number(metadata.kingOfTheHillTimestamp)
+          }
+
+          if (metadata.bondingCurve && !existing.bonding_curve) {
+            updates.bonding_curve = metadata.bondingCurve
+          }
+
+          if (metadata.associatedBondingCurve && !existing.associated_bonding_curve) {
+            updates.associated_bonding_curve = metadata.associatedBondingCurve
+          }
+
+          if (Object.keys(updates).length === 0) {
+            return prev
+          }
+
+          appliedUpdates = updates
+          const next = new Map(prev)
+          next.set(mint, { ...existing, ...updates })
+          return next
+        })
+
+        if (appliedUpdates) {
+          setVisibleTokens((prev) =>
+            prev.map((token) => (token.mint === mint ? { ...token, ...appliedUpdates } : token)),
+          )
+        }
+      } finally {
+        metadataPendingRef.current.delete(mint)
+      }
+    },
+    [fetchCoinClient, setTokens, setVisibleTokens],
+  )
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const pending = metadataPendingRef.current
+    const retries = metadataRetryRef.current
+
+    const candidates = visibleTokens.filter(shouldHydrateOnClient).slice(0, 5)
+    for (const token of candidates) {
+      if (pending.has(token.mint)) continue
+      const attempts = retries.get(token.mint) ?? 0
+      if (attempts >= 3) continue
+      pending.add(token.mint)
+      void hydrateFromClient(token.mint)
+    }
+  }, [visibleTokens, hydrateFromClient])
 
   const value = useMemo(
     () => ({
