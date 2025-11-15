@@ -9,6 +9,7 @@ import {
 } from "@/lib/pump-trades"
 import { normalizeTokenMetadata, isMetadataEmpty } from "@/lib/token-metadata"
 import { fetchPumpCoin, PUMP_HEADERS } from "@/lib/pump-coin"
+import { getDexPairCreatedAt } from "@/lib/dexscreener"
 
 function enforceConnectionLimit(url?: string): string | undefined {
   if (!url) return url
@@ -152,6 +153,7 @@ const METADATA_RETRY_INTERVAL_MS = 15_000
 const METADATA_RETRY_BATCH_SIZE = 10
 const METADATA_RETRY_BASE_DELAY_MS = 250
 const CREATION_TIMESTAMP_FALLBACK_WINDOW_MS = 24 * 60 * 60 * 1000
+const DEX_CREATION_REFRESH_WINDOW_MS = 7 * 24 * 60 * 60 * 1000
 
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -347,7 +349,24 @@ async function refreshTokenMetadata(mint: string): Promise<boolean> {
 
     const updates: Prisma.TokenUpdateInput = {}
 
-    const createdTimestampCandidate = combinedMetadata.createdTimestamp
+    const existingCreatedTimestamp = tokenRecord.createdTimestamp ? Number(tokenRecord.createdTimestamp) : null
+    const creationLooksRecent =
+      !existingCreatedTimestamp ||
+      Date.now() - existingCreatedTimestamp < DEX_CREATION_REFRESH_WINDOW_MS
+
+    let createdTimestampCandidate =
+      typeof combinedMetadata.createdTimestamp === "number" ? combinedMetadata.createdTimestamp : null
+
+    if (
+      (tokenRecord.completed || coinRecord.complete === true) &&
+      creationLooksRecent
+    ) {
+      const dexCreatedAt = await getDexPairCreatedAt(mint)
+      if (dexCreatedAt && (!createdTimestampCandidate || dexCreatedAt < createdTimestampCandidate)) {
+        createdTimestampCandidate = dexCreatedAt
+      }
+    }
+
     if (
       typeof createdTimestampCandidate === "number" &&
       Number.isFinite(createdTimestampCandidate) &&
