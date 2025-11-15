@@ -151,6 +151,7 @@ const METADATA_RETRY_MAX_ATTEMPTS = 5
 const METADATA_RETRY_INTERVAL_MS = 15_000
 const METADATA_RETRY_BATCH_SIZE = 10
 const METADATA_RETRY_BASE_DELAY_MS = 250
+const CREATION_TIMESTAMP_FALLBACK_WINDOW_MS = 24 * 60 * 60 * 1000
 
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -346,6 +347,21 @@ async function refreshTokenMetadata(mint: string): Promise<boolean> {
 
     const updates: Prisma.TokenUpdateInput = {}
 
+    const createdTimestampCandidate = combinedMetadata.createdTimestamp
+    if (
+      typeof createdTimestampCandidate === "number" &&
+      Number.isFinite(createdTimestampCandidate) &&
+      createdTimestampCandidate > 0
+    ) {
+      const candidateBigInt = BigInt(Math.round(createdTimestampCandidate))
+      if (
+        !tokenRecord.createdTimestamp ||
+        candidateBigInt < tokenRecord.createdTimestamp
+      ) {
+        updates.createdTimestamp = candidateBigInt
+      }
+    }
+
     const nameCandidate = combinedMetadata.name ?? null
     const symbolCandidate = combinedMetadata.symbol ?? null
 
@@ -480,6 +496,7 @@ interface PreparedTradeContext {
   fallbackName: string
   creatorAddress: string
   createdTs: number
+  hasFeedCreatedTimestamp: boolean
   logSymbol: string
   marketCapUsd: Decimal
   metadataUri?: string | null
@@ -526,7 +543,10 @@ async function prepareTradeContext(
   amountUsd = amountUsd.toDecimalPlaces(2)
 
   const creatorAddress = trade.creatorAddress ?? trade.coinMeta?.creator ?? "unknown"
-  const createdTs = trade.coinMeta?.createdTs ?? timestampMs
+  const feedCreatedTsRaw = trade.coinMeta?.createdTs
+  const hasFeedCreatedTimestamp =
+    typeof feedCreatedTsRaw === "number" && Number.isFinite(feedCreatedTsRaw) && feedCreatedTsRaw > 0
+  const createdTs = hasFeedCreatedTimestamp ? Number(feedCreatedTsRaw) : timestampMs
 
   const coinMetaRecord = (trade.coinMeta as Record<string, unknown> | undefined) ?? {}
   const rawMetadataUri = firstString(
@@ -619,6 +639,7 @@ async function prepareTradeContext(
     fallbackName,
     creatorAddress,
     createdTs,
+    hasFeedCreatedTimestamp,
     logSymbol,
     marketCapUsd,
     metadataUri: normalizedMetadataUri,
@@ -687,6 +708,7 @@ async function persistPreparedTrade(ctx: PreparedTradeContext): Promise<void> {
       id: true,
       completed: true,
       kingOfTheHillTimestamp: true,
+      createdTimestamp: true,
     },
   })
 
@@ -708,11 +730,19 @@ async function persistPreparedTrade(ctx: PreparedTradeContext): Promise<void> {
     })
   }
 
+  const storedCreatedTimestampMs =
+    typeof token.createdTimestamp === "bigint" ? Number(token.createdTimestamp) : null
+  const creationLikelyFallback =
+    !ctx.hasFeedCreatedTimestamp &&
+    (!storedCreatedTimestampMs ||
+      ctx.timestampMs - storedCreatedTimestampMs < CREATION_TIMESTAMP_FALLBACK_WINDOW_MS)
+
   const needsMetadataRetry =
     !ctx.metadataUri ||
     !ctx.imageUri ||
     looksLikeMintPrefix(ctx.fallbackName, trade.mintAddress) ||
-    looksLikeMintPrefix(ctx.fallbackSymbol, trade.mintAddress)
+    looksLikeMintPrefix(ctx.fallbackSymbol, trade.mintAddress) ||
+    creationLikelyFallback
 
   if (needsMetadataRetry) {
     scheduleMetadataRetry(trade.mintAddress)
