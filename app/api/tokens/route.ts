@@ -404,11 +404,14 @@ export async function POST(request: Request) {
     const aggregatedTokens: AggregatedToken[] = []
 
     const buildTokenRecord = (token: (typeof tokenRecords)[number], metrics?: AggregatedMetrics) => {
-      const priceSol = normalizeNumber(token.price?.priceSol)
-      const priceUsd = normalizeNumber(token.price?.priceUsd)
-      const marketCapUsd = normalizeNumber(token.price?.marketCapUsd)
-      const marketCapSol = priceSol * 1_000_000_000
-      const createdTs = token.createdTimestamp ? normalizeNumber(token.createdTimestamp) : undefined
+  const priceSol = normalizeNumber(token.price?.priceSol)
+  const priceUsd = normalizeNumber(token.price?.priceUsd)
+  const marketCapUsd = normalizeNumber(token.price?.marketCapUsd)
+  const marketCapSol = priceSol * 1_000_000_000
+  const createdTs =
+    token.createdTimestamp && token.createdTimestamp > BigInt(0)
+      ? normalizeNumber(token.createdTimestamp)
+      : undefined
       const kothTs = token.kingOfTheHillTimestamp ? normalizeNumber(token.kingOfTheHillTimestamp) : null
 
       const minTradeAmountThreshold = filters.minTradeAmount ?? 0
