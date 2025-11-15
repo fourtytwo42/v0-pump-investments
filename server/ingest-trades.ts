@@ -463,6 +463,7 @@ setInterval(() => {
 
 async function seedMetadataRetryQueue(): Promise<void> {
   try {
+    const creationCutoff = BigInt(Date.now() - DEX_CREATION_REFRESH_WINDOW_MS)
     const candidates = await prisma.token.findMany({
       where: {
         OR: [
@@ -471,6 +472,13 @@ async function seedMetadataRetryQueue(): Promise<void> {
           { description: null },
           { twitter: null },
           { telegram: null },
+          { createdTimestamp: null },
+          {
+            completed: true,
+            createdTimestamp: {
+              gte: creationCutoff,
+            },
+          },
         ],
       },
       select: {
