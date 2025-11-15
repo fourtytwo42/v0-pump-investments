@@ -251,8 +251,33 @@ function sortTokens(tokens: AggregatedToken[], sortBy: string, sortOrder: "asc" 
   })
 }
 
-const MIN_TIME_RANGE_MINUTES = 30
-const MAX_LOOKBACK_MINUTES = 6 * 60
+const MIN_REQUESTED_TIME_RANGE_MINUTES = 1
+const FALLBACK_MIN_TIME_RANGE_MINUTES = 30
+const MAX_LOOKBACK_MINUTES = 60
+
+async function fetchTradesSince(minutes: number) {
+  const cutoffMs = Date.now() - minutes * 60 * 1000
+  const cutoffBigInt = BigInt(cutoffMs)
+
+  const trades = await prisma.trade.findMany({
+    where: {
+      timestamp: {
+        gte: cutoffBigInt,
+      },
+    },
+    select: {
+      tokenId: true,
+      timestamp: true,
+      isBuy: true,
+      amountSol: true,
+      amountUsd: true,
+      baseAmount: true,
+      userAddress: true,
+    },
+  })
+
+  return { trades, cutoffBigInt }
+}
 
 export async function POST(request: Request) {
   try {
@@ -263,9 +288,9 @@ export async function POST(request: Request) {
     const sortBy = body.sortBy ?? "marketCap"
     const sortOrder = (body.sortOrder ?? "desc") as "asc" | "desc"
     const requestedTimeRangeMinutes = Number(body.timeRangeMinutes ?? 10)
-    const timeRangeMinutes = Number.isFinite(requestedTimeRangeMinutes)
-      ? Math.min(Math.max(requestedTimeRangeMinutes, MIN_TIME_RANGE_MINUTES), MAX_LOOKBACK_MINUTES)
-      : MIN_TIME_RANGE_MINUTES
+    let effectiveTimeRangeMinutes = Number.isFinite(requestedTimeRangeMinutes)
+      ? Math.min(Math.max(requestedTimeRangeMinutes, MIN_REQUESTED_TIME_RANGE_MINUTES), MAX_LOOKBACK_MINUTES)
+      : FALLBACK_MIN_TIME_RANGE_MINUTES
     const filters: TokenQueryFilters = {
       hideExternal: body.filters?.hideExternal ?? false,
       hideKOTH: body.filters?.hideKOTH ?? false,
@@ -286,25 +311,18 @@ export async function POST(request: Request) {
     }
     const favoriteMints = new Set((body.favoriteMints ?? []).filter(Boolean))
 
-    const cutoffMs = Date.now() - timeRangeMinutes * 60 * 1000
-    const cutoffBigInt = BigInt(cutoffMs)
+    let { trades, cutoffBigInt } = await fetchTradesSince(effectiveTimeRangeMinutes)
 
-    const trades = await prisma.trade.findMany({
-      where: {
-        timestamp: {
-          gte: cutoffBigInt,
-        },
-      },
-      select: {
-        tokenId: true,
-        timestamp: true,
-        isBuy: true,
-        amountSol: true,
-        amountUsd: true,
-        baseAmount: true,
-        userAddress: true,
-      },
-    })
+    if (
+      trades.length === 0 &&
+      requestedTimeRangeMinutes < FALLBACK_MIN_TIME_RANGE_MINUTES &&
+      effectiveTimeRangeMinutes < FALLBACK_MIN_TIME_RANGE_MINUTES
+    ) {
+      effectiveTimeRangeMinutes = Math.min(FALLBACK_MIN_TIME_RANGE_MINUTES, MAX_LOOKBACK_MINUTES)
+      const fallback = await fetchTradesSince(effectiveTimeRangeMinutes)
+      trades = fallback.trades
+      cutoffBigInt = fallback.cutoffBigInt
+    }
 
     const tokenIds = new Set(trades.map((trade) => trade.tokenId))
 
@@ -325,6 +343,7 @@ export async function POST(request: Request) {
         totalPages: 1,
         total: 0,
         tokens: [],
+        effectiveTimeRangeMinutes,
       })
     }
 
@@ -465,11 +484,13 @@ export async function POST(request: Request) {
       buildTokenRecord(token, metrics)
     })
 
-    tokenRecords.forEach((token) => {
-      if (!metricsByToken.has(token.id)) {
-        buildTokenRecord(token)
-      }
-    })
+    if (filters.favoritesOnly && favoriteMints.size > 0) {
+      tokenRecords.forEach((token) => {
+        if (!metricsByToken.has(token.id) && favoriteMints.has(token.mintAddress)) {
+          buildTokenRecord(token)
+        }
+      })
+    }
 
     await Promise.all(
       aggregatedTokens.map(async (token) => {
@@ -570,6 +591,7 @@ export async function POST(request: Request) {
       total,
       totalPages,
       tokens: pageItems,
+      effectiveTimeRangeMinutes,
     })
   } catch (error) {
     console.error("[api/tokens] Failed to fetch tokens:", error)
