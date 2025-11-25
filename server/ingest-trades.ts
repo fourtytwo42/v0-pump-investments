@@ -472,12 +472,12 @@ async function seedMetadataRetryQueue(): Promise<void> {
           { description: null },
           { twitter: null },
           { telegram: null },
-          { createdTimestamp: null },
+          { createdTimestamp: 0n },
           {
-            completed: true,
-            createdTimestamp: {
-              gte: creationCutoff,
-            },
+            AND: [
+              { completed: true },
+              { createdTimestamp: { gte: creationCutoff } },
+            ],
           },
         ],
       },
