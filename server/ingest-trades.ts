@@ -974,12 +974,35 @@ async function cleanupOldTrades() {
   }
 }
 
+const AUTO_RESTART_INTERVAL_MS = 24 * 60 * 60 * 1000 // 24 hours
+
+async function gracefulRestart() {
+  console.log("🔄 Scheduled restart: gracefully shutting down for auto-restart…")
+  try {
+    ws?.close()
+    await prisma.$disconnect()
+    console.log("✅ Graceful shutdown complete, PM2 will restart the service")
+    process.exit(0)
+  } catch (error) {
+    console.error("[ingest] Error during graceful restart:", (error as Error).message)
+    process.exit(1)
+  }
+}
+
 console.log("🚀 Starting trade ingestion service…")
 connectToFeed()
 void cleanupOldTrades()
 setInterval(() => {
   void cleanupOldTrades()
 }, CLEANUP_INTERVAL_MS)
+
+// Schedule automatic restart every 24 hours
+const restartInterval = AUTO_RESTART_INTERVAL_MS
+const restartInHours = restartInterval / (60 * 60 * 1000)
+console.log(`⏰ Auto-restart scheduled every ${restartInHours} hours`)
+setTimeout(() => {
+  void gracefulRestart()
+}, restartInterval)
 
 process.on("SIGINT", async () => {
   console.log("\n🛑 Shutting down…")
