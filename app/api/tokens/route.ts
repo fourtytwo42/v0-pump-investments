@@ -162,6 +162,34 @@ function passesFilters(
     return false
   }
 
+  // Filter by token age (created_timestamp)
+  // minTokenAgeMinutes: token must be at least X minutes old
+  // maxTokenAgeMinutes: token must be at most X minutes old
+  if (token.created_timestamp) {
+    const now = Date.now()
+    const tokenAgeMs = now - token.created_timestamp
+    const tokenAgeMinutes = tokenAgeMs / (60 * 1000)
+    
+    // minTokenAgeMinutes: token must be at least X minutes old
+    if (filters.minTokenAgeMinutes !== undefined && filters.minTokenAgeMinutes !== null) {
+      if (tokenAgeMinutes < filters.minTokenAgeMinutes) {
+        return false
+      }
+    }
+
+    // maxTokenAgeMinutes: token must be at most X minutes old
+    if (filters.maxTokenAgeMinutes !== undefined && filters.maxTokenAgeMinutes !== null) {
+      if (tokenAgeMinutes > filters.maxTokenAgeMinutes) {
+        return false
+      }
+    }
+  } else {
+    // If token has no created_timestamp, exclude it if age filters are set
+    if (filters.minTokenAgeMinutes !== undefined || filters.maxTokenAgeMinutes !== undefined) {
+      return false
+    }
+  }
+
   return true
 }
 
@@ -307,6 +335,8 @@ export async function POST(request: Request) {
       maxUniqueTraders: body.filters?.maxUniqueTraders,
       minTradeAmount: body.filters?.minTradeAmount ?? 0,
       maxTradeAmount: body.filters?.maxTradeAmount,
+      minTokenAgeMinutes: body.filters?.minTokenAgeMinutes,
+      maxTokenAgeMinutes: body.filters?.maxTokenAgeMinutes,
       favoritesOnly: body.filters?.favoritesOnly ?? false,
     }
     const favoriteMints = new Set((body.favoriteMints ?? []).filter(Boolean))

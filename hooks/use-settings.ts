@@ -28,6 +28,8 @@ export interface DashboardSettings {
   tradeRetentionMinutes: number // Keeping this in settings but removing UI, fixed at 60 minutes
   showBonkBotLogo: boolean
   graduationFilter: "all" | "bonding" | "graduated"
+  minTokenAgeMinutes: number
+  maxTokenAgeMinutes: number
 }
 
 export function useSettings(setOnboardingActive: (active: boolean) => void) {
@@ -55,6 +57,8 @@ export function useSettings(setOnboardingActive: (active: boolean) => void) {
     tradeRetentionMinutes: 60, // Fixed at 1 hour (60 minutes)
     showBonkBotLogo: false,
     graduationFilter: "all",
+    minTokenAgeMinutes: 0,
+    maxTokenAgeMinutes: 10080, // 7 days in minutes
   })
 
   // Function to update settings

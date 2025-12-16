@@ -31,6 +31,20 @@ interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: "3.0.31",
+    date: "December 20, 2024",
+    changes: [
+      {
+        type: "new",
+        description: "Added Token Age Range filter slider in settings to filter tokens by their creation age (0 minutes to 7 days) with granular control for minutes, hours, and days.",
+      },
+      {
+        type: "improved",
+        description: "Token age filter uses non-linear scaling for precise selection of common values like 5 minutes, 25 minutes, 5 hours, or 3 days.",
+      },
+    ],
+  },
+  {
     version: "3.0.30",
     date: "November 13, 2025",
     changes: [

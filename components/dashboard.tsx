@@ -108,6 +108,8 @@ export default function Dashboard() {
     settings.maxUniqueTraderCountFilter,
     settings.minTradeAmountFilter,
     settings.maxTradeAmountFilter,
+    settings.minTokenAgeMinutes,
+    settings.maxTokenAgeMinutes,
     showFavorites,
     isPaused,
   ])
@@ -151,6 +153,8 @@ export default function Dashboard() {
         maxUniqueTraders: settings.maxUniqueTraderCountFilter,
         minTradeAmount: settings.minTradeAmountFilter,
         maxTradeAmount: settings.maxTradeAmountFilter,
+        minTokenAgeMinutes: settings.minTokenAgeMinutes > 0 ? settings.minTokenAgeMinutes : undefined,
+        maxTokenAgeMinutes: settings.maxTokenAgeMinutes < 10080 ? settings.maxTokenAgeMinutes : undefined,
         favoritesOnly: showFavorites,
       },
     }
@@ -174,6 +178,8 @@ export default function Dashboard() {
     settings.maxUniqueTraderCountFilter,
     settings.minTradeAmountFilter,
     settings.maxTradeAmountFilter,
+    settings.minTokenAgeMinutes,
+    settings.maxTokenAgeMinutes,
     showFavorites,
   ])
 
@@ -313,6 +319,59 @@ export default function Dashboard() {
       // Second half: 100-5000 value = 50-100 slider
       const normalized = (value - 100) / 4900 // 0 to 1
       return Math.round(50 + normalized * 50) // 50 to 100
+    }
+  }
+
+  // Maps slider position (0-100) to token age in minutes (0 to 10080 = 7 days)
+  // Non-linear scale: more granular for minutes/hours, less granular for days
+  const mapTokenAgeSliderToValue = (sliderValue: number): number => {
+    if (sliderValue <= 33) {
+      // First third: 0-33 slider = 0-60 minutes (about 1.8 minutes per unit)
+      const normalized = sliderValue / 33 // 0 to 1
+      return Math.round(normalized * 60) // 0 to 60 minutes
+    } else if (sliderValue <= 66) {
+      // Second third: 33-66 slider = 1-12 hours (non-linear, more granular at lower hours)
+      const normalized = (sliderValue - 33) / 33 // 0 to 1
+      // Use exponential curve for better granularity at lower hours
+      const hours = 1 + normalized * 11 // 1 to 12 hours
+      return Math.round(hours * 60) // Convert to minutes
+    } else {
+      // Final third: 66-100 slider = 12 hours - 7 days (non-linear, more granular at lower days)
+      const normalized = (sliderValue - 66) / 34 // 0 to 1
+      // Use exponential curve for better granularity at lower days
+      const days = 0.5 + normalized * 6.5 // 0.5 to 7 days (12 hours to 7 days)
+      return Math.round(days * 24 * 60) // Convert to minutes
+    }
+  }
+
+  const mapTokenAgeValueToSlider = (value: number): number => {
+    if (value <= 60) {
+      // First third: 0-60 minutes = 0-33 slider
+      const normalized = value / 60 // 0 to 1
+      return Math.round(normalized * 33) // 0 to 33
+    } else if (value <= 12 * 60) {
+      // Second third: 1-12 hours = 33-66 slider
+      const hours = value / 60 // Convert to hours
+      const normalized = (hours - 1) / 11 // 0 to 1
+      return Math.round(33 + normalized * 33) // 33 to 66
+    } else {
+      // Final third: 12 hours - 7 days = 66-100 slider
+      const days = value / (24 * 60) // Convert to days
+      const normalized = (days - 0.5) / 6.5 // 0 to 1
+      return Math.round(66 + normalized * 34) // 66 to 100
+    }
+  }
+
+  // Format token age for display
+  const formatTokenAge = (minutes: number): string => {
+    if (minutes < 60) {
+      return `${minutes}m`
+    } else if (minutes < 24 * 60) {
+      const hours = Math.round(minutes / 60)
+      return `${hours}h`
+    } else {
+      const days = Math.round(minutes / (24 * 60))
+      return `${days}d`
     }
   }
 
@@ -598,6 +657,39 @@ export default function Dashboard() {
                     {settings.maxTradeAmountFilter >= 5000
                       ? `Only counting traders with individual trades above $${settings.minTradeAmountFilter}`
                       : `Only counting traders with individual trades between $${settings.minTradeAmountFilter}–$${settings.maxTradeAmountFilter}`}
+                  </p>
+                </div>
+
+                <div className="space-y-4 mt-6 border-t pt-4">
+                  <Label className="text-base font-semibold">Token Age Range</Label>
+
+                  <RangeSlider
+                    min={0}
+                    max={100}
+                    step={1}
+                    value={[
+                      mapTokenAgeValueToSlider(settings.minTokenAgeMinutes),
+                      mapTokenAgeValueToSlider(settings.maxTokenAgeMinutes),
+                    ]}
+                    onValueChange={(sliderValues) => {
+                      const minValue = mapTokenAgeSliderToValue(sliderValues[0])
+                      const maxValue = mapTokenAgeSliderToValue(sliderValues[1])
+                      updateSettingsBatch({
+                        minTokenAgeMinutes: minValue,
+                        maxTokenAgeMinutes: maxValue,
+                      })
+                    }}
+                    formatValue={(sliderValue) => {
+                      const value = mapTokenAgeSliderToValue(sliderValue)
+                      return formatTokenAge(value)
+                    }}
+                    className="my-4"
+                  />
+
+                  <p className="text-xs text-muted-foreground pt-2 border-t">
+                    {settings.maxTokenAgeMinutes >= 10080
+                      ? `Showing tokens with age ${formatTokenAge(settings.minTokenAgeMinutes)}+`
+                      : `Showing tokens with age between ${formatTokenAge(settings.minTokenAgeMinutes)}–${formatTokenAge(settings.maxTokenAgeMinutes)}`}
                   </p>
                 </div>
 
