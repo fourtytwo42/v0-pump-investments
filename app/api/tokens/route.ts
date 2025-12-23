@@ -202,6 +202,7 @@ interface AggregatedMetrics {
   sellVolumeUsd: number
   lastTradeTimestamp: number
   userTotals: Map<string, number>
+  buyerTotals: Map<string, number>
 }
 
 interface AggregatedToken {
@@ -404,6 +405,7 @@ export async function POST(request: Request) {
           sellVolumeUsd: 0,
           lastTradeTimestamp: 0,
           userTotals: new Map<string, number>(),
+          buyerTotals: new Map<string, number>(),
         })
       }
 
@@ -418,6 +420,11 @@ export async function POST(request: Request) {
       if (trade.isBuy) {
         metrics.buyVolumeSol += amountSol
         metrics.buyVolumeUsd += amountUsd
+        // Track buyers separately
+        if (trade.userAddress) {
+          const previous = metrics.buyerTotals.get(trade.userAddress) ?? 0
+          metrics.buyerTotals.set(trade.userAddress, previous + amountUsd)
+        }
       } else {
         metrics.sellVolumeSol += amountSol
         metrics.sellVolumeUsd += amountUsd
@@ -447,12 +454,13 @@ export async function POST(request: Request) {
       const minTradeAmountThreshold = filters.minTradeAmount ?? 0
       const maxTradeAmountThreshold = filters.maxTradeAmount ?? Number.POSITIVE_INFINITY
 
-      let uniqueTraderCount = 0
+      let uniqueBuyerCount = 0
 
-      if (metrics?.userTotals) {
-        for (const totalUsd of metrics.userTotals.values()) {
+      // Count only unique buyers (not all traders)
+      if (metrics?.buyerTotals) {
+        for (const totalUsd of metrics.buyerTotals.values()) {
           if (totalUsd >= minTradeAmountThreshold && totalUsd <= maxTradeAmountThreshold) {
-            uniqueTraderCount += 1
+            uniqueBuyerCount += 1
           }
         }
       }
@@ -493,7 +501,7 @@ export async function POST(request: Request) {
         buy_volume_usd: buyVolumeUsd,
         sell_volume: sellVolumeSol,
         sell_volume_usd: sellVolumeUsd,
-        unique_trader_count: uniqueTraderCount,
+        unique_trader_count: uniqueBuyerCount,
         last_trade_time: Math.floor(lastTradeTimestamp / 1000),
         last_trade_timestamp: lastTradeTimestamp,
         created_timestamp: createdTs,

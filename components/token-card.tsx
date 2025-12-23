@@ -510,7 +510,7 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
                 <p className="font-medium text-red-500">{formatUSD(volumeInfo.sellVolumeUSD)}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Unique Traders</p>
+                <p className="text-xs text-muted-foreground">Unique Buyers</p>
                 <p className="font-medium">{token.unique_trader_count}</p>
               </div>
               <div>

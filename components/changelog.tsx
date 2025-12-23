@@ -31,6 +31,20 @@ interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: "3.0.32",
+    date: "January 15, 2025",
+    changes: [
+      {
+        type: "improved",
+        description: "Changed 'Unique Traders' to 'Unique Buyers' throughout the application to accurately reflect that only buyers are counted, not all traders.",
+      },
+      {
+        type: "improved",
+        description: "Updated filter logic to count only unique buyers when filtering and displaying token statistics.",
+      },
+    ],
+  },
+  {
     version: "3.0.31",
     date: "December 20, 2024",
     changes: [

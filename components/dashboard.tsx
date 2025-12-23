@@ -406,7 +406,7 @@ export default function Dashboard() {
                 <SelectItem value="totalVolume">Total Volume</SelectItem>
                 <SelectItem value="buyVolume">Buy Volume</SelectItem>
                 <SelectItem value="sellVolume">Sell Volume</SelectItem>
-                <SelectItem value="uniqueTraders">Unique Traders</SelectItem>
+                <SelectItem value="uniqueTraders">Unique Buyers</SelectItem>
                 <SelectItem value="tokenAge">Token Age</SelectItem>
                 <SelectItem value="lastTrade">Last Trade</SelectItem>
               </SelectContent>
@@ -603,7 +603,7 @@ export default function Dashboard() {
                 </div>
 
                 <div className="space-y-4 mt-6 border-t pt-4">
-                  <Label className="text-base font-semibold">Unique Traders Range</Label>
+                  <Label className="text-base font-semibold">Unique Buyers Range</Label>
 
                   <RangeSlider
                     min={1}
@@ -621,8 +621,8 @@ export default function Dashboard() {
 
                   <p className="text-xs text-muted-foreground pt-2 border-t">
                     {settings.maxUniqueTraderCountFilter === 500
-                      ? `Showing tokens with ${settings.minUniqueTraderCountFilter}+ unique traders`
-                      : `Showing tokens with ${settings.minUniqueTraderCountFilter}–${settings.maxUniqueTraderCountFilter} unique traders`}
+                      ? `Showing tokens with ${settings.minUniqueTraderCountFilter}+ unique buyers`
+                      : `Showing tokens with ${settings.minUniqueTraderCountFilter}–${settings.maxUniqueTraderCountFilter} unique buyers`}
                   </p>
                 </div>
 

@@ -26,7 +26,7 @@ const steps = [
   },
   {
     title: "Sort Options",
-    description: "Sort tokens by different metrics like Market Cap, Volume, or Unique Traders.",
+    description: "Sort tokens by different metrics like Market Cap, Volume, or Unique Buyers.",
     target: "[data-onboarding='sort-by']",
     placement: "bottom",
   },

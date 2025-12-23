@@ -54,7 +54,7 @@ export async function getTokensData(): Promise<string> {
         tokenDataString += `- Buy Volume: ${buyVolume}\n`
         tokenDataString += `- Sell Volume: ${sellVolume}\n`
         tokenDataString += `- Buy/Sell Ratio: ${buyToSellRatio}\n`
-        tokenDataString += `- Unique Traders: ${uniqueTraders}\n`
+        tokenDataString += `- Unique Buyers: ${uniqueTraders}\n`
         tokenDataString += `- Token Address: ${token.mint}\n\n`
       } catch (err) {
         console.error(`Error formatting token ${index}:`, err)
