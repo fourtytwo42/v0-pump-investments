@@ -16,12 +16,15 @@ function enforceConnectionLimit(url?: string): string | undefined {
 
   try {
     const parsed = new URL(url)
-    parsed.searchParams.set("connection_limit", parsed.searchParams.get("connection_limit") ?? "1")
+    // Increase connection limit to support parallel database writes (batch processing up to 50 trades)
+    // Default to 10 connections if not specified, allowing parallel operations without overwhelming the DB
+    parsed.searchParams.set("connection_limit", parsed.searchParams.get("connection_limit") ?? "10")
     parsed.searchParams.set("pool_timeout", parsed.searchParams.get("pool_timeout") ?? "0")
     return parsed.toString()
   } catch {
     const separator = url.includes("?") ? "&" : "?"
-    return `${url}${separator}connection_limit=1&pool_timeout=0`
+    // Increase from 1 to 10 to support parallel writes
+    return `${url}${separator}connection_limit=10&pool_timeout=0`
   }
 }
 
@@ -57,11 +60,15 @@ const NATS_CONNECT_PAYLOAD = {
 }
 const SUBJECTS = ["unifiedTradeEvent.processed"]
 
-const TRADE_RETENTION_MS = 60 * 60 * 1000
-const CLEANUP_INTERVAL_MS = 5 * 60 * 1000
-
 const tradeQueue: PumpUnifiedTrade[] = []
 let isProcessingQueue = false
+
+// RAM staging buffer for batched database writes
+const stagingBuffer: PreparedTradeContext[] = []
+let isFlushingStaging = false
+let lastFlushTime = Date.now()
+const STAGING_BUFFER_SIZE = 200 // Flush when we have 200 prepared trades
+const STAGING_FLUSH_INTERVAL_MS = 500 // Or flush every 500ms
 
 let ws: WebSocket | null = null
 let reconnectTimer: NodeJS.Timeout | null = null
@@ -154,6 +161,15 @@ const METADATA_RETRY_BATCH_SIZE = 10
 const METADATA_RETRY_BASE_DELAY_MS = 250
 const CREATION_TIMESTAMP_FALLBACK_WINDOW_MS = 24 * 60 * 60 * 1000
 const DEX_CREATION_REFRESH_WINDOW_MS = 7 * 24 * 60 * 60 * 1000
+
+// Cleanup configuration
+// TRADE_RETENTION_HOURS: How many hours of trades to keep (default: disabled/0 = keep all trades)
+// Only enable cleanup if explicitly set in environment variable
+const TRADE_RETENTION_HOURS = process.env.TRADE_RETENTION_HOURS
+  ? parseInt(process.env.TRADE_RETENTION_HOURS, 10)
+  : 0
+const CLEANUP_INTERVAL_MS = 60 * 60 * 1000 // Run cleanup every hour
+const CLEANUP_BATCH_SIZE = 1000 // Delete in batches of 1000 to avoid blocking
 
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -461,6 +477,121 @@ setInterval(() => {
   void processMetadataRetryQueue()
 }, METADATA_RETRY_INTERVAL_MS)
 
+// Periodically flush staging buffer based on time
+setInterval(() => {
+  if (stagingBuffer.length > 0 && (Date.now() - lastFlushTime) >= STAGING_FLUSH_INTERVAL_MS) {
+    void flushStagingBuffer()
+  }
+}, STAGING_FLUSH_INTERVAL_MS / 2) // Check every half interval
+
+// Cleanup old trades based on retention period
+async function cleanupOldTrades(): Promise<void> {
+  if (TRADE_RETENTION_HOURS <= 0) {
+    return // Cleanup disabled
+  }
+
+  try {
+    const cutoffTimestamp = BigInt(Date.now() - TRADE_RETENTION_HOURS * 60 * 60 * 1000)
+    console.log(
+      `[cleanup] Starting cleanup of trades older than ${TRADE_RETENTION_HOURS} hours (before ${new Date(Number(cutoffTimestamp)).toISOString()})`,
+    )
+
+    let totalDeleted = 0
+    let batchDeleted = 0
+
+    do {
+      // Delete in batches to avoid blocking for too long
+      // First find trades to delete
+      const tradesToDelete = await prisma.trade.findMany({
+        where: {
+          timestamp: {
+            lt: cutoffTimestamp,
+          },
+        },
+        select: {
+          id: true,
+        },
+        take: CLEANUP_BATCH_SIZE,
+      })
+
+      if (tradesToDelete.length === 0) {
+        batchDeleted = 0
+        break
+      }
+
+      // Delete the found trades
+      const result = await prisma.trade.deleteMany({
+        where: {
+          id: {
+            in: tradesToDelete.map((t) => t.id),
+          },
+        },
+      })
+
+      batchDeleted = result.count
+      totalDeleted += batchDeleted
+
+      if (batchDeleted > 0) {
+        console.log(`[cleanup] Deleted batch of ${batchDeleted} trades (${totalDeleted} total so far)`)
+        // Small delay between batches to avoid overwhelming the database
+        await delay(100)
+      }
+    } while (batchDeleted === CLEANUP_BATCH_SIZE)
+
+    // Also clean up orphaned tokens (tokens with no trades and no price)
+    // But only if they're older than the retention period
+    const cutoffTimestampForTokens = BigInt(Date.now() - TRADE_RETENTION_HOURS * 60 * 60 * 1000)
+    const orphanedTokens = await prisma.token.findMany({
+      where: {
+        trades: {
+          none: {},
+        },
+        price: null,
+        createdTimestamp: {
+          lt: cutoffTimestampForTokens,
+        },
+      },
+      select: {
+        id: true,
+      },
+      take: CLEANUP_BATCH_SIZE,
+    })
+
+    if (orphanedTokens.length > 0) {
+      const deletedTokens = await prisma.token.deleteMany({
+        where: {
+          id: {
+            in: orphanedTokens.map((t) => t.id),
+          },
+        },
+      })
+      console.log(`[cleanup] Deleted ${deletedTokens.count} orphaned tokens`)
+    }
+
+    console.log(`[cleanup] ✅ Cleanup complete: ${totalDeleted} trades deleted`)
+  } catch (error) {
+    console.error(`[cleanup] ❌ Failed to cleanup old trades:`, (error as Error).message)
+  }
+}
+
+// Run cleanup periodically
+if (TRADE_RETENTION_HOURS > 0) {
+  console.log(
+    `[cleanup] Trade retention enabled: keeping last ${TRADE_RETENTION_HOURS} hours of trades`,
+  )
+  // Run cleanup on startup after a short delay
+  setTimeout(() => {
+    void cleanupOldTrades()
+  }, 5 * 60 * 1000) // Wait 5 minutes after startup before first cleanup
+
+  // Then run cleanup periodically
+  setInterval(() => {
+    void cleanupOldTrades()
+  }, CLEANUP_INTERVAL_MS)
+} else {
+  console.log(`[cleanup] Trade retention disabled (TRADE_RETENTION_HOURS=0 or not set)`)
+}
+
 async function seedMetadataRetryQueue(): Promise<void> {
   try {
     const creationCutoff = BigInt(Date.now() - DEX_CREATION_REFRESH_WINDOW_MS)
@@ -595,43 +726,53 @@ async function prepareTradeContext(
     (!normalizedMetadataUri || isMetadataEmpty(metadata) || !imageUri || imageMatchesMetadataUri)
 
   if (shouldFetchCoinInfo && trade.mintAddress) {
-    const coinInfo = await fetchPumpCoin(trade.mintAddress)
+    // Reduce timeout to prevent blocking - metadata can be fetched later via retry queue
+    const COIN_FETCH_TIMEOUT_MS = 500 // 500ms timeout - prioritize speed over completeness
+    try {
+      const coinInfo = await Promise.race([
+        fetchPumpCoin(trade.mintAddress),
+        new Promise<null>((resolve) => setTimeout(() => resolve(null), COIN_FETCH_TIMEOUT_MS)),
+      ])
 
-    if (coinInfo && typeof coinInfo === "object") {
-      const coinRecord = coinInfo as Record<string, unknown>
+      if (coinInfo && typeof coinInfo === "object") {
+        const coinRecord = coinInfo as Record<string, unknown>
 
-      const coinMetadataUri = firstString(
-        coinRecord.metadataUri,
-        coinRecord.metadata_uri,
-        coinRecord.uri,
-      )
+        const coinMetadataUri = firstString(
+          coinRecord.metadataUri,
+          coinRecord.metadata_uri,
+          coinRecord.uri,
+        )
 
-      if (!normalizedMetadataUri && typeof coinMetadataUri === "string") {
-        normalizedMetadataUri = normalizeIpfsUri(coinMetadataUri)
+        if (!normalizedMetadataUri && typeof coinMetadataUri === "string") {
+          normalizedMetadataUri = normalizeIpfsUri(coinMetadataUri)
+        }
+
+        const normalizedCoinMetadata = normalizeTokenMetadata(
+          (coinRecord.metadata as Record<string, unknown> | undefined) ?? coinRecord,
+        )
+
+        metadata = {
+          ...normalizedCoinMetadata,
+          ...metadata,
+        }
+
+        const coinImageCandidate = firstString(
+          coinRecord.imageUri,
+          coinRecord.image_uri,
+          coinRecord.image,
+          normalizedCoinMetadata.image ?? undefined,
+        )
+
+        if (
+          coinImageCandidate &&
+          (!imageUri || imageMatchesMetadataUri)
+        ) {
+          imageUri = normalizeIpfsUri(coinImageCandidate) ?? imageUri
+        }
       }
-
-      const normalizedCoinMetadata = normalizeTokenMetadata(
-        (coinRecord.metadata as Record<string, unknown> | undefined) ?? coinRecord,
-      )
-
-      metadata = {
-        ...normalizedCoinMetadata,
-        ...metadata,
-      }
-
-      const coinImageCandidate = firstString(
-        coinRecord.imageUri,
-        coinRecord.image_uri,
-        coinRecord.image,
-        normalizedCoinMetadata.image ?? undefined,
-      )
-
-      if (
-        coinImageCandidate &&
-        (!imageUri || imageMatchesMetadataUri)
-      ) {
-        imageUri = normalizeIpfsUri(coinImageCandidate) ?? imageUri
-      }
+    } catch (error) {
+      // Log but don't block - metadata can be fetched later via retry queue
+      console.warn(`[ingest] Coin info fetch timeout/failed for ${trade.mintAddress}:`, (error as Error).message)
     }
   }
 
@@ -833,16 +974,251 @@ async function processTradeBatch(batch: PumpUnifiedTrade[]): Promise<void> {
 
   if (prepared.length === 0) return
 
-  for (const ctx of prepared) {
-    try {
-      await persistPreparedTrade(ctx)
+  // Add to staging buffer instead of persisting immediately
+  stagingBuffer.push(...prepared)
+  
+  // Check if we should flush the staging buffer
+  const shouldFlush =
+    stagingBuffer.length >= STAGING_BUFFER_SIZE ||
+    (Date.now() - lastFlushTime) >= STAGING_FLUSH_INTERVAL_MS
+
+  if (shouldFlush) {
+    void flushStagingBuffer()
+  }
+}
+
+async function flushStagingBuffer(): Promise<void> {
+  if (isFlushingStaging || stagingBuffer.length === 0) return
+  isFlushingStaging = true
+
+  let toFlush: PreparedTradeContext[] = []
+  try {
+    toFlush = stagingBuffer.splice(0, stagingBuffer.length)
+    if (toFlush.length === 0) return
+
+    const flushStartTime = Date.now()
+    await persistBatchedTrades(toFlush)
+    const flushDuration = Date.now() - flushStartTime
+
+    // Log processed trades (reduced logging frequency)
+    const sampleSize = Math.min(5, toFlush.length)
+    for (let i = 0; i < sampleSize; i++) {
+      const ctx = toFlush[i]
       console.log(
         `📊 [${ctx.logSymbol}] ${ctx.isBuy ? "BUY" : "SELL"} | ${ctx.amountSol.toString()} SOL @ ${ctx.priceSol.toString()}`,
       )
-    } catch (error) {
-      console.error(`[ingest] Failed to persist trade ${ctx.trade.tx}:`, (error as Error).message)
     }
+    if (toFlush.length > sampleSize) {
+      console.log(`📊 ... and ${toFlush.length - sampleSize} more trades`)
+    }
+
+    console.log(
+      `[ingest] ✅ Flushed ${toFlush.length} trades in ${flushDuration}ms (${(toFlush.length / (flushDuration / 1000)).toFixed(1)} trades/sec)`,
+    )
+
+    lastFlushTime = Date.now()
+  } catch (error) {
+    console.error(`[ingest] ❌ Failed to flush staging buffer:`, error instanceof Error ? error.message : String(error))
+    if (error instanceof Error && error.stack) {
+      console.error(`[ingest] Stack trace:`, error.stack)
+    }
+    // Put trades back in buffer to retry
+    if (toFlush.length > 0) {
+      stagingBuffer.unshift(...toFlush)
+    }
+  } finally {
+    isFlushingStaging = false
   }
+}
+
+async function persistBatchedTrades(preparedTrades: PreparedTradeContext[]): Promise<void> {
+  if (preparedTrades.length === 0) return
+
+  // Group by mint address for efficient token upserts
+  const tradesByMint = new Map<string, PreparedTradeContext[]>()
+  for (const ctx of preparedTrades) {
+    const mint = ctx.trade.mintAddress
+    if (!tradesByMint.has(mint)) {
+      tradesByMint.set(mint, [])
+    }
+    tradesByMint.get(mint)!.push(ctx)
+  }
+
+  // Use transaction for atomicity
+  await prisma.$transaction(async (tx) => {
+    // Step 1: Upsert all unique tokens in batch
+    const tokenUpserts = Array.from(tradesByMint.entries()).map(([mint, contexts]) => {
+      const ctx = contexts[0] // Use first trade for token data
+      const { trade } = ctx
+      const program = typeof trade.program === "string" ? trade.program.toLowerCase() : ""
+      const coinMeta = (trade.coinMeta as Record<string, unknown> | undefined) ?? {}
+      const bondingCurveAddress = firstString(coinMeta.bondingCurve, coinMeta.bonding_curve)
+      const associatedBondingCurve = firstString(
+        coinMeta.associatedBondingCurve,
+        coinMeta.associated_bonding_curve,
+      )
+      const isBondingFlag = trade.isBondingCurve
+      const explicitlyBonding =
+        isBondingFlag === true ||
+        (isBondingFlag === undefined && typeof bondingCurveAddress === "string" && bondingCurveAddress.length > 0)
+      const reachedKoth = isBondingFlag === false || (!bondingCurveAddress && program.includes("amm"))
+      const kothTimestamp = BigInt(ctx.timestampMs)
+
+      return tx.token.upsert({
+        where: { mintAddress: mint },
+        update: {
+          symbol: ctx.fallbackSymbol,
+          name: ctx.fallbackName,
+          imageUri: ctx.imageUri ?? undefined,
+          metadataUri: ctx.metadataUri ?? undefined,
+          twitter: ctx.twitter ?? undefined,
+          telegram: ctx.telegram ?? undefined,
+          website: ctx.website ?? undefined,
+          description: ctx.description ?? undefined,
+          creatorAddress: ctx.creatorAddress,
+          bondingCurve: bondingCurveAddress ?? undefined,
+          associatedBondingCurve: associatedBondingCurve ?? undefined,
+        },
+        create: {
+          mintAddress: mint,
+          symbol: ctx.fallbackSymbol,
+          name: ctx.fallbackName,
+          imageUri: ctx.imageUri ?? null,
+          metadataUri: ctx.metadataUri ?? null,
+          twitter: ctx.twitter ?? null,
+          telegram: ctx.telegram ?? null,
+          website: ctx.website ?? null,
+          description: ctx.description ?? null,
+          creatorAddress: ctx.creatorAddress,
+          createdTimestamp: BigInt(ctx.createdTs),
+          kingOfTheHillTimestamp: reachedKoth ? kothTimestamp : null,
+          completed: reachedKoth,
+          bondingCurve: bondingCurveAddress ?? null,
+          associatedBondingCurve: associatedBondingCurve ?? null,
+        },
+        select: { id: true, completed: true, kingOfTheHillTimestamp: true, createdTimestamp: true },
+      })
+    })
+
+    const tokens = await Promise.all(tokenUpserts)
+    const tokenMap = new Map(Array.from(tradesByMint.keys()).map((mint, i) => [mint, tokens[i]]))
+
+    // Step 2: Update token KOTH status if needed (parallel)
+    const kothUpdates = tokens.map(async (token, i) => {
+      const [mint, contexts] = Array.from(tradesByMint.entries())[i]
+      const ctx = contexts[0]
+      const { trade } = ctx
+      const program = typeof trade.program === "string" ? trade.program.toLowerCase() : ""
+      const coinMeta = (trade.coinMeta as Record<string, unknown> | undefined) ?? {}
+      const bondingCurveAddress = firstString(coinMeta.bondingCurve, coinMeta.bonding_curve)
+      const isBondingFlag = trade.isBondingCurve
+      const explicitlyBonding =
+        isBondingFlag === true ||
+        (isBondingFlag === undefined && typeof bondingCurveAddress === "string" && bondingCurveAddress.length > 0)
+      const reachedKoth = isBondingFlag === false || (!bondingCurveAddress && program.includes("amm"))
+      const kothTimestamp = BigInt(ctx.timestampMs)
+
+      if (reachedKoth && (!token.completed || !token.kingOfTheHillTimestamp)) {
+        await tx.token.update({
+          where: { id: token.id },
+          data: {
+            completed: true,
+            kingOfTheHillTimestamp: token.kingOfTheHillTimestamp ?? kothTimestamp,
+          },
+        })
+      } else if (explicitlyBonding && (token.completed || token.kingOfTheHillTimestamp !== null)) {
+        await tx.token.update({
+          where: { id: token.id },
+          data: {
+            completed: false,
+            kingOfTheHillTimestamp: null,
+          },
+        })
+      }
+    })
+    await Promise.all(kothUpdates)
+
+    // Step 3: Schedule metadata retries for tokens that need it
+    for (const [mint, contexts] of tradesByMint.entries()) {
+      const ctx = contexts[0]
+      const token = tokenMap.get(mint)!
+      const storedCreatedTimestampMs =
+        typeof token.createdTimestamp === "bigint" ? Number(token.createdTimestamp) : null
+      const creationLikelyFallback =
+        !ctx.hasFeedCreatedTimestamp &&
+        (!storedCreatedTimestampMs ||
+          ctx.timestampMs - storedCreatedTimestampMs < CREATION_TIMESTAMP_FALLBACK_WINDOW_MS)
+
+      const needsMetadataRetry =
+        !ctx.metadataUri ||
+        !ctx.imageUri ||
+        looksLikeMintPrefix(ctx.fallbackName, mint) ||
+        looksLikeMintPrefix(ctx.fallbackSymbol, mint) ||
+        creationLikelyFallback
+
+      if (needsMetadataRetry) {
+        scheduleMetadataRetry(mint)
+      }
+    }
+
+    // Step 4: Upsert token prices (use latest price per token)
+    const priceUpserts = Array.from(tradesByMint.entries()).map(([mint, contexts]) => {
+      const token = tokenMap.get(mint)!
+      // Get the most recent trade for this token (latest price)
+      const latestCtx = contexts.reduce((latest, current) =>
+        current.timestampMs > latest.timestampMs ? current : latest,
+      )
+
+      return tx.tokenPrice.upsert({
+        where: { tokenId: token.id },
+        update: {
+          priceSol: latestCtx.priceSol,
+          priceUsd: latestCtx.priceUsd,
+          marketCapUsd: latestCtx.marketCapUsd,
+          lastTradeTimestamp: BigInt(latestCtx.timestampMs),
+        },
+        create: {
+          tokenId: token.id,
+          priceSol: latestCtx.priceSol,
+          priceUsd: latestCtx.priceUsd,
+          marketCapUsd: latestCtx.marketCapUsd,
+          lastTradeTimestamp: BigInt(latestCtx.timestampMs),
+        },
+      })
+    })
+    await Promise.all(priceUpserts)
+
+    // Step 5: Batch insert trades using createMany with skipDuplicates
+    const tradeInserts = preparedTrades.map((ctx) => {
+      const token = tokenMap.get(ctx.trade.mintAddress)
+      if (!token) {
+        throw new Error(`Token not found for mint ${ctx.trade.mintAddress}`)
+      }
+      return {
+        tokenId: token.id,
+        txSignature: ctx.trade.tx,
+        userAddress: ctx.trade.userAddress ?? "unknown",
+        isBuy: ctx.isBuy,
+        amountSol: ctx.amountSol,
+        amountUsd: ctx.amountUsd,
+        baseAmount: ctx.baseAmountRaw,
+        priceSol: ctx.priceSol,
+        priceUsd: ctx.priceUsd,
+        timestamp: BigInt(ctx.timestampMs),
+        raw: ctx.trade as Prisma.InputJsonValue,
+      }
+    })
+
+    // Use createMany with skipDuplicates for batch insert
+    if (tradeInserts.length > 0) {
+      await tx.trade.createMany({
+        data: tradeInserts,
+        skipDuplicates: true,
+      })
+    }
+  }, {
+    timeout: 30000, // 30 second timeout for large transactions
+  })
 }
 
 async function scheduleQueueProcessing() {
@@ -850,15 +1226,53 @@ async function scheduleQueueProcessing() {
   isProcessingQueue = true
 
   try {
+    let batchCount = 0
+    const startTime = Date.now()
+    let lastLogTime = startTime
+    
     while (tradeQueue.length > 0) {
+      const queueSizeBefore = tradeQueue.length
       const batch = tradeQueue.splice(0, 50)
+      batchCount++
+      
       try {
+        const batchStartTime = Date.now()
         await processTradeBatch(batch)
+        const batchDuration = Date.now() - batchStartTime
+        
+        // Log queue status every 10 batches or if queue is large
+        const now = Date.now()
+        if (batchCount % 10 === 0 || tradeQueue.length > 500 || (now - lastLogTime) > 10000) {
+          const elapsed = now - startTime
+          const tradesProcessed = batchCount * 50
+          const rate = tradesProcessed / (elapsed / 1000) // trades per second
+          console.log(
+            `[ingest] Queue: ${tradeQueue.length} remaining | Staging: ${stagingBuffer.length} | Processed: ${tradesProcessed} trades in ${(elapsed / 1000).toFixed(1)}s | Rate: ${rate.toFixed(1)} trades/sec`
+          )
+          lastLogTime = now
+        }
+
+        // Check if we should flush staging buffer based on time
+        if ((Date.now() - lastFlushTime) >= STAGING_FLUSH_INTERVAL_MS && stagingBuffer.length > 0) {
+          void flushStagingBuffer()
+        }
       } catch (error) {
         console.error("❌ Error processing batch:", (error as Error).message)
         tradeQueue.unshift(...batch)
         await new Promise((resolve) => setTimeout(resolve, 1000))
       }
+    }
+
+    // Flush any remaining trades in staging buffer
+    if (stagingBuffer.length > 0) {
+      await flushStagingBuffer()
+    }
+    
+    if (batchCount > 0) {
+      const totalDuration = Date.now() - startTime
+      const totalTrades = batchCount * 50
+      const avgRate = totalTrades / (totalDuration / 1000)
+      console.log(`[ingest] Finished processing queue: ${totalTrades} trades in ${(totalDuration / 1000).toFixed(1)}s (${avgRate.toFixed(1)} trades/sec)`)
     }
   } finally {
     isProcessingQueue = false
@@ -923,6 +1337,12 @@ function handleMessageChunk(chunk: string) {
     const trade = decodePumpPayload(payload)
     if (trade) {
       tradeQueue.push(trade as PumpUnifiedTrade)
+      
+      // Log queue size if it's getting large
+      if (tradeQueue.length % 100 === 0 || tradeQueue.length > 1000) {
+        console.log(`[ingest] Queue size: ${tradeQueue.length} trades`)
+      }
+      
       void scheduleQueueProcessing()
     }
   }
@@ -957,23 +1377,6 @@ function connectToFeed() {
   })
 }
 
-async function cleanupOldTrades() {
-  const cutoffMs = Date.now() - TRADE_RETENTION_MS
-  const cutoffBigInt = BigInt(cutoffMs)
-
-  try {
-    await prisma.trade.deleteMany({
-      where: {
-        timestamp: {
-          lt: cutoffBigInt,
-        },
-      },
-    })
-  } catch (error) {
-    console.error("[ingest] Failed to cleanup old trades:", (error as Error).message)
-  }
-}
-
 const AUTO_RESTART_INTERVAL_MS = 24 * 60 * 60 * 1000 // 24 hours
 
 async function gracefulRestart() {
@@ -991,10 +1394,6 @@ async function gracefulRestart() {
 
 console.log("🚀 Starting trade ingestion service…")
 connectToFeed()
-void cleanupOldTrades()
-setInterval(() => {
-  void cleanupOldTrades()
-}, CLEANUP_INTERVAL_MS)
 
 // Schedule automatic restart every 24 hours
 const restartInterval = AUTO_RESTART_INTERVAL_MS
