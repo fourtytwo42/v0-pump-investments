@@ -1,0 +1,23 @@
+2026-01-13T21:41:18: 
+2026-01-13T21:41:18: > pump-investments@3.0.32 start
+2026-01-13T21:41:18: > next start
+2026-01-13T21:41:18: 
+2026-01-13T21:41:18:    ▲ Next.js 14.1.0
+2026-01-13T21:41:18:    - Local:        http://localhost:3000
+2026-01-13T21:41:18: 
+2026-01-13T21:41:19:  ✓ Ready in 326ms
+2026-01-13T21:41:26: prisma:error 
+2026-01-13T21:41:26: Invalid `prisma.trade.findMany()` invocation:
+2026-01-13T21:41:26: 
+2026-01-13T21:41:26: 
+2026-01-13T21:41:26: Can't reach database server at `localhost:5432`
+2026-01-13T21:41:26: 
+2026-01-13T21:41:26: Please make sure your database server is running at `localhost:5432`.
+2026-01-13T21:46:34: 
+2026-01-13T21:46:34: > pump-investments@3.0.32 start
+2026-01-13T21:46:34: > next start
+2026-01-13T21:46:34: 
+2026-01-13T21:46:35:    ▲ Next.js 14.1.0
+2026-01-13T21:46:35:    - Local:        http://localhost:3000
+2026-01-13T21:46:35: 
+2026-01-13T21:46:35:  ✓ Ready in 344ms

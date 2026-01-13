@@ -33,6 +33,11 @@ const TRADE_RETENTION_HOURS = process.env.TRADE_RETENTION_HOURS
 const CLEANUP_INTERVAL_MS = 60 * 60 * 1000
 const CLEANUP_BATCH_SIZE = 1000
 
+// Logging throttling
+const LOG_INTERVAL_MS = 30 * 1000 // Log every 30 seconds max
+let lastLogTime = 0
+let logBatchCount = 0
+
 // NATS connection
 const NATS_URL = "wss://unified-prod.nats.realtime.pump.fun/"
 const NATS_HEADERS = {
@@ -495,9 +500,17 @@ async function persistTradesBulk(trades: PreparedTrade[]): Promise<void> {
 
     const duration = Date.now() - startTime
     const rate = trades.length / (duration / 1000)
-    console.log(
-      `[ingest] ✅ ${trades.length} trades in ${duration}ms (${rate.toFixed(0)}/sec) | cache: ${tokenIdCache.size}`
-    )
+    logBatchCount++
+    const now = Date.now()
+    
+    // Only log every 30 seconds or every 20 batches, whichever comes first
+    if (now - lastLogTime >= LOG_INTERVAL_MS || logBatchCount >= 20) {
+      console.log(
+        `[ingest] ✅ ${trades.length} trades in ${duration}ms (${rate.toFixed(0)}/sec) | cache: ${tokenIdCache.size} | batches: ${logBatchCount}`
+      )
+      lastLogTime = now
+      logBatchCount = 0
+    }
   } catch (error) {
     console.error("[ingest] ❌ Bulk insert failed:", (error as Error).message)
     throw error
@@ -528,7 +541,9 @@ async function processQueue(): Promise<void> {
       await persistTradesBulk(prepared)
     }
 
-    if (tradeQueue.length > 0) {
+    // Only log queue size every 30 seconds
+    const now = Date.now()
+    if (tradeQueue.length > 0 && (now - lastLogTime >= LOG_INTERVAL_MS)) {
       console.log(`[ingest] Queue: ${tradeQueue.length}`)
     }
   } catch (error) {
@@ -874,9 +889,8 @@ function handleMessageChunk(chunk: string): void {
     if (trade) {
       tradeQueue.push(trade as PumpUnifiedTrade)
 
-      if (tradeQueue.length % 500 === 0) {
-        console.log(`[ingest] Queue: ${tradeQueue.length}`)
-      }
+      // Only log queue size every 30 seconds (throttled above)
+      // Removed frequent queue logging
 
       scheduleQueueProcessing()
     }
