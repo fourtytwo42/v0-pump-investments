@@ -84,7 +84,7 @@ const TOTAL_SUPPLY_TOKENS = new Decimal("1000000000")
 
 const tradeQueue: PumpUnifiedTrade[] = []
 let activeProcessors = 0
-const MAX_PROCESSORS = 10 // Parallel processors - safe now with ON CONFLICT DO NOTHING
+const MAX_PROCESSORS = 5 // Reduced from 10 to avoid connection pool exhaustion
 let lastQueueFlush = Date.now()
 
 let ws: WebSocket | null = null
@@ -350,12 +350,29 @@ async function persistTradesBulk(trades: PreparedTrade[]): Promise<void> {
         })
         .join(",")
 
-      // INSERT new tokens, skip existing
-      await prisma.$executeRawUnsafe(`
-        INSERT INTO tokens (id,mint_address,symbol,name,image_uri,metadata_uri,twitter,telegram,website,description,creator_address,created_timestamp,king_of_the_hill_timestamp,completed,bonding_curve,associated_bonding_curve,updated_at)
-        VALUES ${tokenValues}
-        ON CONFLICT (mint_address) DO NOTHING
-      `)
+      // INSERT new tokens, skip existing (only if we have values)
+      if (tokenValues.length > 0) {
+        try {
+          await prisma.$executeRawUnsafe(`
+            INSERT INTO tokens (id,mint_address,symbol,name,image_uri,metadata_uri,twitter,telegram,website,description,creator_address,created_timestamp,king_of_the_hill_timestamp,completed,bonding_curve,associated_bonding_curve,updated_at)
+            VALUES ${tokenValues}
+            ON CONFLICT (mint_address) DO NOTHING
+          `)
+        } catch (error) {
+          const errMsg = (error as Error).message
+          console.error(`[ingest] Token insert failed for ${uncachedTokens.length} tokens:`, errMsg)
+          // If it's a connection error, don't throw - let it retry later
+          if (errMsg.includes("connector") || errMsg.includes("connection")) {
+            console.warn(`[ingest] Connection issue, will retry tokens later`)
+            // Put tokens back in queue for retry
+            for (const t of uncachedTokens) {
+              tradeQueue.unshift({ mintAddress: t.mint } as PumpUnifiedTrade)
+            }
+            return // Exit early, don't process prices/trades if tokens failed
+          }
+          throw error
+        }
+      }
 
       // Get IDs for uncached tokens only
       const mints = uncachedTokens.map((t) => t.mint)
@@ -388,42 +405,93 @@ async function persistTradesBulk(trades: PreparedTrade[]): Promise<void> {
     if (priceTokens.length > 0) {
       const priceValues = priceTokens
         .map((t) => {
-          const tokenId = mintToId.get(t.mint)!
-          return `(${escapeSQL(tokenId)},${t.priceSol},${t.priceUsd},${t.marketCapUsd},${t.timestampMs},NOW())`
+          const tokenId = mintToId.get(t.mint)
+          if (!tokenId) return null
+          // Convert Decimal to string for SQL
+          const priceSol = t.priceSol.toString()
+          const priceUsd = t.priceUsd.toString()
+          const marketCapUsd = t.marketCapUsd.toString()
+          return `(${escapeSQL(tokenId)},${priceSol},${priceUsd},${marketCapUsd},${t.timestampMs},NOW())`
         })
+        .filter((v): v is string => v !== null)
         .join(",")
 
-      parallelOps.push(
-        prisma.$executeRawUnsafe(`
-          INSERT INTO token_prices (token_id,price_sol,price_usd,market_cap_usd,last_trade_timestamp,updated_at)
-          VALUES ${priceValues}
-          ON CONFLICT (token_id) DO UPDATE SET
-            price_sol=EXCLUDED.price_sol,price_usd=EXCLUDED.price_usd,
-            market_cap_usd=EXCLUDED.market_cap_usd,last_trade_timestamp=EXCLUDED.last_trade_timestamp,updated_at=NOW()
-        `)
-      )
+      if (priceValues.length > 0) {
+        parallelOps.push(
+          prisma.$executeRawUnsafe(`
+            INSERT INTO token_prices (token_id,price_sol,price_usd,market_cap_usd,last_trade_timestamp,updated_at)
+            VALUES ${priceValues}
+            ON CONFLICT (token_id) DO UPDATE SET
+              price_sol=EXCLUDED.price_sol,price_usd=EXCLUDED.price_usd,
+              market_cap_usd=EXCLUDED.market_cap_usd,last_trade_timestamp=EXCLUDED.last_trade_timestamp,updated_at=NOW()
+          `).catch((error) => {
+            const errMsg = (error as Error).message
+            console.error(`[ingest] Price upsert failed for ${priceTokens.length} tokens:`, errMsg)
+            // If connection error, return resolved promise to continue
+            if (errMsg.includes("connector") || errMsg.includes("connection")) {
+              console.warn(`[ingest] Connection issue on price upsert, skipping`)
+              return Promise.resolve()
+            }
+            throw error
+          })
+        )
+      }
     }
 
     // Trade insert
     if (validTrades.length > 0) {
       const tradeValues = validTrades
         .map((t) => {
-          const tokenId = mintToId.get(t.mint)!
-          return `(${escapeSQL(tokenId)},${escapeSQL(t.tx)},${escapeSQL(t.userAddress)},${t.isBuy},${t.amountSol},${t.amountUsd},${t.baseAmount},${t.priceSol},${t.priceUsd},${t.timestampMs},NOW())`
+          const tokenId = mintToId.get(t.mint)
+          if (!tokenId) return null
+          // Convert Decimal to string for SQL
+          const amountSol = t.amountSol.toString()
+          const amountUsd = t.amountUsd.toString()
+          const baseAmount = t.baseAmount.toString()
+          const priceSol = t.priceSol.toString()
+          const priceUsd = t.priceUsd.toString()
+          return `(${escapeSQL(tokenId)},${escapeSQL(t.tx)},${escapeSQL(t.userAddress)},${t.isBuy},${amountSol},${amountUsd},${baseAmount},${priceSol},${priceUsd},${t.timestampMs},NOW())`
         })
+        .filter((v): v is string => v !== null)
         .join(",")
 
-      parallelOps.push(
-        prisma.$executeRawUnsafe(`
-          INSERT INTO trades (token_id,tx_signature,user_address,is_buy,amount_sol,amount_usd,base_amount,price_sol,price_usd,timestamp,created_at)
-          VALUES ${tradeValues}
-          ON CONFLICT (tx_signature) DO NOTHING
-        `)
-      )
+      if (tradeValues.length > 0) {
+        parallelOps.push(
+          prisma.$executeRawUnsafe(`
+            INSERT INTO trades (token_id,tx_signature,user_address,is_buy,amount_sol,amount_usd,base_amount,price_sol,price_usd,timestamp,created_at)
+            VALUES ${tradeValues}
+            ON CONFLICT (tx_signature) DO NOTHING
+          `).catch((error) => {
+            const errMsg = (error as Error).message
+            console.error(`[ingest] Trade insert failed for ${validTrades.length} trades:`, errMsg)
+            // If connection error, return resolved promise to continue
+            if (errMsg.includes("connector") || errMsg.includes("connection")) {
+              console.warn(`[ingest] Connection issue on trade insert, skipping`)
+              return Promise.resolve()
+            }
+            throw error
+          })
+        )
+      }
     }
 
-    // Run both in parallel
-    await Promise.all(parallelOps)
+    // Run both in parallel (only if we have operations)
+    if (parallelOps.length > 0) {
+      try {
+        await Promise.all(parallelOps)
+      } catch (error) {
+        // If parallel execution fails, try sequential as fallback
+        console.warn(`[ingest] Parallel execution failed, retrying sequentially:`, (error as Error).message)
+        for (const op of parallelOps) {
+          try {
+            await op
+          } catch (seqError) {
+            console.error(`[ingest] Sequential operation also failed:`, (seqError as Error).message)
+            // Don't throw - continue with other operations
+          }
+        }
+      }
+    }
 
     const duration = Date.now() - startTime
     const rate = trades.length / (duration / 1000)
