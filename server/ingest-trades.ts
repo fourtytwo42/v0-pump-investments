@@ -660,7 +660,7 @@ async function refreshTokenMetadata(mint: string): Promise<boolean> {
     const coinInfo = await fetchPumpCoin(mint)
     if (!coinInfo) return false
 
-    const coinRecord = coinInfo as Record<string, unknown>
+      const coinRecord = coinInfo as Record<string, unknown>
     const rawUri = firstString(coinRecord.metadataUri, coinRecord.metadata_uri, coinRecord.uri)
     const metadataUri = rawUri ? normalizeIpfsUri(rawUri) : null
 
@@ -719,7 +719,19 @@ async function refreshTokenMetadata(mint: string): Promise<boolean> {
       })
     }
 
-    return true
+    // Only return true if we now have both metadataUri and imageUri (or already had both)
+    // This prevents re-seeding tokens that legitimately don't have metadata available
+    const updatedToken = await prisma.token.findUnique({
+      where: { id: token.id },
+      select: { metadataUri: true, imageUri: true },
+    })
+    if (updatedToken && updatedToken.metadataUri && updatedToken.imageUri) {
+      return true
+    }
+
+    // Return false if we still don't have both metadataUri and imageUri
+    // This will cause the token to be retried (up to METADATA_RETRY_MAX_ATTEMPTS)
+    return false
   } catch (error) {
     console.warn(`[metadata] Failed ${mint}:`, (error as Error).message)
     return false
@@ -746,7 +758,7 @@ async function processMetadataRetryQueue(): Promise<void> {
           const waitSec = Math.floor((Date.now() - firstSeen) / 1000)
           console.log(`[metadata] ✅ ${mint.slice(0, 8)}... (${waitSec}s)`)
         }
-      } else {
+    } else {
         scheduleMetadataRetry(mint)
       }
       await delay(50)
@@ -801,7 +813,7 @@ async function cleanupOldTrades(): Promise<void> {
     } while (batchDeleted === CLEANUP_BATCH_SIZE)
 
     console.log(`[cleanup] ✅ Done: ${totalDeleted} trades deleted`)
-  } catch (error) {
+    } catch (error) {
     console.error("[cleanup] ❌ Failed:", (error as Error).message)
   }
 }
@@ -818,9 +830,14 @@ if (TRADE_RETENTION_HOURS > 0) {
 
 async function seedMetadataRetryQueue(): Promise<void> {
   try {
+    // Only seed tokens missing BOTH metadataUri AND imageUri (not just description)
     const candidates = await prisma.token.findMany({
       where: {
-        OR: [{ imageUri: null }, { metadataUri: null }, { description: null }],
+        OR: [
+          { metadataUri: null, imageUri: null }, // Missing both
+          { metadataUri: null }, // Missing metadataUri only
+          { imageUri: null }, // Missing imageUri only
+        ],
       },
       select: { mintAddress: true },
       take: 5000,
@@ -832,7 +849,7 @@ async function seedMetadataRetryQueue(): Promise<void> {
       }
     }
 
-    console.log(`[metadata] Seeded ${candidates.length} tokens`)
+    console.log(`[metadata] Seeded ${candidates.length} tokens (missing metadataUri or imageUri)`)
   } catch (error) {
     console.warn("[metadata] Seed failed:", (error as Error).message)
   }
@@ -942,9 +959,9 @@ connectToFeed()
 // Auto-restart every 24 hours
 setTimeout(async () => {
   console.log("🔄 24h restart...")
-  ws?.close()
-  await prisma.$disconnect()
-  process.exit(0)
+    ws?.close()
+    await prisma.$disconnect()
+    process.exit(0)
 }, 24 * 60 * 60 * 1000)
 
 process.on("SIGINT", async () => {
