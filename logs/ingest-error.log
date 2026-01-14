@@ -16290,3 +16290,1219 @@
 2026-01-13T21:47:55: [pump-coin] Failed to fetch coin 2ast17D5bVtXix3mE3rtspbvFusjPUDFTCx2ZgNqpFmT from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
 2026-01-13T21:47:55: [pump-coin] https://frontend-api.pump.fun/coins/2ast17D5bVtXix3mE3rtspbvFusjPUDFTCx2ZgNqpFmT responded with 530
 2026-01-13T21:47:55: [pump-coin] All endpoints failed for 2ast17D5bVtXix3mE3rtspbvFusjPUDFTCx2ZgNqpFmT: pump.fun coin request failed with status 530
+2026-01-14T20:04:51: [pump-coin] Failed to fetch coin 9H62dXYm38C5V1TszzYbFyEzkLFP62x1QZxAF7Re1aaM from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:52: [pump-coin] https://frontend-api.pump.fun/coins/9H62dXYm38C5V1TszzYbFyEzkLFP62x1QZxAF7Re1aaM responded with 530
+2026-01-14T20:04:52: [pump-coin] All endpoints failed for 9H62dXYm38C5V1TszzYbFyEzkLFP62x1QZxAF7Re1aaM: pump.fun coin request failed with status 530
+2026-01-14T20:04:52: [pump-coin] Failed to fetch coin BeNLsmXhhCCJAnCLW95xARk1SqhxybzdAKpK85ubUV3p from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:52: [pump-coin] https://frontend-api.pump.fun/coins/BeNLsmXhhCCJAnCLW95xARk1SqhxybzdAKpK85ubUV3p responded with 530
+2026-01-14T20:04:52: [pump-coin] All endpoints failed for BeNLsmXhhCCJAnCLW95xARk1SqhxybzdAKpK85ubUV3p: pump.fun coin request failed with status 530
+2026-01-14T20:04:52: [pump-coin] Failed to fetch coin 2Zx4qheiHNKbSPHNa1ypNVzdWNwKc1Jrhoou8SE9XoJv from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:52: [pump-coin] https://frontend-api.pump.fun/coins/2Zx4qheiHNKbSPHNa1ypNVzdWNwKc1Jrhoou8SE9XoJv responded with 530
+2026-01-14T20:04:52: [pump-coin] All endpoints failed for 2Zx4qheiHNKbSPHNa1ypNVzdWNwKc1Jrhoou8SE9XoJv: pump.fun coin request failed with status 530
+2026-01-14T20:04:52: [pump-coin] Failed to fetch coin DaoLAeA3GpA7HR2NUH23vFmPeiZaTJmYit6ZgTV2TQjh from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:52: [pump-coin] https://frontend-api.pump.fun/coins/DaoLAeA3GpA7HR2NUH23vFmPeiZaTJmYit6ZgTV2TQjh responded with 530
+2026-01-14T20:04:52: [pump-coin] All endpoints failed for DaoLAeA3GpA7HR2NUH23vFmPeiZaTJmYit6ZgTV2TQjh: pump.fun coin request failed with status 530
+2026-01-14T20:04:52: [pump-coin] Failed to fetch coin Gpw8BDVDFrpCGgHmpPpdEQUsodypt2x7YfnGMQ9XVTw1 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:52: [pump-coin] https://frontend-api.pump.fun/coins/Gpw8BDVDFrpCGgHmpPpdEQUsodypt2x7YfnGMQ9XVTw1 responded with 530
+2026-01-14T20:04:52: [pump-coin] All endpoints failed for Gpw8BDVDFrpCGgHmpPpdEQUsodypt2x7YfnGMQ9XVTw1: pump.fun coin request failed with status 530
+2026-01-14T20:04:52: [pump-coin] Failed to fetch coin 5fA3Gepc3Xqzd1GBddXigUEjY5LSb4k6HkZb3jeHtwvh from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:52: [pump-coin] https://frontend-api.pump.fun/coins/5fA3Gepc3Xqzd1GBddXigUEjY5LSb4k6HkZb3jeHtwvh responded with 530
+2026-01-14T20:04:52: [pump-coin] All endpoints failed for 5fA3Gepc3Xqzd1GBddXigUEjY5LSb4k6HkZb3jeHtwvh: pump.fun coin request failed with status 530
+2026-01-14T20:04:53: [pump-coin] Failed to fetch coin 2ast17D5bVtXix3mE3rtspbvFusjPUDFTCx2ZgNqpFmT from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:53: [pump-coin] https://frontend-api.pump.fun/coins/2ast17D5bVtXix3mE3rtspbvFusjPUDFTCx2ZgNqpFmT responded with 530
+2026-01-14T20:04:53: [pump-coin] All endpoints failed for 2ast17D5bVtXix3mE3rtspbvFusjPUDFTCx2ZgNqpFmT: pump.fun coin request failed with status 530
+2026-01-14T20:04:53: [pump-coin] Failed to fetch coin EzudGy5TdRgXNhs3jd4a28V3ARw5VXyjMrZkxQtro8ZH from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:53: [pump-coin] https://frontend-api.pump.fun/coins/EzudGy5TdRgXNhs3jd4a28V3ARw5VXyjMrZkxQtro8ZH responded with 530
+2026-01-14T20:04:53: [pump-coin] All endpoints failed for EzudGy5TdRgXNhs3jd4a28V3ARw5VXyjMrZkxQtro8ZH: pump.fun coin request failed with status 530
+2026-01-14T20:04:53: [pump-coin] Failed to fetch coin 79745PRjSLwDzGVLJboJ2m2MSMRD1zb38UwAMFiZt1Cs from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:53: [pump-coin] https://frontend-api.pump.fun/coins/79745PRjSLwDzGVLJboJ2m2MSMRD1zb38UwAMFiZt1Cs responded with 530
+2026-01-14T20:04:53: [pump-coin] All endpoints failed for 79745PRjSLwDzGVLJboJ2m2MSMRD1zb38UwAMFiZt1Cs: pump.fun coin request failed with status 530
+2026-01-14T20:04:53: [pump-coin] Failed to fetch coin 6wBj2qG1jUPswsqn9G1gnFJgarxzyjizFxidfZH65dKd from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:53: [pump-coin] https://frontend-api.pump.fun/coins/6wBj2qG1jUPswsqn9G1gnFJgarxzyjizFxidfZH65dKd responded with 530
+2026-01-14T20:04:53: [pump-coin] All endpoints failed for 6wBj2qG1jUPswsqn9G1gnFJgarxzyjizFxidfZH65dKd: pump.fun coin request failed with status 530
+2026-01-14T20:04:53: [pump-coin] Failed to fetch coin 13wggeqG3pBU2zo89Fdt2J8YufATCYrKZxYXJwPpkVHw from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:53: [pump-coin] https://frontend-api.pump.fun/coins/13wggeqG3pBU2zo89Fdt2J8YufATCYrKZxYXJwPpkVHw responded with 530
+2026-01-14T20:04:53: [pump-coin] All endpoints failed for 13wggeqG3pBU2zo89Fdt2J8YufATCYrKZxYXJwPpkVHw: pump.fun coin request failed with status 530
+2026-01-14T20:04:54: [pump-coin] Failed to fetch coin 5mCMf3enuvHDhkkHvi33C842m1PqB6dvGtVruaHi7tG9 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:54: [pump-coin] https://frontend-api.pump.fun/coins/5mCMf3enuvHDhkkHvi33C842m1PqB6dvGtVruaHi7tG9 responded with 530
+2026-01-14T20:04:54: [pump-coin] All endpoints failed for 5mCMf3enuvHDhkkHvi33C842m1PqB6dvGtVruaHi7tG9: pump.fun coin request failed with status 530
+2026-01-14T20:04:54: [pump-coin] Failed to fetch coin 6LRA6CnrH6NVgiBySqQnajRs2L1vySHTr7f1e9Dhp4RE from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:54: [pump-coin] https://frontend-api.pump.fun/coins/6LRA6CnrH6NVgiBySqQnajRs2L1vySHTr7f1e9Dhp4RE responded with 530
+2026-01-14T20:04:54: [pump-coin] All endpoints failed for 6LRA6CnrH6NVgiBySqQnajRs2L1vySHTr7f1e9Dhp4RE: pump.fun coin request failed with status 530
+2026-01-14T20:04:54: [pump-coin] Failed to fetch coin 5NA94bui6DUy6WaxhHoHieMrzVLnzToGoBaAmhgGeNmG from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:54: [pump-coin] https://frontend-api.pump.fun/coins/5NA94bui6DUy6WaxhHoHieMrzVLnzToGoBaAmhgGeNmG responded with 530
+2026-01-14T20:04:54: [pump-coin] All endpoints failed for 5NA94bui6DUy6WaxhHoHieMrzVLnzToGoBaAmhgGeNmG: pump.fun coin request failed with status 530
+2026-01-14T20:04:54: [pump-coin] Failed to fetch coin 8MtUJG2GWWbuDZmxtG8jfYcja3fbGGVcMeAKEitZGvmi from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:54: [pump-coin] https://frontend-api.pump.fun/coins/8MtUJG2GWWbuDZmxtG8jfYcja3fbGGVcMeAKEitZGvmi responded with 530
+2026-01-14T20:04:54: [pump-coin] All endpoints failed for 8MtUJG2GWWbuDZmxtG8jfYcja3fbGGVcMeAKEitZGvmi: pump.fun coin request failed with status 530
+2026-01-14T20:04:54: [pump-coin] Failed to fetch coin 5vKcMpui5kTHFBDhyhu5jPs79s24yWwHaQ7X4GWwztJT from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:54: [pump-coin] https://frontend-api.pump.fun/coins/5vKcMpui5kTHFBDhyhu5jPs79s24yWwHaQ7X4GWwztJT responded with 530
+2026-01-14T20:04:54: [pump-coin] All endpoints failed for 5vKcMpui5kTHFBDhyhu5jPs79s24yWwHaQ7X4GWwztJT: pump.fun coin request failed with status 530
+2026-01-14T20:04:54: [pump-coin] Failed to fetch coin 5QnsWhUuDY3Qew8FuNziZWfT2anqwfQGZypLJYkmqdeV from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:54: [pump-coin] https://frontend-api.pump.fun/coins/5QnsWhUuDY3Qew8FuNziZWfT2anqwfQGZypLJYkmqdeV responded with 530
+2026-01-14T20:04:54: [pump-coin] All endpoints failed for 5QnsWhUuDY3Qew8FuNziZWfT2anqwfQGZypLJYkmqdeV: pump.fun coin request failed with status 530
+2026-01-14T20:04:55: [pump-coin] Failed to fetch coin 7uyWBYLiHQYXs16ggHm1DbP2zLzGXanvi8Y8zmHwGpJU from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:55: [pump-coin] https://frontend-api.pump.fun/coins/7uyWBYLiHQYXs16ggHm1DbP2zLzGXanvi8Y8zmHwGpJU responded with 530
+2026-01-14T20:04:55: [pump-coin] All endpoints failed for 7uyWBYLiHQYXs16ggHm1DbP2zLzGXanvi8Y8zmHwGpJU: pump.fun coin request failed with status 530
+2026-01-14T20:04:55: [pump-coin] Failed to fetch coin GQxGfTJgXj9ASrBWyMuESrNKJ4dd12v7zNSL2NzUinRA from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:55: [pump-coin] https://frontend-api.pump.fun/coins/GQxGfTJgXj9ASrBWyMuESrNKJ4dd12v7zNSL2NzUinRA responded with 530
+2026-01-14T20:04:55: [pump-coin] All endpoints failed for GQxGfTJgXj9ASrBWyMuESrNKJ4dd12v7zNSL2NzUinRA: pump.fun coin request failed with status 530
+2026-01-14T20:04:55: [pump-coin] Failed to fetch coin PECazcZMchmn86TfUVDVKeAtVaiKSJFQCZ9BvZfh3km from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:55: [pump-coin] https://frontend-api.pump.fun/coins/PECazcZMchmn86TfUVDVKeAtVaiKSJFQCZ9BvZfh3km responded with 530
+2026-01-14T20:04:55: [pump-coin] All endpoints failed for PECazcZMchmn86TfUVDVKeAtVaiKSJFQCZ9BvZfh3km: pump.fun coin request failed with status 530
+2026-01-14T20:04:55: [pump-coin] Failed to fetch coin 8PW9w3J14mWvb65DJ264bh73L7k1g9NsuWKjmfTBmZXd from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:56: [pump-coin] https://frontend-api.pump.fun/coins/8PW9w3J14mWvb65DJ264bh73L7k1g9NsuWKjmfTBmZXd responded with 530
+2026-01-14T20:04:56: [pump-coin] All endpoints failed for 8PW9w3J14mWvb65DJ264bh73L7k1g9NsuWKjmfTBmZXd: pump.fun coin request failed with status 530
+2026-01-14T20:04:56: [pump-coin] Failed to fetch coin Q3iZj2m3WRbiAar3uAQ1QFEQWW23m6beV8kzFWEmHP7 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:56: [pump-coin] https://frontend-api.pump.fun/coins/Q3iZj2m3WRbiAar3uAQ1QFEQWW23m6beV8kzFWEmHP7 responded with 530
+2026-01-14T20:04:56: [pump-coin] All endpoints failed for Q3iZj2m3WRbiAar3uAQ1QFEQWW23m6beV8kzFWEmHP7: pump.fun coin request failed with status 530
+2026-01-14T20:04:56: [pump-coin] Failed to fetch coin CgwW9y8aLVJKGSLbjRr23mY1iGSDpwgbQetLAph15fRk from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:56: [pump-coin] https://frontend-api.pump.fun/coins/CgwW9y8aLVJKGSLbjRr23mY1iGSDpwgbQetLAph15fRk responded with 530
+2026-01-14T20:04:56: [pump-coin] All endpoints failed for CgwW9y8aLVJKGSLbjRr23mY1iGSDpwgbQetLAph15fRk: pump.fun coin request failed with status 530
+2026-01-14T20:04:57: [pump-coin] Failed to fetch coin GsDYYF8ZHNidFL3oeXz4ThS7Ffpi1aHPvT5FX2nqoWa3 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:57: [pump-coin] https://frontend-api.pump.fun/coins/GsDYYF8ZHNidFL3oeXz4ThS7Ffpi1aHPvT5FX2nqoWa3 responded with 530
+2026-01-14T20:04:57: [pump-coin] All endpoints failed for GsDYYF8ZHNidFL3oeXz4ThS7Ffpi1aHPvT5FX2nqoWa3: pump.fun coin request failed with status 530
+2026-01-14T20:04:57: [pump-coin] Failed to fetch coin 9U3VyrPwdPxCqja88pYtALHU4DkkGe7P74EQGxWg62mM from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:57: [pump-coin] https://frontend-api.pump.fun/coins/9U3VyrPwdPxCqja88pYtALHU4DkkGe7P74EQGxWg62mM responded with 530
+2026-01-14T20:04:57: [pump-coin] All endpoints failed for 9U3VyrPwdPxCqja88pYtALHU4DkkGe7P74EQGxWg62mM: pump.fun coin request failed with status 530
+2026-01-14T20:04:57: [pump-coin] Failed to fetch coin 6ovHJHkGarQws9z7ChqfAFb8yVsunyjBHzSdiw9YZmLk from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:57: [pump-coin] https://frontend-api.pump.fun/coins/6ovHJHkGarQws9z7ChqfAFb8yVsunyjBHzSdiw9YZmLk responded with 530
+2026-01-14T20:04:57: [pump-coin] All endpoints failed for 6ovHJHkGarQws9z7ChqfAFb8yVsunyjBHzSdiw9YZmLk: pump.fun coin request failed with status 530
+2026-01-14T20:04:57: [pump-coin] Failed to fetch coin DnGoK2oYLyEAvEVgsYDiLHCYBuYUZUdxKd84uPPxpump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:57: [pump-coin] https://frontend-api.pump.fun/coins/DnGoK2oYLyEAvEVgsYDiLHCYBuYUZUdxKd84uPPxpump responded with 530
+2026-01-14T20:04:57: [pump-coin] All endpoints failed for DnGoK2oYLyEAvEVgsYDiLHCYBuYUZUdxKd84uPPxpump: pump.fun coin request failed with status 530
+2026-01-14T20:04:57: [pump-coin] Failed to fetch coin 7NVD35TWpShBSwnVZrMq2vY3sec31U7EDaEYFbfHfUrh from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:58: [pump-coin] https://frontend-api.pump.fun/coins/7NVD35TWpShBSwnVZrMq2vY3sec31U7EDaEYFbfHfUrh responded with 530
+2026-01-14T20:04:58: [pump-coin] All endpoints failed for 7NVD35TWpShBSwnVZrMq2vY3sec31U7EDaEYFbfHfUrh: pump.fun coin request failed with status 530
+2026-01-14T20:04:58: [pump-coin] Failed to fetch coin 4BSdiU2gGPqUXPXBXj8kbQtqtjK53d6PZvZFr1s8C4NB from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:04:58: [pump-coin] https://frontend-api.pump.fun/coins/4BSdiU2gGPqUXPXBXj8kbQtqtjK53d6PZvZFr1s8C4NB responded with 530
+2026-01-14T20:04:58: [pump-coin] All endpoints failed for 4BSdiU2gGPqUXPXBXj8kbQtqtjK53d6PZvZFr1s8C4NB: pump.fun coin request failed with status 530
+2026-01-14T20:05:02: [pump-coin] Failed to fetch coin CBWnsXToiZAKwJs5vx6YWX3QxrTCFZLgdUgHysfspump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:05:02: [pump-coin] https://frontend-api.pump.fun/coins/CBWnsXToiZAKwJs5vx6YWX3QxrTCFZLgdUgHysfspump responded with 530
+2026-01-14T20:05:02: [pump-coin] All endpoints failed for CBWnsXToiZAKwJs5vx6YWX3QxrTCFZLgdUgHysfspump: pump.fun coin request failed with status 530
+2026-01-14T20:05:02: [pump-coin] Failed to fetch coin 7XQ7hf3jFbzswf3KBuno7YzJ4NX38FfccmiXjE7Vfb9w from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:05:02: [pump-coin] https://frontend-api.pump.fun/coins/7XQ7hf3jFbzswf3KBuno7YzJ4NX38FfccmiXjE7Vfb9w responded with 530
+2026-01-14T20:05:02: [pump-coin] All endpoints failed for 7XQ7hf3jFbzswf3KBuno7YzJ4NX38FfccmiXjE7Vfb9w: pump.fun coin request failed with status 530
+2026-01-14T20:05:02: [pump-coin] Failed to fetch coin DbjLAT7Sx4gyShhp7jf9DAdvKZRSJDQtyqeYGVeoX8mf from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:05:02: [pump-coin] https://frontend-api.pump.fun/coins/DbjLAT7Sx4gyShhp7jf9DAdvKZRSJDQtyqeYGVeoX8mf responded with 530
+2026-01-14T20:05:02: [pump-coin] All endpoints failed for DbjLAT7Sx4gyShhp7jf9DAdvKZRSJDQtyqeYGVeoX8mf: pump.fun coin request failed with status 530
+2026-01-14T20:05:02: [pump-coin] Failed to fetch coin 69aK5KzghBzE5qLJ2q2CF29eUXy3bhrsQKmRHrdrabyh from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:05:02: [pump-coin] https://frontend-api.pump.fun/coins/69aK5KzghBzE5qLJ2q2CF29eUXy3bhrsQKmRHrdrabyh responded with 530
+2026-01-14T20:05:02: [pump-coin] All endpoints failed for 69aK5KzghBzE5qLJ2q2CF29eUXy3bhrsQKmRHrdrabyh: pump.fun coin request failed with status 530
+2026-01-14T20:05:03: [pump-coin] Failed to fetch coin GBeuJqw4FvKS8MPDLiohCo1GUK5q8rUP9PmbdVv82VjX from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:05:03: [pump-coin] https://frontend-api.pump.fun/coins/GBeuJqw4FvKS8MPDLiohCo1GUK5q8rUP9PmbdVv82VjX responded with 530
+2026-01-14T20:05:03: [pump-coin] All endpoints failed for GBeuJqw4FvKS8MPDLiohCo1GUK5q8rUP9PmbdVv82VjX: pump.fun coin request failed with status 530
+2026-01-14T20:05:03: [pump-coin] Failed to fetch coin 6CmzHq53AqzdFeziJDFBKjXYhEKcrBCSWqVmBbtHzvuz from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:05:03: [pump-coin] https://frontend-api.pump.fun/coins/6CmzHq53AqzdFeziJDFBKjXYhEKcrBCSWqVmBbtHzvuz responded with 530
+2026-01-14T20:05:03: [pump-coin] All endpoints failed for 6CmzHq53AqzdFeziJDFBKjXYhEKcrBCSWqVmBbtHzvuz: pump.fun coin request failed with status 530
+2026-01-14T20:05:04: [pump-coin] Failed to fetch coin 6MoDZYCW7ZeRba9i2P8Pru1mQ5fpM4X3hcouewp46y9S from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:05:04: [pump-coin] https://frontend-api.pump.fun/coins/6MoDZYCW7ZeRba9i2P8Pru1mQ5fpM4X3hcouewp46y9S responded with 530
+2026-01-14T20:05:04: [pump-coin] All endpoints failed for 6MoDZYCW7ZeRba9i2P8Pru1mQ5fpM4X3hcouewp46y9S: pump.fun coin request failed with status 530
+2026-01-14T20:05:04: [pump-coin] Failed to fetch coin 5yUAzNfehpbPPXd8Rnyt2Gs7VMXNrDEAUMqmdcdgpump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:05:04: [pump-coin] https://frontend-api.pump.fun/coins/5yUAzNfehpbPPXd8Rnyt2Gs7VMXNrDEAUMqmdcdgpump responded with 530
+2026-01-14T20:05:04: [pump-coin] All endpoints failed for 5yUAzNfehpbPPXd8Rnyt2Gs7VMXNrDEAUMqmdcdgpump: pump.fun coin request failed with status 530
+2026-01-14T20:05:04: [pump-coin] Failed to fetch coin 3wv3PFukRzyj1yTUujoy9QgEw84t8vgzw5PNC642pump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:05:04: [pump-coin] https://frontend-api.pump.fun/coins/3wv3PFukRzyj1yTUujoy9QgEw84t8vgzw5PNC642pump responded with 530
+2026-01-14T20:05:04: [pump-coin] All endpoints failed for 3wv3PFukRzyj1yTUujoy9QgEw84t8vgzw5PNC642pump: pump.fun coin request failed with status 530
+2026-01-14T20:05:24: [pump-coin] Failed to fetch coin DMFqQZHCdbDWgvmNdRdQMJcN2gLo6qmgKERcAC29pump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:05:24: [pump-coin] https://frontend-api.pump.fun/coins/DMFqQZHCdbDWgvmNdRdQMJcN2gLo6qmgKERcAC29pump responded with 530
+2026-01-14T20:05:24: [pump-coin] All endpoints failed for DMFqQZHCdbDWgvmNdRdQMJcN2gLo6qmgKERcAC29pump: pump.fun coin request failed with status 530
+2026-01-14T20:05:24: [pump-coin] Failed to fetch coin 42TCQRW8URpUsdbXYmhnJzXDb7HuugnraZdbvkdLfRnP from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:05:24: [pump-coin] https://frontend-api.pump.fun/coins/42TCQRW8URpUsdbXYmhnJzXDb7HuugnraZdbvkdLfRnP responded with 530
+2026-01-14T20:05:24: [pump-coin] All endpoints failed for 42TCQRW8URpUsdbXYmhnJzXDb7HuugnraZdbvkdLfRnP: pump.fun coin request failed with status 530
+2026-01-14T20:05:25: [pump-coin] Failed to fetch coin GDzTUWe7ztH6g7y7g77VJJh6KRBi8fDa6gHo54VMwSSy from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:05:25: [pump-coin] https://frontend-api.pump.fun/coins/GDzTUWe7ztH6g7y7g77VJJh6KRBi8fDa6gHo54VMwSSy responded with 530
+2026-01-14T20:05:25: [pump-coin] All endpoints failed for GDzTUWe7ztH6g7y7g77VJJh6KRBi8fDa6gHo54VMwSSy: pump.fun coin request failed with status 530
+2026-01-14T20:05:25: [pump-coin] Failed to fetch coin E6HPTSc4wubH4U8xpKSgyS6JXo9KvBkAUcBQqSTYf4uK from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:05:25: [pump-coin] https://frontend-api.pump.fun/coins/E6HPTSc4wubH4U8xpKSgyS6JXo9KvBkAUcBQqSTYf4uK responded with 530
+2026-01-14T20:05:25: [pump-coin] All endpoints failed for E6HPTSc4wubH4U8xpKSgyS6JXo9KvBkAUcBQqSTYf4uK: pump.fun coin request failed with status 530
+2026-01-14T20:05:25: [pump-coin] Failed to fetch coin zi4dXZzxWPjC5H5YMjedoiVqdzKLes6UY47c6xFpump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:05:25: [pump-coin] https://frontend-api.pump.fun/coins/zi4dXZzxWPjC5H5YMjedoiVqdzKLes6UY47c6xFpump responded with 530
+2026-01-14T20:05:25: [pump-coin] All endpoints failed for zi4dXZzxWPjC5H5YMjedoiVqdzKLes6UY47c6xFpump: pump.fun coin request failed with status 530
+2026-01-14T20:05:25: [pump-coin] Failed to fetch coin ZGPm6ACPjwMYAuXdn4X7sdLGxU72XZwVqvwBvnwpump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:05:25: [pump-coin] https://frontend-api.pump.fun/coins/ZGPm6ACPjwMYAuXdn4X7sdLGxU72XZwVqvwBvnwpump responded with 530
+2026-01-14T20:05:25: [pump-coin] All endpoints failed for ZGPm6ACPjwMYAuXdn4X7sdLGxU72XZwVqvwBvnwpump: pump.fun coin request failed with status 530
+2026-01-14T20:05:25: [pump-coin] Failed to fetch coin BhK6TrPiJ9hA3ATR98pXw1gnM2uKbNadkaxZNSavSjvo from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:05:25: [pump-coin] https://frontend-api.pump.fun/coins/BhK6TrPiJ9hA3ATR98pXw1gnM2uKbNadkaxZNSavSjvo responded with 530
+2026-01-14T20:05:25: [pump-coin] All endpoints failed for BhK6TrPiJ9hA3ATR98pXw1gnM2uKbNadkaxZNSavSjvo: pump.fun coin request failed with status 530
+2026-01-14T20:05:26: [pump-coin] Failed to fetch coin 3hVJC6UqRkMm1RQkG3FHNLX8L3deUb2x5eWzExAh4KBV from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:05:26: [pump-coin] https://frontend-api.pump.fun/coins/3hVJC6UqRkMm1RQkG3FHNLX8L3deUb2x5eWzExAh4KBV responded with 530
+2026-01-14T20:05:26: [pump-coin] All endpoints failed for 3hVJC6UqRkMm1RQkG3FHNLX8L3deUb2x5eWzExAh4KBV: pump.fun coin request failed with status 530
+2026-01-14T20:05:26: [pump-coin] Failed to fetch coin CNj25crKmMcApqiHkgTC4QRNSjTcp6h1Zrh1bWJGXYX1 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:05:26: [pump-coin] https://frontend-api.pump.fun/coins/CNj25crKmMcApqiHkgTC4QRNSjTcp6h1Zrh1bWJGXYX1 responded with 530
+2026-01-14T20:05:26: [pump-coin] All endpoints failed for CNj25crKmMcApqiHkgTC4QRNSjTcp6h1Zrh1bWJGXYX1: pump.fun coin request failed with status 530
+2026-01-14T20:05:26: [pump-coin] Failed to fetch coin 9TzbeT4jxducv8UhFh3hqXJwsdo87qrcrPBpwivrji1y from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:05:26: [pump-coin] https://frontend-api.pump.fun/coins/9TzbeT4jxducv8UhFh3hqXJwsdo87qrcrPBpwivrji1y responded with 530
+2026-01-14T20:05:26: [pump-coin] All endpoints failed for 9TzbeT4jxducv8UhFh3hqXJwsdo87qrcrPBpwivrji1y: pump.fun coin request failed with status 530
+2026-01-14T20:05:26: [pump-coin] Failed to fetch coin 3ZiXL811oAR4eY8XEY3pmKNnZy8JLbpLyybDD5jTornf from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:05:26: [pump-coin] https://frontend-api.pump.fun/coins/3ZiXL811oAR4eY8XEY3pmKNnZy8JLbpLyybDD5jTornf responded with 530
+2026-01-14T20:05:26: [pump-coin] All endpoints failed for 3ZiXL811oAR4eY8XEY3pmKNnZy8JLbpLyybDD5jTornf: pump.fun coin request failed with status 530
+2026-01-14T20:05:26: [pump-coin] Failed to fetch coin CSwb1hX2WA4xYa5ewTdrytnnDpJ4mFcqqiAWfZziWCXZ from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:05:26: [pump-coin] https://frontend-api.pump.fun/coins/CSwb1hX2WA4xYa5ewTdrytnnDpJ4mFcqqiAWfZziWCXZ responded with 530
+2026-01-14T20:05:26: [pump-coin] All endpoints failed for CSwb1hX2WA4xYa5ewTdrytnnDpJ4mFcqqiAWfZziWCXZ: pump.fun coin request failed with status 530
+2026-01-14T20:05:27: [pump-coin] Failed to fetch coin 5smab9DE55x3LnJRM5XUyrXw6kk1if2NgWN47rCHq7fP from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:05:27: [pump-coin] https://frontend-api.pump.fun/coins/5smab9DE55x3LnJRM5XUyrXw6kk1if2NgWN47rCHq7fP responded with 530
+2026-01-14T20:05:27: [pump-coin] All endpoints failed for 5smab9DE55x3LnJRM5XUyrXw6kk1if2NgWN47rCHq7fP: pump.fun coin request failed with status 530
+2026-01-14T20:05:27: [pump-coin] Failed to fetch coin J7SAqHACevpxVAXrYdmv49CtrAK4KjW4CKaCmWTDnZFZ from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:05:27: [pump-coin] https://frontend-api.pump.fun/coins/J7SAqHACevpxVAXrYdmv49CtrAK4KjW4CKaCmWTDnZFZ responded with 530
+2026-01-14T20:05:27: [pump-coin] All endpoints failed for J7SAqHACevpxVAXrYdmv49CtrAK4KjW4CKaCmWTDnZFZ: pump.fun coin request failed with status 530
+2026-01-14T20:05:27: [pump-coin] Failed to fetch coin CZgAHLgdvrATfoJJoRnx4NCv9G9DsWhEsP3X4DX7yH8a from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:05:27: [pump-coin] https://frontend-api.pump.fun/coins/CZgAHLgdvrATfoJJoRnx4NCv9G9DsWhEsP3X4DX7yH8a responded with 530
+2026-01-14T20:05:27: [pump-coin] All endpoints failed for CZgAHLgdvrATfoJJoRnx4NCv9G9DsWhEsP3X4DX7yH8a: pump.fun coin request failed with status 530
+2026-01-14T20:06:27: [pump-coin] Failed to fetch coin 9H62dXYm38C5V1TszzYbFyEzkLFP62x1QZxAF7Re1aaM from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:27: [pump-coin] https://frontend-api.pump.fun/coins/9H62dXYm38C5V1TszzYbFyEzkLFP62x1QZxAF7Re1aaM responded with 530
+2026-01-14T20:06:27: [pump-coin] All endpoints failed for 9H62dXYm38C5V1TszzYbFyEzkLFP62x1QZxAF7Re1aaM: pump.fun coin request failed with status 530
+2026-01-14T20:06:28: [pump-coin] Failed to fetch coin BeNLsmXhhCCJAnCLW95xARk1SqhxybzdAKpK85ubUV3p from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:28: [pump-coin] https://frontend-api.pump.fun/coins/BeNLsmXhhCCJAnCLW95xARk1SqhxybzdAKpK85ubUV3p responded with 530
+2026-01-14T20:06:28: [pump-coin] All endpoints failed for BeNLsmXhhCCJAnCLW95xARk1SqhxybzdAKpK85ubUV3p: pump.fun coin request failed with status 530
+2026-01-14T20:06:28: [pump-coin] Failed to fetch coin 2Zx4qheiHNKbSPHNa1ypNVzdWNwKc1Jrhoou8SE9XoJv from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:28: [pump-coin] https://frontend-api.pump.fun/coins/2Zx4qheiHNKbSPHNa1ypNVzdWNwKc1Jrhoou8SE9XoJv responded with 530
+2026-01-14T20:06:28: [pump-coin] All endpoints failed for 2Zx4qheiHNKbSPHNa1ypNVzdWNwKc1Jrhoou8SE9XoJv: pump.fun coin request failed with status 530
+2026-01-14T20:06:28: [pump-coin] Failed to fetch coin DaoLAeA3GpA7HR2NUH23vFmPeiZaTJmYit6ZgTV2TQjh from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:28: [pump-coin] https://frontend-api.pump.fun/coins/DaoLAeA3GpA7HR2NUH23vFmPeiZaTJmYit6ZgTV2TQjh responded with 530
+2026-01-14T20:06:28: [pump-coin] All endpoints failed for DaoLAeA3GpA7HR2NUH23vFmPeiZaTJmYit6ZgTV2TQjh: pump.fun coin request failed with status 530
+2026-01-14T20:06:28: [pump-coin] Failed to fetch coin Gpw8BDVDFrpCGgHmpPpdEQUsodypt2x7YfnGMQ9XVTw1 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:28: [pump-coin] https://frontend-api.pump.fun/coins/Gpw8BDVDFrpCGgHmpPpdEQUsodypt2x7YfnGMQ9XVTw1 responded with 530
+2026-01-14T20:06:28: [pump-coin] All endpoints failed for Gpw8BDVDFrpCGgHmpPpdEQUsodypt2x7YfnGMQ9XVTw1: pump.fun coin request failed with status 530
+2026-01-14T20:06:28: [pump-coin] Failed to fetch coin 5fA3Gepc3Xqzd1GBddXigUEjY5LSb4k6HkZb3jeHtwvh from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:28: [pump-coin] https://frontend-api.pump.fun/coins/5fA3Gepc3Xqzd1GBddXigUEjY5LSb4k6HkZb3jeHtwvh responded with 530
+2026-01-14T20:06:28: [pump-coin] All endpoints failed for 5fA3Gepc3Xqzd1GBddXigUEjY5LSb4k6HkZb3jeHtwvh: pump.fun coin request failed with status 530
+2026-01-14T20:06:28: [pump-coin] Failed to fetch coin 2ast17D5bVtXix3mE3rtspbvFusjPUDFTCx2ZgNqpFmT from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:29: [pump-coin] https://frontend-api.pump.fun/coins/2ast17D5bVtXix3mE3rtspbvFusjPUDFTCx2ZgNqpFmT responded with 530
+2026-01-14T20:06:29: [pump-coin] All endpoints failed for 2ast17D5bVtXix3mE3rtspbvFusjPUDFTCx2ZgNqpFmT: pump.fun coin request failed with status 530
+2026-01-14T20:06:29: [pump-coin] Failed to fetch coin EzudGy5TdRgXNhs3jd4a28V3ARw5VXyjMrZkxQtro8ZH from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:29: [pump-coin] https://frontend-api.pump.fun/coins/EzudGy5TdRgXNhs3jd4a28V3ARw5VXyjMrZkxQtro8ZH responded with 530
+2026-01-14T20:06:29: [pump-coin] All endpoints failed for EzudGy5TdRgXNhs3jd4a28V3ARw5VXyjMrZkxQtro8ZH: pump.fun coin request failed with status 530
+2026-01-14T20:06:29: [pump-coin] Failed to fetch coin 79745PRjSLwDzGVLJboJ2m2MSMRD1zb38UwAMFiZt1Cs from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:29: [pump-coin] https://frontend-api.pump.fun/coins/79745PRjSLwDzGVLJboJ2m2MSMRD1zb38UwAMFiZt1Cs responded with 530
+2026-01-14T20:06:29: [pump-coin] All endpoints failed for 79745PRjSLwDzGVLJboJ2m2MSMRD1zb38UwAMFiZt1Cs: pump.fun coin request failed with status 530
+2026-01-14T20:06:29: [pump-coin] Failed to fetch coin 6wBj2qG1jUPswsqn9G1gnFJgarxzyjizFxidfZH65dKd from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:29: [pump-coin] https://frontend-api.pump.fun/coins/6wBj2qG1jUPswsqn9G1gnFJgarxzyjizFxidfZH65dKd responded with 530
+2026-01-14T20:06:29: [pump-coin] All endpoints failed for 6wBj2qG1jUPswsqn9G1gnFJgarxzyjizFxidfZH65dKd: pump.fun coin request failed with status 530
+2026-01-14T20:06:29: [pump-coin] Failed to fetch coin 13wggeqG3pBU2zo89Fdt2J8YufATCYrKZxYXJwPpkVHw from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:29: [pump-coin] https://frontend-api.pump.fun/coins/13wggeqG3pBU2zo89Fdt2J8YufATCYrKZxYXJwPpkVHw responded with 530
+2026-01-14T20:06:29: [pump-coin] All endpoints failed for 13wggeqG3pBU2zo89Fdt2J8YufATCYrKZxYXJwPpkVHw: pump.fun coin request failed with status 530
+2026-01-14T20:06:29: [pump-coin] Failed to fetch coin 5mCMf3enuvHDhkkHvi33C842m1PqB6dvGtVruaHi7tG9 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:29: [pump-coin] https://frontend-api.pump.fun/coins/5mCMf3enuvHDhkkHvi33C842m1PqB6dvGtVruaHi7tG9 responded with 530
+2026-01-14T20:06:29: [pump-coin] All endpoints failed for 5mCMf3enuvHDhkkHvi33C842m1PqB6dvGtVruaHi7tG9: pump.fun coin request failed with status 530
+2026-01-14T20:06:30: [pump-coin] Failed to fetch coin 6LRA6CnrH6NVgiBySqQnajRs2L1vySHTr7f1e9Dhp4RE from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:30: [pump-coin] https://frontend-api.pump.fun/coins/6LRA6CnrH6NVgiBySqQnajRs2L1vySHTr7f1e9Dhp4RE responded with 530
+2026-01-14T20:06:30: [pump-coin] All endpoints failed for 6LRA6CnrH6NVgiBySqQnajRs2L1vySHTr7f1e9Dhp4RE: pump.fun coin request failed with status 530
+2026-01-14T20:06:30: [pump-coin] Failed to fetch coin 5NA94bui6DUy6WaxhHoHieMrzVLnzToGoBaAmhgGeNmG from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:30: [pump-coin] https://frontend-api.pump.fun/coins/5NA94bui6DUy6WaxhHoHieMrzVLnzToGoBaAmhgGeNmG responded with 530
+2026-01-14T20:06:30: [pump-coin] All endpoints failed for 5NA94bui6DUy6WaxhHoHieMrzVLnzToGoBaAmhgGeNmG: pump.fun coin request failed with status 530
+2026-01-14T20:06:30: [pump-coin] Failed to fetch coin 8MtUJG2GWWbuDZmxtG8jfYcja3fbGGVcMeAKEitZGvmi from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:30: [pump-coin] https://frontend-api.pump.fun/coins/8MtUJG2GWWbuDZmxtG8jfYcja3fbGGVcMeAKEitZGvmi responded with 530
+2026-01-14T20:06:30: [pump-coin] All endpoints failed for 8MtUJG2GWWbuDZmxtG8jfYcja3fbGGVcMeAKEitZGvmi: pump.fun coin request failed with status 530
+2026-01-14T20:06:30: [pump-coin] Failed to fetch coin 5vKcMpui5kTHFBDhyhu5jPs79s24yWwHaQ7X4GWwztJT from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:30: [pump-coin] https://frontend-api.pump.fun/coins/5vKcMpui5kTHFBDhyhu5jPs79s24yWwHaQ7X4GWwztJT responded with 530
+2026-01-14T20:06:30: [pump-coin] All endpoints failed for 5vKcMpui5kTHFBDhyhu5jPs79s24yWwHaQ7X4GWwztJT: pump.fun coin request failed with status 530
+2026-01-14T20:06:30: [pump-coin] Failed to fetch coin 5QnsWhUuDY3Qew8FuNziZWfT2anqwfQGZypLJYkmqdeV from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:30: [pump-coin] https://frontend-api.pump.fun/coins/5QnsWhUuDY3Qew8FuNziZWfT2anqwfQGZypLJYkmqdeV responded with 530
+2026-01-14T20:06:30: [pump-coin] All endpoints failed for 5QnsWhUuDY3Qew8FuNziZWfT2anqwfQGZypLJYkmqdeV: pump.fun coin request failed with status 530
+2026-01-14T20:06:31: [pump-coin] Failed to fetch coin 7uyWBYLiHQYXs16ggHm1DbP2zLzGXanvi8Y8zmHwGpJU from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:31: [pump-coin] https://frontend-api.pump.fun/coins/7uyWBYLiHQYXs16ggHm1DbP2zLzGXanvi8Y8zmHwGpJU responded with 530
+2026-01-14T20:06:31: [pump-coin] All endpoints failed for 7uyWBYLiHQYXs16ggHm1DbP2zLzGXanvi8Y8zmHwGpJU: pump.fun coin request failed with status 530
+2026-01-14T20:06:31: [pump-coin] Failed to fetch coin GQxGfTJgXj9ASrBWyMuESrNKJ4dd12v7zNSL2NzUinRA from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:31: [pump-coin] https://frontend-api.pump.fun/coins/GQxGfTJgXj9ASrBWyMuESrNKJ4dd12v7zNSL2NzUinRA responded with 530
+2026-01-14T20:06:31: [pump-coin] All endpoints failed for GQxGfTJgXj9ASrBWyMuESrNKJ4dd12v7zNSL2NzUinRA: pump.fun coin request failed with status 530
+2026-01-14T20:06:31: [pump-coin] Failed to fetch coin PECazcZMchmn86TfUVDVKeAtVaiKSJFQCZ9BvZfh3km from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:31: [pump-coin] https://frontend-api.pump.fun/coins/PECazcZMchmn86TfUVDVKeAtVaiKSJFQCZ9BvZfh3km responded with 530
+2026-01-14T20:06:31: [pump-coin] All endpoints failed for PECazcZMchmn86TfUVDVKeAtVaiKSJFQCZ9BvZfh3km: pump.fun coin request failed with status 530
+2026-01-14T20:06:31: [pump-coin] Failed to fetch coin 8PW9w3J14mWvb65DJ264bh73L7k1g9NsuWKjmfTBmZXd from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:31: [pump-coin] https://frontend-api.pump.fun/coins/8PW9w3J14mWvb65DJ264bh73L7k1g9NsuWKjmfTBmZXd responded with 530
+2026-01-14T20:06:31: [pump-coin] All endpoints failed for 8PW9w3J14mWvb65DJ264bh73L7k1g9NsuWKjmfTBmZXd: pump.fun coin request failed with status 530
+2026-01-14T20:06:32: [pump-coin] Failed to fetch coin Q3iZj2m3WRbiAar3uAQ1QFEQWW23m6beV8kzFWEmHP7 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:32: [pump-coin] https://frontend-api.pump.fun/coins/Q3iZj2m3WRbiAar3uAQ1QFEQWW23m6beV8kzFWEmHP7 responded with 530
+2026-01-14T20:06:32: [pump-coin] All endpoints failed for Q3iZj2m3WRbiAar3uAQ1QFEQWW23m6beV8kzFWEmHP7: pump.fun coin request failed with status 530
+2026-01-14T20:06:32: [pump-coin] Failed to fetch coin CgwW9y8aLVJKGSLbjRr23mY1iGSDpwgbQetLAph15fRk from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:32: [pump-coin] https://frontend-api.pump.fun/coins/CgwW9y8aLVJKGSLbjRr23mY1iGSDpwgbQetLAph15fRk responded with 530
+2026-01-14T20:06:32: [pump-coin] All endpoints failed for CgwW9y8aLVJKGSLbjRr23mY1iGSDpwgbQetLAph15fRk: pump.fun coin request failed with status 530
+2026-01-14T20:06:33: [pump-coin] Failed to fetch coin GsDYYF8ZHNidFL3oeXz4ThS7Ffpi1aHPvT5FX2nqoWa3 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:33: [pump-coin] https://frontend-api.pump.fun/coins/GsDYYF8ZHNidFL3oeXz4ThS7Ffpi1aHPvT5FX2nqoWa3 responded with 530
+2026-01-14T20:06:33: [pump-coin] All endpoints failed for GsDYYF8ZHNidFL3oeXz4ThS7Ffpi1aHPvT5FX2nqoWa3: pump.fun coin request failed with status 530
+2026-01-14T20:06:33: [pump-coin] Failed to fetch coin 9U3VyrPwdPxCqja88pYtALHU4DkkGe7P74EQGxWg62mM from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:33: [pump-coin] https://frontend-api.pump.fun/coins/9U3VyrPwdPxCqja88pYtALHU4DkkGe7P74EQGxWg62mM responded with 530
+2026-01-14T20:06:33: [pump-coin] All endpoints failed for 9U3VyrPwdPxCqja88pYtALHU4DkkGe7P74EQGxWg62mM: pump.fun coin request failed with status 530
+2026-01-14T20:06:33: [pump-coin] Failed to fetch coin 6ovHJHkGarQws9z7ChqfAFb8yVsunyjBHzSdiw9YZmLk from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:33: [pump-coin] https://frontend-api.pump.fun/coins/6ovHJHkGarQws9z7ChqfAFb8yVsunyjBHzSdiw9YZmLk responded with 530
+2026-01-14T20:06:33: [pump-coin] All endpoints failed for 6ovHJHkGarQws9z7ChqfAFb8yVsunyjBHzSdiw9YZmLk: pump.fun coin request failed with status 530
+2026-01-14T20:06:34: [pump-coin] Failed to fetch coin DnGoK2oYLyEAvEVgsYDiLHCYBuYUZUdxKd84uPPxpump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:34: [pump-coin] https://frontend-api.pump.fun/coins/DnGoK2oYLyEAvEVgsYDiLHCYBuYUZUdxKd84uPPxpump responded with 530
+2026-01-14T20:06:34: [pump-coin] All endpoints failed for DnGoK2oYLyEAvEVgsYDiLHCYBuYUZUdxKd84uPPxpump: pump.fun coin request failed with status 530
+2026-01-14T20:06:34: [pump-coin] Failed to fetch coin 7NVD35TWpShBSwnVZrMq2vY3sec31U7EDaEYFbfHfUrh from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:34: [pump-coin] https://frontend-api.pump.fun/coins/7NVD35TWpShBSwnVZrMq2vY3sec31U7EDaEYFbfHfUrh responded with 530
+2026-01-14T20:06:34: [pump-coin] All endpoints failed for 7NVD35TWpShBSwnVZrMq2vY3sec31U7EDaEYFbfHfUrh: pump.fun coin request failed with status 530
+2026-01-14T20:06:35: [pump-coin] Failed to fetch coin 4BSdiU2gGPqUXPXBXj8kbQtqtjK53d6PZvZFr1s8C4NB from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:35: [pump-coin] https://frontend-api.pump.fun/coins/4BSdiU2gGPqUXPXBXj8kbQtqtjK53d6PZvZFr1s8C4NB responded with 530
+2026-01-14T20:06:35: [pump-coin] All endpoints failed for 4BSdiU2gGPqUXPXBXj8kbQtqtjK53d6PZvZFr1s8C4NB: pump.fun coin request failed with status 530
+2026-01-14T20:06:38: [pump-coin] Failed to fetch coin CBWnsXToiZAKwJs5vx6YWX3QxrTCFZLgdUgHysfspump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:38: [pump-coin] https://frontend-api.pump.fun/coins/CBWnsXToiZAKwJs5vx6YWX3QxrTCFZLgdUgHysfspump responded with 530
+2026-01-14T20:06:38: [pump-coin] All endpoints failed for CBWnsXToiZAKwJs5vx6YWX3QxrTCFZLgdUgHysfspump: pump.fun coin request failed with status 530
+2026-01-14T20:06:38: [pump-coin] Failed to fetch coin 7XQ7hf3jFbzswf3KBuno7YzJ4NX38FfccmiXjE7Vfb9w from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:38: [pump-coin] https://frontend-api.pump.fun/coins/7XQ7hf3jFbzswf3KBuno7YzJ4NX38FfccmiXjE7Vfb9w responded with 530
+2026-01-14T20:06:38: [pump-coin] All endpoints failed for 7XQ7hf3jFbzswf3KBuno7YzJ4NX38FfccmiXjE7Vfb9w: pump.fun coin request failed with status 530
+2026-01-14T20:06:38: [pump-coin] Failed to fetch coin DbjLAT7Sx4gyShhp7jf9DAdvKZRSJDQtyqeYGVeoX8mf from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:38: [pump-coin] https://frontend-api.pump.fun/coins/DbjLAT7Sx4gyShhp7jf9DAdvKZRSJDQtyqeYGVeoX8mf responded with 530
+2026-01-14T20:06:38: [pump-coin] All endpoints failed for DbjLAT7Sx4gyShhp7jf9DAdvKZRSJDQtyqeYGVeoX8mf: pump.fun coin request failed with status 530
+2026-01-14T20:06:39: [pump-coin] Failed to fetch coin 69aK5KzghBzE5qLJ2q2CF29eUXy3bhrsQKmRHrdrabyh from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:39: [pump-coin] https://frontend-api.pump.fun/coins/69aK5KzghBzE5qLJ2q2CF29eUXy3bhrsQKmRHrdrabyh responded with 530
+2026-01-14T20:06:39: [pump-coin] All endpoints failed for 69aK5KzghBzE5qLJ2q2CF29eUXy3bhrsQKmRHrdrabyh: pump.fun coin request failed with status 530
+2026-01-14T20:06:39: [pump-coin] Failed to fetch coin GBeuJqw4FvKS8MPDLiohCo1GUK5q8rUP9PmbdVv82VjX from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:39: [pump-coin] https://frontend-api.pump.fun/coins/GBeuJqw4FvKS8MPDLiohCo1GUK5q8rUP9PmbdVv82VjX responded with 530
+2026-01-14T20:06:39: [pump-coin] All endpoints failed for GBeuJqw4FvKS8MPDLiohCo1GUK5q8rUP9PmbdVv82VjX: pump.fun coin request failed with status 530
+2026-01-14T20:06:39: [pump-coin] Failed to fetch coin 6CmzHq53AqzdFeziJDFBKjXYhEKcrBCSWqVmBbtHzvuz from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:39: [pump-coin] https://frontend-api.pump.fun/coins/6CmzHq53AqzdFeziJDFBKjXYhEKcrBCSWqVmBbtHzvuz responded with 530
+2026-01-14T20:06:39: [pump-coin] All endpoints failed for 6CmzHq53AqzdFeziJDFBKjXYhEKcrBCSWqVmBbtHzvuz: pump.fun coin request failed with status 530
+2026-01-14T20:06:40: [pump-coin] Failed to fetch coin 6MoDZYCW7ZeRba9i2P8Pru1mQ5fpM4X3hcouewp46y9S from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:40: [pump-coin] https://frontend-api.pump.fun/coins/6MoDZYCW7ZeRba9i2P8Pru1mQ5fpM4X3hcouewp46y9S responded with 530
+2026-01-14T20:06:40: [pump-coin] All endpoints failed for 6MoDZYCW7ZeRba9i2P8Pru1mQ5fpM4X3hcouewp46y9S: pump.fun coin request failed with status 530
+2026-01-14T20:06:40: [pump-coin] Failed to fetch coin 5yUAzNfehpbPPXd8Rnyt2Gs7VMXNrDEAUMqmdcdgpump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:40: [pump-coin] https://frontend-api.pump.fun/coins/5yUAzNfehpbPPXd8Rnyt2Gs7VMXNrDEAUMqmdcdgpump responded with 530
+2026-01-14T20:06:40: [pump-coin] All endpoints failed for 5yUAzNfehpbPPXd8Rnyt2Gs7VMXNrDEAUMqmdcdgpump: pump.fun coin request failed with status 530
+2026-01-14T20:06:40: [pump-coin] Failed to fetch coin 3wv3PFukRzyj1yTUujoy9QgEw84t8vgzw5PNC642pump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:40: [pump-coin] https://frontend-api.pump.fun/coins/3wv3PFukRzyj1yTUujoy9QgEw84t8vgzw5PNC642pump responded with 530
+2026-01-14T20:06:40: [pump-coin] All endpoints failed for 3wv3PFukRzyj1yTUujoy9QgEw84t8vgzw5PNC642pump: pump.fun coin request failed with status 530
+2026-01-14T20:06:56: [pump-coin] Failed to fetch coin DMFqQZHCdbDWgvmNdRdQMJcN2gLo6qmgKERcAC29pump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:56: [pump-coin] https://frontend-api.pump.fun/coins/DMFqQZHCdbDWgvmNdRdQMJcN2gLo6qmgKERcAC29pump responded with 530
+2026-01-14T20:06:56: [pump-coin] All endpoints failed for DMFqQZHCdbDWgvmNdRdQMJcN2gLo6qmgKERcAC29pump: pump.fun coin request failed with status 530
+2026-01-14T20:06:56: [pump-coin] Failed to fetch coin 42TCQRW8URpUsdbXYmhnJzXDb7HuugnraZdbvkdLfRnP from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:56: [pump-coin] https://frontend-api.pump.fun/coins/42TCQRW8URpUsdbXYmhnJzXDb7HuugnraZdbvkdLfRnP responded with 530
+2026-01-14T20:06:56: [pump-coin] All endpoints failed for 42TCQRW8URpUsdbXYmhnJzXDb7HuugnraZdbvkdLfRnP: pump.fun coin request failed with status 530
+2026-01-14T20:06:56: [pump-coin] Failed to fetch coin GDzTUWe7ztH6g7y7g77VJJh6KRBi8fDa6gHo54VMwSSy from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:56: [pump-coin] https://frontend-api.pump.fun/coins/GDzTUWe7ztH6g7y7g77VJJh6KRBi8fDa6gHo54VMwSSy responded with 530
+2026-01-14T20:06:56: [pump-coin] All endpoints failed for GDzTUWe7ztH6g7y7g77VJJh6KRBi8fDa6gHo54VMwSSy: pump.fun coin request failed with status 530
+2026-01-14T20:06:56: [pump-coin] Failed to fetch coin E6HPTSc4wubH4U8xpKSgyS6JXo9KvBkAUcBQqSTYf4uK from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:56: [pump-coin] https://frontend-api.pump.fun/coins/E6HPTSc4wubH4U8xpKSgyS6JXo9KvBkAUcBQqSTYf4uK responded with 530
+2026-01-14T20:06:56: [pump-coin] All endpoints failed for E6HPTSc4wubH4U8xpKSgyS6JXo9KvBkAUcBQqSTYf4uK: pump.fun coin request failed with status 530
+2026-01-14T20:06:57: [pump-coin] Failed to fetch coin zi4dXZzxWPjC5H5YMjedoiVqdzKLes6UY47c6xFpump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:57: [pump-coin] https://frontend-api.pump.fun/coins/zi4dXZzxWPjC5H5YMjedoiVqdzKLes6UY47c6xFpump responded with 530
+2026-01-14T20:06:57: [pump-coin] All endpoints failed for zi4dXZzxWPjC5H5YMjedoiVqdzKLes6UY47c6xFpump: pump.fun coin request failed with status 530
+2026-01-14T20:06:57: [pump-coin] Failed to fetch coin ZGPm6ACPjwMYAuXdn4X7sdLGxU72XZwVqvwBvnwpump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:57: [pump-coin] https://frontend-api.pump.fun/coins/ZGPm6ACPjwMYAuXdn4X7sdLGxU72XZwVqvwBvnwpump responded with 530
+2026-01-14T20:06:57: [pump-coin] All endpoints failed for ZGPm6ACPjwMYAuXdn4X7sdLGxU72XZwVqvwBvnwpump: pump.fun coin request failed with status 530
+2026-01-14T20:06:57: [pump-coin] Failed to fetch coin BhK6TrPiJ9hA3ATR98pXw1gnM2uKbNadkaxZNSavSjvo from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:57: [pump-coin] https://frontend-api.pump.fun/coins/BhK6TrPiJ9hA3ATR98pXw1gnM2uKbNadkaxZNSavSjvo responded with 530
+2026-01-14T20:06:57: [pump-coin] All endpoints failed for BhK6TrPiJ9hA3ATR98pXw1gnM2uKbNadkaxZNSavSjvo: pump.fun coin request failed with status 530
+2026-01-14T20:06:57: [pump-coin] Failed to fetch coin 3hVJC6UqRkMm1RQkG3FHNLX8L3deUb2x5eWzExAh4KBV from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:57: [pump-coin] https://frontend-api.pump.fun/coins/3hVJC6UqRkMm1RQkG3FHNLX8L3deUb2x5eWzExAh4KBV responded with 530
+2026-01-14T20:06:57: [pump-coin] All endpoints failed for 3hVJC6UqRkMm1RQkG3FHNLX8L3deUb2x5eWzExAh4KBV: pump.fun coin request failed with status 530
+2026-01-14T20:06:57: [pump-coin] Failed to fetch coin CNj25crKmMcApqiHkgTC4QRNSjTcp6h1Zrh1bWJGXYX1 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:57: [pump-coin] https://frontend-api.pump.fun/coins/CNj25crKmMcApqiHkgTC4QRNSjTcp6h1Zrh1bWJGXYX1 responded with 530
+2026-01-14T20:06:57: [pump-coin] All endpoints failed for CNj25crKmMcApqiHkgTC4QRNSjTcp6h1Zrh1bWJGXYX1: pump.fun coin request failed with status 530
+2026-01-14T20:06:58: [pump-coin] Failed to fetch coin 9TzbeT4jxducv8UhFh3hqXJwsdo87qrcrPBpwivrji1y from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:58: [pump-coin] https://frontend-api.pump.fun/coins/9TzbeT4jxducv8UhFh3hqXJwsdo87qrcrPBpwivrji1y responded with 530
+2026-01-14T20:06:58: [pump-coin] All endpoints failed for 9TzbeT4jxducv8UhFh3hqXJwsdo87qrcrPBpwivrji1y: pump.fun coin request failed with status 530
+2026-01-14T20:06:58: [pump-coin] Failed to fetch coin 3ZiXL811oAR4eY8XEY3pmKNnZy8JLbpLyybDD5jTornf from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:58: [pump-coin] https://frontend-api.pump.fun/coins/3ZiXL811oAR4eY8XEY3pmKNnZy8JLbpLyybDD5jTornf responded with 530
+2026-01-14T20:06:58: [pump-coin] All endpoints failed for 3ZiXL811oAR4eY8XEY3pmKNnZy8JLbpLyybDD5jTornf: pump.fun coin request failed with status 530
+2026-01-14T20:06:58: [pump-coin] Failed to fetch coin CSwb1hX2WA4xYa5ewTdrytnnDpJ4mFcqqiAWfZziWCXZ from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:58: [pump-coin] https://frontend-api.pump.fun/coins/CSwb1hX2WA4xYa5ewTdrytnnDpJ4mFcqqiAWfZziWCXZ responded with 530
+2026-01-14T20:06:58: [pump-coin] All endpoints failed for CSwb1hX2WA4xYa5ewTdrytnnDpJ4mFcqqiAWfZziWCXZ: pump.fun coin request failed with status 530
+2026-01-14T20:06:58: [pump-coin] Failed to fetch coin 5smab9DE55x3LnJRM5XUyrXw6kk1if2NgWN47rCHq7fP from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:58: [pump-coin] https://frontend-api.pump.fun/coins/5smab9DE55x3LnJRM5XUyrXw6kk1if2NgWN47rCHq7fP responded with 530
+2026-01-14T20:06:58: [pump-coin] All endpoints failed for 5smab9DE55x3LnJRM5XUyrXw6kk1if2NgWN47rCHq7fP: pump.fun coin request failed with status 530
+2026-01-14T20:06:58: [pump-coin] Failed to fetch coin J7SAqHACevpxVAXrYdmv49CtrAK4KjW4CKaCmWTDnZFZ from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:58: [pump-coin] https://frontend-api.pump.fun/coins/J7SAqHACevpxVAXrYdmv49CtrAK4KjW4CKaCmWTDnZFZ responded with 530
+2026-01-14T20:06:58: [pump-coin] All endpoints failed for J7SAqHACevpxVAXrYdmv49CtrAK4KjW4CKaCmWTDnZFZ: pump.fun coin request failed with status 530
+2026-01-14T20:06:58: [pump-coin] Failed to fetch coin CZgAHLgdvrATfoJJoRnx4NCv9G9DsWhEsP3X4DX7yH8a from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:06:59: [pump-coin] https://frontend-api.pump.fun/coins/CZgAHLgdvrATfoJJoRnx4NCv9G9DsWhEsP3X4DX7yH8a responded with 530
+2026-01-14T20:06:59: [pump-coin] All endpoints failed for CZgAHLgdvrATfoJJoRnx4NCv9G9DsWhEsP3X4DX7yH8a: pump.fun coin request failed with status 530
+2026-01-14T20:09:03: [pump-coin] Failed to fetch coin 9H62dXYm38C5V1TszzYbFyEzkLFP62x1QZxAF7Re1aaM from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:03: [pump-coin] https://frontend-api.pump.fun/coins/9H62dXYm38C5V1TszzYbFyEzkLFP62x1QZxAF7Re1aaM responded with 530
+2026-01-14T20:09:03: [pump-coin] All endpoints failed for 9H62dXYm38C5V1TszzYbFyEzkLFP62x1QZxAF7Re1aaM: pump.fun coin request failed with status 530
+2026-01-14T20:09:03: [pump-coin] Failed to fetch coin BeNLsmXhhCCJAnCLW95xARk1SqhxybzdAKpK85ubUV3p from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:04: [pump-coin] https://frontend-api.pump.fun/coins/BeNLsmXhhCCJAnCLW95xARk1SqhxybzdAKpK85ubUV3p responded with 530
+2026-01-14T20:09:04: [pump-coin] All endpoints failed for BeNLsmXhhCCJAnCLW95xARk1SqhxybzdAKpK85ubUV3p: pump.fun coin request failed with status 530
+2026-01-14T20:09:04: [pump-coin] Failed to fetch coin 2Zx4qheiHNKbSPHNa1ypNVzdWNwKc1Jrhoou8SE9XoJv from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:04: [pump-coin] https://frontend-api.pump.fun/coins/2Zx4qheiHNKbSPHNa1ypNVzdWNwKc1Jrhoou8SE9XoJv responded with 530
+2026-01-14T20:09:04: [pump-coin] All endpoints failed for 2Zx4qheiHNKbSPHNa1ypNVzdWNwKc1Jrhoou8SE9XoJv: pump.fun coin request failed with status 530
+2026-01-14T20:09:04: [pump-coin] Failed to fetch coin DaoLAeA3GpA7HR2NUH23vFmPeiZaTJmYit6ZgTV2TQjh from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:04: [pump-coin] https://frontend-api.pump.fun/coins/DaoLAeA3GpA7HR2NUH23vFmPeiZaTJmYit6ZgTV2TQjh responded with 530
+2026-01-14T20:09:04: [pump-coin] All endpoints failed for DaoLAeA3GpA7HR2NUH23vFmPeiZaTJmYit6ZgTV2TQjh: pump.fun coin request failed with status 530
+2026-01-14T20:09:04: [pump-coin] Failed to fetch coin Gpw8BDVDFrpCGgHmpPpdEQUsodypt2x7YfnGMQ9XVTw1 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:04: [pump-coin] https://frontend-api.pump.fun/coins/Gpw8BDVDFrpCGgHmpPpdEQUsodypt2x7YfnGMQ9XVTw1 responded with 530
+2026-01-14T20:09:04: [pump-coin] All endpoints failed for Gpw8BDVDFrpCGgHmpPpdEQUsodypt2x7YfnGMQ9XVTw1: pump.fun coin request failed with status 530
+2026-01-14T20:09:04: [pump-coin] Failed to fetch coin 5fA3Gepc3Xqzd1GBddXigUEjY5LSb4k6HkZb3jeHtwvh from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:04: [pump-coin] https://frontend-api.pump.fun/coins/5fA3Gepc3Xqzd1GBddXigUEjY5LSb4k6HkZb3jeHtwvh responded with 530
+2026-01-14T20:09:04: [pump-coin] All endpoints failed for 5fA3Gepc3Xqzd1GBddXigUEjY5LSb4k6HkZb3jeHtwvh: pump.fun coin request failed with status 530
+2026-01-14T20:09:04: [pump-coin] Failed to fetch coin 2ast17D5bVtXix3mE3rtspbvFusjPUDFTCx2ZgNqpFmT from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:04: [pump-coin] https://frontend-api.pump.fun/coins/2ast17D5bVtXix3mE3rtspbvFusjPUDFTCx2ZgNqpFmT responded with 530
+2026-01-14T20:09:04: [pump-coin] All endpoints failed for 2ast17D5bVtXix3mE3rtspbvFusjPUDFTCx2ZgNqpFmT: pump.fun coin request failed with status 530
+2026-01-14T20:09:05: [pump-coin] Failed to fetch coin EzudGy5TdRgXNhs3jd4a28V3ARw5VXyjMrZkxQtro8ZH from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:05: [pump-coin] https://frontend-api.pump.fun/coins/EzudGy5TdRgXNhs3jd4a28V3ARw5VXyjMrZkxQtro8ZH responded with 530
+2026-01-14T20:09:05: [pump-coin] All endpoints failed for EzudGy5TdRgXNhs3jd4a28V3ARw5VXyjMrZkxQtro8ZH: pump.fun coin request failed with status 530
+2026-01-14T20:09:05: [pump-coin] Failed to fetch coin 79745PRjSLwDzGVLJboJ2m2MSMRD1zb38UwAMFiZt1Cs from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:05: [pump-coin] https://frontend-api.pump.fun/coins/79745PRjSLwDzGVLJboJ2m2MSMRD1zb38UwAMFiZt1Cs responded with 530
+2026-01-14T20:09:05: [pump-coin] All endpoints failed for 79745PRjSLwDzGVLJboJ2m2MSMRD1zb38UwAMFiZt1Cs: pump.fun coin request failed with status 530
+2026-01-14T20:09:05: [pump-coin] Failed to fetch coin 6wBj2qG1jUPswsqn9G1gnFJgarxzyjizFxidfZH65dKd from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:05: [pump-coin] https://frontend-api.pump.fun/coins/6wBj2qG1jUPswsqn9G1gnFJgarxzyjizFxidfZH65dKd responded with 530
+2026-01-14T20:09:05: [pump-coin] All endpoints failed for 6wBj2qG1jUPswsqn9G1gnFJgarxzyjizFxidfZH65dKd: pump.fun coin request failed with status 530
+2026-01-14T20:09:05: [pump-coin] Failed to fetch coin 13wggeqG3pBU2zo89Fdt2J8YufATCYrKZxYXJwPpkVHw from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:05: [pump-coin] https://frontend-api.pump.fun/coins/13wggeqG3pBU2zo89Fdt2J8YufATCYrKZxYXJwPpkVHw responded with 530
+2026-01-14T20:09:05: [pump-coin] All endpoints failed for 13wggeqG3pBU2zo89Fdt2J8YufATCYrKZxYXJwPpkVHw: pump.fun coin request failed with status 530
+2026-01-14T20:09:05: [pump-coin] Failed to fetch coin 5mCMf3enuvHDhkkHvi33C842m1PqB6dvGtVruaHi7tG9 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:05: [pump-coin] https://frontend-api.pump.fun/coins/5mCMf3enuvHDhkkHvi33C842m1PqB6dvGtVruaHi7tG9 responded with 530
+2026-01-14T20:09:05: [pump-coin] All endpoints failed for 5mCMf3enuvHDhkkHvi33C842m1PqB6dvGtVruaHi7tG9: pump.fun coin request failed with status 530
+2026-01-14T20:09:06: [pump-coin] Failed to fetch coin 6LRA6CnrH6NVgiBySqQnajRs2L1vySHTr7f1e9Dhp4RE from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:06: [pump-coin] https://frontend-api.pump.fun/coins/6LRA6CnrH6NVgiBySqQnajRs2L1vySHTr7f1e9Dhp4RE responded with 530
+2026-01-14T20:09:06: [pump-coin] All endpoints failed for 6LRA6CnrH6NVgiBySqQnajRs2L1vySHTr7f1e9Dhp4RE: pump.fun coin request failed with status 530
+2026-01-14T20:09:06: [pump-coin] Failed to fetch coin 5NA94bui6DUy6WaxhHoHieMrzVLnzToGoBaAmhgGeNmG from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:06: [pump-coin] https://frontend-api.pump.fun/coins/5NA94bui6DUy6WaxhHoHieMrzVLnzToGoBaAmhgGeNmG responded with 530
+2026-01-14T20:09:06: [pump-coin] All endpoints failed for 5NA94bui6DUy6WaxhHoHieMrzVLnzToGoBaAmhgGeNmG: pump.fun coin request failed with status 530
+2026-01-14T20:09:06: [pump-coin] Failed to fetch coin 8MtUJG2GWWbuDZmxtG8jfYcja3fbGGVcMeAKEitZGvmi from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:06: [pump-coin] https://frontend-api.pump.fun/coins/8MtUJG2GWWbuDZmxtG8jfYcja3fbGGVcMeAKEitZGvmi responded with 530
+2026-01-14T20:09:06: [pump-coin] All endpoints failed for 8MtUJG2GWWbuDZmxtG8jfYcja3fbGGVcMeAKEitZGvmi: pump.fun coin request failed with status 530
+2026-01-14T20:09:06: [pump-coin] Failed to fetch coin 5vKcMpui5kTHFBDhyhu5jPs79s24yWwHaQ7X4GWwztJT from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:06: [pump-coin] https://frontend-api.pump.fun/coins/5vKcMpui5kTHFBDhyhu5jPs79s24yWwHaQ7X4GWwztJT responded with 530
+2026-01-14T20:09:06: [pump-coin] All endpoints failed for 5vKcMpui5kTHFBDhyhu5jPs79s24yWwHaQ7X4GWwztJT: pump.fun coin request failed with status 530
+2026-01-14T20:09:06: [pump-coin] Failed to fetch coin 5QnsWhUuDY3Qew8FuNziZWfT2anqwfQGZypLJYkmqdeV from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:06: [pump-coin] https://frontend-api.pump.fun/coins/5QnsWhUuDY3Qew8FuNziZWfT2anqwfQGZypLJYkmqdeV responded with 530
+2026-01-14T20:09:06: [pump-coin] All endpoints failed for 5QnsWhUuDY3Qew8FuNziZWfT2anqwfQGZypLJYkmqdeV: pump.fun coin request failed with status 530
+2026-01-14T20:09:07: [pump-coin] Failed to fetch coin 7uyWBYLiHQYXs16ggHm1DbP2zLzGXanvi8Y8zmHwGpJU from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:07: [pump-coin] https://frontend-api.pump.fun/coins/7uyWBYLiHQYXs16ggHm1DbP2zLzGXanvi8Y8zmHwGpJU responded with 530
+2026-01-14T20:09:07: [pump-coin] All endpoints failed for 7uyWBYLiHQYXs16ggHm1DbP2zLzGXanvi8Y8zmHwGpJU: pump.fun coin request failed with status 530
+2026-01-14T20:09:07: [pump-coin] Failed to fetch coin GQxGfTJgXj9ASrBWyMuESrNKJ4dd12v7zNSL2NzUinRA from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:07: [pump-coin] https://frontend-api.pump.fun/coins/GQxGfTJgXj9ASrBWyMuESrNKJ4dd12v7zNSL2NzUinRA responded with 530
+2026-01-14T20:09:07: [pump-coin] All endpoints failed for GQxGfTJgXj9ASrBWyMuESrNKJ4dd12v7zNSL2NzUinRA: pump.fun coin request failed with status 530
+2026-01-14T20:09:07: [pump-coin] Failed to fetch coin PECazcZMchmn86TfUVDVKeAtVaiKSJFQCZ9BvZfh3km from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:07: [pump-coin] https://frontend-api.pump.fun/coins/PECazcZMchmn86TfUVDVKeAtVaiKSJFQCZ9BvZfh3km responded with 530
+2026-01-14T20:09:07: [pump-coin] All endpoints failed for PECazcZMchmn86TfUVDVKeAtVaiKSJFQCZ9BvZfh3km: pump.fun coin request failed with status 530
+2026-01-14T20:09:08: [pump-coin] Failed to fetch coin 8PW9w3J14mWvb65DJ264bh73L7k1g9NsuWKjmfTBmZXd from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:08: [pump-coin] https://frontend-api.pump.fun/coins/8PW9w3J14mWvb65DJ264bh73L7k1g9NsuWKjmfTBmZXd responded with 530
+2026-01-14T20:09:08: [pump-coin] All endpoints failed for 8PW9w3J14mWvb65DJ264bh73L7k1g9NsuWKjmfTBmZXd: pump.fun coin request failed with status 530
+2026-01-14T20:09:09: [pump-coin] Failed to fetch coin Q3iZj2m3WRbiAar3uAQ1QFEQWW23m6beV8kzFWEmHP7 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:09: [pump-coin] https://frontend-api.pump.fun/coins/Q3iZj2m3WRbiAar3uAQ1QFEQWW23m6beV8kzFWEmHP7 responded with 530
+2026-01-14T20:09:09: [pump-coin] All endpoints failed for Q3iZj2m3WRbiAar3uAQ1QFEQWW23m6beV8kzFWEmHP7: pump.fun coin request failed with status 530
+2026-01-14T20:09:09: [pump-coin] Failed to fetch coin CgwW9y8aLVJKGSLbjRr23mY1iGSDpwgbQetLAph15fRk from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:09: [pump-coin] https://frontend-api.pump.fun/coins/CgwW9y8aLVJKGSLbjRr23mY1iGSDpwgbQetLAph15fRk responded with 530
+2026-01-14T20:09:09: [pump-coin] All endpoints failed for CgwW9y8aLVJKGSLbjRr23mY1iGSDpwgbQetLAph15fRk: pump.fun coin request failed with status 530
+2026-01-14T20:09:09: [pump-coin] Failed to fetch coin GsDYYF8ZHNidFL3oeXz4ThS7Ffpi1aHPvT5FX2nqoWa3 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:09: [pump-coin] https://frontend-api.pump.fun/coins/GsDYYF8ZHNidFL3oeXz4ThS7Ffpi1aHPvT5FX2nqoWa3 responded with 530
+2026-01-14T20:09:09: [pump-coin] All endpoints failed for GsDYYF8ZHNidFL3oeXz4ThS7Ffpi1aHPvT5FX2nqoWa3: pump.fun coin request failed with status 530
+2026-01-14T20:09:09: [pump-coin] Failed to fetch coin 9U3VyrPwdPxCqja88pYtALHU4DkkGe7P74EQGxWg62mM from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:09: [pump-coin] https://frontend-api.pump.fun/coins/9U3VyrPwdPxCqja88pYtALHU4DkkGe7P74EQGxWg62mM responded with 530
+2026-01-14T20:09:09: [pump-coin] All endpoints failed for 9U3VyrPwdPxCqja88pYtALHU4DkkGe7P74EQGxWg62mM: pump.fun coin request failed with status 530
+2026-01-14T20:09:10: [pump-coin] Failed to fetch coin 6ovHJHkGarQws9z7ChqfAFb8yVsunyjBHzSdiw9YZmLk from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:10: [pump-coin] https://frontend-api.pump.fun/coins/6ovHJHkGarQws9z7ChqfAFb8yVsunyjBHzSdiw9YZmLk responded with 530
+2026-01-14T20:09:10: [pump-coin] All endpoints failed for 6ovHJHkGarQws9z7ChqfAFb8yVsunyjBHzSdiw9YZmLk: pump.fun coin request failed with status 530
+2026-01-14T20:09:10: [pump-coin] Failed to fetch coin DnGoK2oYLyEAvEVgsYDiLHCYBuYUZUdxKd84uPPxpump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:10: [pump-coin] https://frontend-api.pump.fun/coins/DnGoK2oYLyEAvEVgsYDiLHCYBuYUZUdxKd84uPPxpump responded with 530
+2026-01-14T20:09:10: [pump-coin] All endpoints failed for DnGoK2oYLyEAvEVgsYDiLHCYBuYUZUdxKd84uPPxpump: pump.fun coin request failed with status 530
+2026-01-14T20:09:10: [pump-coin] Failed to fetch coin 7NVD35TWpShBSwnVZrMq2vY3sec31U7EDaEYFbfHfUrh from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:10: [pump-coin] https://frontend-api.pump.fun/coins/7NVD35TWpShBSwnVZrMq2vY3sec31U7EDaEYFbfHfUrh responded with 530
+2026-01-14T20:09:10: [pump-coin] All endpoints failed for 7NVD35TWpShBSwnVZrMq2vY3sec31U7EDaEYFbfHfUrh: pump.fun coin request failed with status 530
+2026-01-14T20:09:11: [pump-coin] Failed to fetch coin 4BSdiU2gGPqUXPXBXj8kbQtqtjK53d6PZvZFr1s8C4NB from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:11: [pump-coin] https://frontend-api.pump.fun/coins/4BSdiU2gGPqUXPXBXj8kbQtqtjK53d6PZvZFr1s8C4NB responded with 530
+2026-01-14T20:09:11: [pump-coin] All endpoints failed for 4BSdiU2gGPqUXPXBXj8kbQtqtjK53d6PZvZFr1s8C4NB: pump.fun coin request failed with status 530
+2026-01-14T20:09:14: [pump-coin] Failed to fetch coin CBWnsXToiZAKwJs5vx6YWX3QxrTCFZLgdUgHysfspump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:14: [pump-coin] https://frontend-api.pump.fun/coins/CBWnsXToiZAKwJs5vx6YWX3QxrTCFZLgdUgHysfspump responded with 530
+2026-01-14T20:09:14: [pump-coin] All endpoints failed for CBWnsXToiZAKwJs5vx6YWX3QxrTCFZLgdUgHysfspump: pump.fun coin request failed with status 530
+2026-01-14T20:09:15: [pump-coin] Failed to fetch coin 7XQ7hf3jFbzswf3KBuno7YzJ4NX38FfccmiXjE7Vfb9w from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:15: [pump-coin] https://frontend-api.pump.fun/coins/7XQ7hf3jFbzswf3KBuno7YzJ4NX38FfccmiXjE7Vfb9w responded with 530
+2026-01-14T20:09:15: [pump-coin] All endpoints failed for 7XQ7hf3jFbzswf3KBuno7YzJ4NX38FfccmiXjE7Vfb9w: pump.fun coin request failed with status 530
+2026-01-14T20:09:15: [pump-coin] Failed to fetch coin DbjLAT7Sx4gyShhp7jf9DAdvKZRSJDQtyqeYGVeoX8mf from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:15: [pump-coin] https://frontend-api.pump.fun/coins/DbjLAT7Sx4gyShhp7jf9DAdvKZRSJDQtyqeYGVeoX8mf responded with 530
+2026-01-14T20:09:15: [pump-coin] All endpoints failed for DbjLAT7Sx4gyShhp7jf9DAdvKZRSJDQtyqeYGVeoX8mf: pump.fun coin request failed with status 530
+2026-01-14T20:09:15: [pump-coin] Failed to fetch coin 69aK5KzghBzE5qLJ2q2CF29eUXy3bhrsQKmRHrdrabyh from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:15: [pump-coin] https://frontend-api.pump.fun/coins/69aK5KzghBzE5qLJ2q2CF29eUXy3bhrsQKmRHrdrabyh responded with 530
+2026-01-14T20:09:15: [pump-coin] All endpoints failed for 69aK5KzghBzE5qLJ2q2CF29eUXy3bhrsQKmRHrdrabyh: pump.fun coin request failed with status 530
+2026-01-14T20:09:16: [pump-coin] Failed to fetch coin GBeuJqw4FvKS8MPDLiohCo1GUK5q8rUP9PmbdVv82VjX from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:16: [pump-coin] https://frontend-api.pump.fun/coins/GBeuJqw4FvKS8MPDLiohCo1GUK5q8rUP9PmbdVv82VjX responded with 530
+2026-01-14T20:09:16: [pump-coin] All endpoints failed for GBeuJqw4FvKS8MPDLiohCo1GUK5q8rUP9PmbdVv82VjX: pump.fun coin request failed with status 530
+2026-01-14T20:09:16: [pump-coin] Failed to fetch coin 6CmzHq53AqzdFeziJDFBKjXYhEKcrBCSWqVmBbtHzvuz from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:16: [pump-coin] https://frontend-api.pump.fun/coins/6CmzHq53AqzdFeziJDFBKjXYhEKcrBCSWqVmBbtHzvuz responded with 530
+2026-01-14T20:09:16: [pump-coin] All endpoints failed for 6CmzHq53AqzdFeziJDFBKjXYhEKcrBCSWqVmBbtHzvuz: pump.fun coin request failed with status 530
+2026-01-14T20:09:17: [pump-coin] Failed to fetch coin 6MoDZYCW7ZeRba9i2P8Pru1mQ5fpM4X3hcouewp46y9S from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:17: [pump-coin] https://frontend-api.pump.fun/coins/6MoDZYCW7ZeRba9i2P8Pru1mQ5fpM4X3hcouewp46y9S responded with 530
+2026-01-14T20:09:17: [pump-coin] All endpoints failed for 6MoDZYCW7ZeRba9i2P8Pru1mQ5fpM4X3hcouewp46y9S: pump.fun coin request failed with status 530
+2026-01-14T20:09:17: [pump-coin] Failed to fetch coin 5yUAzNfehpbPPXd8Rnyt2Gs7VMXNrDEAUMqmdcdgpump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:17: [pump-coin] https://frontend-api.pump.fun/coins/5yUAzNfehpbPPXd8Rnyt2Gs7VMXNrDEAUMqmdcdgpump responded with 530
+2026-01-14T20:09:17: [pump-coin] All endpoints failed for 5yUAzNfehpbPPXd8Rnyt2Gs7VMXNrDEAUMqmdcdgpump: pump.fun coin request failed with status 530
+2026-01-14T20:09:17: [pump-coin] Failed to fetch coin 3wv3PFukRzyj1yTUujoy9QgEw84t8vgzw5PNC642pump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:17: [pump-coin] https://frontend-api.pump.fun/coins/3wv3PFukRzyj1yTUujoy9QgEw84t8vgzw5PNC642pump responded with 530
+2026-01-14T20:09:17: [pump-coin] All endpoints failed for 3wv3PFukRzyj1yTUujoy9QgEw84t8vgzw5PNC642pump: pump.fun coin request failed with status 530
+2026-01-14T20:09:33: [pump-coin] Failed to fetch coin DMFqQZHCdbDWgvmNdRdQMJcN2gLo6qmgKERcAC29pump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:33: [pump-coin] https://frontend-api.pump.fun/coins/DMFqQZHCdbDWgvmNdRdQMJcN2gLo6qmgKERcAC29pump responded with 530
+2026-01-14T20:09:33: [pump-coin] All endpoints failed for DMFqQZHCdbDWgvmNdRdQMJcN2gLo6qmgKERcAC29pump: pump.fun coin request failed with status 530
+2026-01-14T20:09:33: [pump-coin] Failed to fetch coin 42TCQRW8URpUsdbXYmhnJzXDb7HuugnraZdbvkdLfRnP from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:33: [pump-coin] https://frontend-api.pump.fun/coins/42TCQRW8URpUsdbXYmhnJzXDb7HuugnraZdbvkdLfRnP responded with 530
+2026-01-14T20:09:33: [pump-coin] All endpoints failed for 42TCQRW8URpUsdbXYmhnJzXDb7HuugnraZdbvkdLfRnP: pump.fun coin request failed with status 530
+2026-01-14T20:09:33: [pump-coin] Failed to fetch coin GDzTUWe7ztH6g7y7g77VJJh6KRBi8fDa6gHo54VMwSSy from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:33: [pump-coin] https://frontend-api.pump.fun/coins/GDzTUWe7ztH6g7y7g77VJJh6KRBi8fDa6gHo54VMwSSy responded with 530
+2026-01-14T20:09:33: [pump-coin] All endpoints failed for GDzTUWe7ztH6g7y7g77VJJh6KRBi8fDa6gHo54VMwSSy: pump.fun coin request failed with status 530
+2026-01-14T20:09:33: [pump-coin] Failed to fetch coin E6HPTSc4wubH4U8xpKSgyS6JXo9KvBkAUcBQqSTYf4uK from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:33: [pump-coin] https://frontend-api.pump.fun/coins/E6HPTSc4wubH4U8xpKSgyS6JXo9KvBkAUcBQqSTYf4uK responded with 530
+2026-01-14T20:09:33: [pump-coin] All endpoints failed for E6HPTSc4wubH4U8xpKSgyS6JXo9KvBkAUcBQqSTYf4uK: pump.fun coin request failed with status 530
+2026-01-14T20:09:33: [pump-coin] Failed to fetch coin zi4dXZzxWPjC5H5YMjedoiVqdzKLes6UY47c6xFpump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:33: [pump-coin] https://frontend-api.pump.fun/coins/zi4dXZzxWPjC5H5YMjedoiVqdzKLes6UY47c6xFpump responded with 530
+2026-01-14T20:09:33: [pump-coin] All endpoints failed for zi4dXZzxWPjC5H5YMjedoiVqdzKLes6UY47c6xFpump: pump.fun coin request failed with status 530
+2026-01-14T20:09:34: [pump-coin] Failed to fetch coin ZGPm6ACPjwMYAuXdn4X7sdLGxU72XZwVqvwBvnwpump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:34: [pump-coin] https://frontend-api.pump.fun/coins/ZGPm6ACPjwMYAuXdn4X7sdLGxU72XZwVqvwBvnwpump responded with 530
+2026-01-14T20:09:34: [pump-coin] All endpoints failed for ZGPm6ACPjwMYAuXdn4X7sdLGxU72XZwVqvwBvnwpump: pump.fun coin request failed with status 530
+2026-01-14T20:09:34: [pump-coin] Failed to fetch coin BhK6TrPiJ9hA3ATR98pXw1gnM2uKbNadkaxZNSavSjvo from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:34: [pump-coin] https://frontend-api.pump.fun/coins/BhK6TrPiJ9hA3ATR98pXw1gnM2uKbNadkaxZNSavSjvo responded with 530
+2026-01-14T20:09:34: [pump-coin] All endpoints failed for BhK6TrPiJ9hA3ATR98pXw1gnM2uKbNadkaxZNSavSjvo: pump.fun coin request failed with status 530
+2026-01-14T20:09:34: [pump-coin] Failed to fetch coin 3hVJC6UqRkMm1RQkG3FHNLX8L3deUb2x5eWzExAh4KBV from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:34: [pump-coin] https://frontend-api.pump.fun/coins/3hVJC6UqRkMm1RQkG3FHNLX8L3deUb2x5eWzExAh4KBV responded with 530
+2026-01-14T20:09:34: [pump-coin] All endpoints failed for 3hVJC6UqRkMm1RQkG3FHNLX8L3deUb2x5eWzExAh4KBV: pump.fun coin request failed with status 530
+2026-01-14T20:09:34: [pump-coin] Failed to fetch coin CNj25crKmMcApqiHkgTC4QRNSjTcp6h1Zrh1bWJGXYX1 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:34: [pump-coin] https://frontend-api.pump.fun/coins/CNj25crKmMcApqiHkgTC4QRNSjTcp6h1Zrh1bWJGXYX1 responded with 530
+2026-01-14T20:09:34: [pump-coin] All endpoints failed for CNj25crKmMcApqiHkgTC4QRNSjTcp6h1Zrh1bWJGXYX1: pump.fun coin request failed with status 530
+2026-01-14T20:09:34: [pump-coin] Failed to fetch coin 9TzbeT4jxducv8UhFh3hqXJwsdo87qrcrPBpwivrji1y from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:34: [pump-coin] https://frontend-api.pump.fun/coins/9TzbeT4jxducv8UhFh3hqXJwsdo87qrcrPBpwivrji1y responded with 530
+2026-01-14T20:09:34: [pump-coin] All endpoints failed for 9TzbeT4jxducv8UhFh3hqXJwsdo87qrcrPBpwivrji1y: pump.fun coin request failed with status 530
+2026-01-14T20:09:35: [pump-coin] Failed to fetch coin 3ZiXL811oAR4eY8XEY3pmKNnZy8JLbpLyybDD5jTornf from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:35: [pump-coin] https://frontend-api.pump.fun/coins/3ZiXL811oAR4eY8XEY3pmKNnZy8JLbpLyybDD5jTornf responded with 530
+2026-01-14T20:09:35: [pump-coin] All endpoints failed for 3ZiXL811oAR4eY8XEY3pmKNnZy8JLbpLyybDD5jTornf: pump.fun coin request failed with status 530
+2026-01-14T20:09:35: [pump-coin] Failed to fetch coin CSwb1hX2WA4xYa5ewTdrytnnDpJ4mFcqqiAWfZziWCXZ from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:35: [pump-coin] https://frontend-api.pump.fun/coins/CSwb1hX2WA4xYa5ewTdrytnnDpJ4mFcqqiAWfZziWCXZ responded with 530
+2026-01-14T20:09:35: [pump-coin] All endpoints failed for CSwb1hX2WA4xYa5ewTdrytnnDpJ4mFcqqiAWfZziWCXZ: pump.fun coin request failed with status 530
+2026-01-14T20:09:35: [pump-coin] Failed to fetch coin 5smab9DE55x3LnJRM5XUyrXw6kk1if2NgWN47rCHq7fP from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:35: [pump-coin] https://frontend-api.pump.fun/coins/5smab9DE55x3LnJRM5XUyrXw6kk1if2NgWN47rCHq7fP responded with 530
+2026-01-14T20:09:35: [pump-coin] All endpoints failed for 5smab9DE55x3LnJRM5XUyrXw6kk1if2NgWN47rCHq7fP: pump.fun coin request failed with status 530
+2026-01-14T20:09:35: [pump-coin] Failed to fetch coin J7SAqHACevpxVAXrYdmv49CtrAK4KjW4CKaCmWTDnZFZ from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:35: [pump-coin] https://frontend-api.pump.fun/coins/J7SAqHACevpxVAXrYdmv49CtrAK4KjW4CKaCmWTDnZFZ responded with 530
+2026-01-14T20:09:35: [pump-coin] All endpoints failed for J7SAqHACevpxVAXrYdmv49CtrAK4KjW4CKaCmWTDnZFZ: pump.fun coin request failed with status 530
+2026-01-14T20:09:35: [pump-coin] Failed to fetch coin CZgAHLgdvrATfoJJoRnx4NCv9G9DsWhEsP3X4DX7yH8a from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:35: [pump-coin] https://frontend-api.pump.fun/coins/CZgAHLgdvrATfoJJoRnx4NCv9G9DsWhEsP3X4DX7yH8a responded with 530
+2026-01-14T20:09:35: [pump-coin] All endpoints failed for CZgAHLgdvrATfoJJoRnx4NCv9G9DsWhEsP3X4DX7yH8a: pump.fun coin request failed with status 530
+2026-01-14T20:09:48: [pump-coin] Failed to fetch coin 9H62dXYm38C5V1TszzYbFyEzkLFP62x1QZxAF7Re1aaM from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:48: [pump-coin] https://frontend-api.pump.fun/coins/9H62dXYm38C5V1TszzYbFyEzkLFP62x1QZxAF7Re1aaM responded with 530
+2026-01-14T20:09:48: [pump-coin] All endpoints failed for 9H62dXYm38C5V1TszzYbFyEzkLFP62x1QZxAF7Re1aaM: pump.fun coin request failed with status 530
+2026-01-14T20:09:49: [pump-coin] Failed to fetch coin BeNLsmXhhCCJAnCLW95xARk1SqhxybzdAKpK85ubUV3p from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:49: [pump-coin] https://frontend-api.pump.fun/coins/BeNLsmXhhCCJAnCLW95xARk1SqhxybzdAKpK85ubUV3p responded with 530
+2026-01-14T20:09:49: [pump-coin] All endpoints failed for BeNLsmXhhCCJAnCLW95xARk1SqhxybzdAKpK85ubUV3p: pump.fun coin request failed with status 530
+2026-01-14T20:09:49: [pump-coin] Failed to fetch coin 2Zx4qheiHNKbSPHNa1ypNVzdWNwKc1Jrhoou8SE9XoJv from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:49: [pump-coin] https://frontend-api.pump.fun/coins/2Zx4qheiHNKbSPHNa1ypNVzdWNwKc1Jrhoou8SE9XoJv responded with 530
+2026-01-14T20:09:49: [pump-coin] All endpoints failed for 2Zx4qheiHNKbSPHNa1ypNVzdWNwKc1Jrhoou8SE9XoJv: pump.fun coin request failed with status 530
+2026-01-14T20:09:49: [pump-coin] Failed to fetch coin DaoLAeA3GpA7HR2NUH23vFmPeiZaTJmYit6ZgTV2TQjh from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:49: [pump-coin] https://frontend-api.pump.fun/coins/DaoLAeA3GpA7HR2NUH23vFmPeiZaTJmYit6ZgTV2TQjh responded with 530
+2026-01-14T20:09:49: [pump-coin] All endpoints failed for DaoLAeA3GpA7HR2NUH23vFmPeiZaTJmYit6ZgTV2TQjh: pump.fun coin request failed with status 530
+2026-01-14T20:09:49: [pump-coin] Failed to fetch coin Gpw8BDVDFrpCGgHmpPpdEQUsodypt2x7YfnGMQ9XVTw1 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:49: [pump-coin] https://frontend-api.pump.fun/coins/Gpw8BDVDFrpCGgHmpPpdEQUsodypt2x7YfnGMQ9XVTw1 responded with 530
+2026-01-14T20:09:49: [pump-coin] All endpoints failed for Gpw8BDVDFrpCGgHmpPpdEQUsodypt2x7YfnGMQ9XVTw1: pump.fun coin request failed with status 530
+2026-01-14T20:09:49: [pump-coin] Failed to fetch coin 5fA3Gepc3Xqzd1GBddXigUEjY5LSb4k6HkZb3jeHtwvh from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:50: [pump-coin] https://frontend-api.pump.fun/coins/5fA3Gepc3Xqzd1GBddXigUEjY5LSb4k6HkZb3jeHtwvh responded with 530
+2026-01-14T20:09:50: [pump-coin] All endpoints failed for 5fA3Gepc3Xqzd1GBddXigUEjY5LSb4k6HkZb3jeHtwvh: pump.fun coin request failed with status 530
+2026-01-14T20:09:50: [pump-coin] Failed to fetch coin 2ast17D5bVtXix3mE3rtspbvFusjPUDFTCx2ZgNqpFmT from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:50: [pump-coin] https://frontend-api.pump.fun/coins/2ast17D5bVtXix3mE3rtspbvFusjPUDFTCx2ZgNqpFmT responded with 530
+2026-01-14T20:09:50: [pump-coin] All endpoints failed for 2ast17D5bVtXix3mE3rtspbvFusjPUDFTCx2ZgNqpFmT: pump.fun coin request failed with status 530
+2026-01-14T20:09:50: [pump-coin] Failed to fetch coin EzudGy5TdRgXNhs3jd4a28V3ARw5VXyjMrZkxQtro8ZH from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:50: [pump-coin] https://frontend-api.pump.fun/coins/EzudGy5TdRgXNhs3jd4a28V3ARw5VXyjMrZkxQtro8ZH responded with 530
+2026-01-14T20:09:50: [pump-coin] All endpoints failed for EzudGy5TdRgXNhs3jd4a28V3ARw5VXyjMrZkxQtro8ZH: pump.fun coin request failed with status 530
+2026-01-14T20:09:50: [pump-coin] Failed to fetch coin 79745PRjSLwDzGVLJboJ2m2MSMRD1zb38UwAMFiZt1Cs from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:50: [pump-coin] https://frontend-api.pump.fun/coins/79745PRjSLwDzGVLJboJ2m2MSMRD1zb38UwAMFiZt1Cs responded with 530
+2026-01-14T20:09:50: [pump-coin] All endpoints failed for 79745PRjSLwDzGVLJboJ2m2MSMRD1zb38UwAMFiZt1Cs: pump.fun coin request failed with status 530
+2026-01-14T20:09:50: [pump-coin] Failed to fetch coin 6wBj2qG1jUPswsqn9G1gnFJgarxzyjizFxidfZH65dKd from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:50: [pump-coin] https://frontend-api.pump.fun/coins/6wBj2qG1jUPswsqn9G1gnFJgarxzyjizFxidfZH65dKd responded with 530
+2026-01-14T20:09:50: [pump-coin] All endpoints failed for 6wBj2qG1jUPswsqn9G1gnFJgarxzyjizFxidfZH65dKd: pump.fun coin request failed with status 530
+2026-01-14T20:09:51: [pump-coin] Failed to fetch coin 13wggeqG3pBU2zo89Fdt2J8YufATCYrKZxYXJwPpkVHw from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:51: [pump-coin] https://frontend-api.pump.fun/coins/13wggeqG3pBU2zo89Fdt2J8YufATCYrKZxYXJwPpkVHw responded with 530
+2026-01-14T20:09:51: [pump-coin] All endpoints failed for 13wggeqG3pBU2zo89Fdt2J8YufATCYrKZxYXJwPpkVHw: pump.fun coin request failed with status 530
+2026-01-14T20:09:51: [pump-coin] Failed to fetch coin 5mCMf3enuvHDhkkHvi33C842m1PqB6dvGtVruaHi7tG9 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:51: [pump-coin] https://frontend-api.pump.fun/coins/5mCMf3enuvHDhkkHvi33C842m1PqB6dvGtVruaHi7tG9 responded with 530
+2026-01-14T20:09:51: [pump-coin] All endpoints failed for 5mCMf3enuvHDhkkHvi33C842m1PqB6dvGtVruaHi7tG9: pump.fun coin request failed with status 530
+2026-01-14T20:09:51: [pump-coin] Failed to fetch coin 6LRA6CnrH6NVgiBySqQnajRs2L1vySHTr7f1e9Dhp4RE from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:51: [pump-coin] https://frontend-api.pump.fun/coins/6LRA6CnrH6NVgiBySqQnajRs2L1vySHTr7f1e9Dhp4RE responded with 530
+2026-01-14T20:09:51: [pump-coin] All endpoints failed for 6LRA6CnrH6NVgiBySqQnajRs2L1vySHTr7f1e9Dhp4RE: pump.fun coin request failed with status 530
+2026-01-14T20:09:51: [pump-coin] Failed to fetch coin 5NA94bui6DUy6WaxhHoHieMrzVLnzToGoBaAmhgGeNmG from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:51: [pump-coin] https://frontend-api.pump.fun/coins/5NA94bui6DUy6WaxhHoHieMrzVLnzToGoBaAmhgGeNmG responded with 530
+2026-01-14T20:09:51: [pump-coin] All endpoints failed for 5NA94bui6DUy6WaxhHoHieMrzVLnzToGoBaAmhgGeNmG: pump.fun coin request failed with status 530
+2026-01-14T20:09:52: [pump-coin] Failed to fetch coin 8MtUJG2GWWbuDZmxtG8jfYcja3fbGGVcMeAKEitZGvmi from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:52: [pump-coin] https://frontend-api.pump.fun/coins/8MtUJG2GWWbuDZmxtG8jfYcja3fbGGVcMeAKEitZGvmi responded with 530
+2026-01-14T20:09:52: [pump-coin] All endpoints failed for 8MtUJG2GWWbuDZmxtG8jfYcja3fbGGVcMeAKEitZGvmi: pump.fun coin request failed with status 530
+2026-01-14T20:09:52: [pump-coin] Failed to fetch coin 5vKcMpui5kTHFBDhyhu5jPs79s24yWwHaQ7X4GWwztJT from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:52: [pump-coin] https://frontend-api.pump.fun/coins/5vKcMpui5kTHFBDhyhu5jPs79s24yWwHaQ7X4GWwztJT responded with 530
+2026-01-14T20:09:52: [pump-coin] All endpoints failed for 5vKcMpui5kTHFBDhyhu5jPs79s24yWwHaQ7X4GWwztJT: pump.fun coin request failed with status 530
+2026-01-14T20:09:52: [pump-coin] Failed to fetch coin 5QnsWhUuDY3Qew8FuNziZWfT2anqwfQGZypLJYkmqdeV from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:52: [pump-coin] https://frontend-api.pump.fun/coins/5QnsWhUuDY3Qew8FuNziZWfT2anqwfQGZypLJYkmqdeV responded with 530
+2026-01-14T20:09:52: [pump-coin] All endpoints failed for 5QnsWhUuDY3Qew8FuNziZWfT2anqwfQGZypLJYkmqdeV: pump.fun coin request failed with status 530
+2026-01-14T20:09:53: [pump-coin] Failed to fetch coin 7uyWBYLiHQYXs16ggHm1DbP2zLzGXanvi8Y8zmHwGpJU from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:53: [pump-coin] https://frontend-api.pump.fun/coins/7uyWBYLiHQYXs16ggHm1DbP2zLzGXanvi8Y8zmHwGpJU responded with 530
+2026-01-14T20:09:53: [pump-coin] All endpoints failed for 7uyWBYLiHQYXs16ggHm1DbP2zLzGXanvi8Y8zmHwGpJU: pump.fun coin request failed with status 530
+2026-01-14T20:09:53: [pump-coin] Failed to fetch coin GQxGfTJgXj9ASrBWyMuESrNKJ4dd12v7zNSL2NzUinRA from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:54: [pump-coin] https://frontend-api.pump.fun/coins/GQxGfTJgXj9ASrBWyMuESrNKJ4dd12v7zNSL2NzUinRA responded with 530
+2026-01-14T20:09:54: [pump-coin] All endpoints failed for GQxGfTJgXj9ASrBWyMuESrNKJ4dd12v7zNSL2NzUinRA: pump.fun coin request failed with status 530
+2026-01-14T20:09:54: [pump-coin] Failed to fetch coin PECazcZMchmn86TfUVDVKeAtVaiKSJFQCZ9BvZfh3km from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:54: [pump-coin] https://frontend-api.pump.fun/coins/PECazcZMchmn86TfUVDVKeAtVaiKSJFQCZ9BvZfh3km responded with 530
+2026-01-14T20:09:54: [pump-coin] All endpoints failed for PECazcZMchmn86TfUVDVKeAtVaiKSJFQCZ9BvZfh3km: pump.fun coin request failed with status 530
+2026-01-14T20:09:54: [pump-coin] Failed to fetch coin 8PW9w3J14mWvb65DJ264bh73L7k1g9NsuWKjmfTBmZXd from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:54: [pump-coin] https://frontend-api.pump.fun/coins/8PW9w3J14mWvb65DJ264bh73L7k1g9NsuWKjmfTBmZXd responded with 530
+2026-01-14T20:09:54: [pump-coin] All endpoints failed for 8PW9w3J14mWvb65DJ264bh73L7k1g9NsuWKjmfTBmZXd: pump.fun coin request failed with status 530
+2026-01-14T20:09:57: [pump-coin] Failed to fetch coin Q3iZj2m3WRbiAar3uAQ1QFEQWW23m6beV8kzFWEmHP7 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:57: [pump-coin] https://frontend-api.pump.fun/coins/Q3iZj2m3WRbiAar3uAQ1QFEQWW23m6beV8kzFWEmHP7 responded with 530
+2026-01-14T20:09:57: [pump-coin] All endpoints failed for Q3iZj2m3WRbiAar3uAQ1QFEQWW23m6beV8kzFWEmHP7: pump.fun coin request failed with status 530
+2026-01-14T20:09:57: [pump-coin] Failed to fetch coin CgwW9y8aLVJKGSLbjRr23mY1iGSDpwgbQetLAph15fRk from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:57: [pump-coin] https://frontend-api.pump.fun/coins/CgwW9y8aLVJKGSLbjRr23mY1iGSDpwgbQetLAph15fRk responded with 530
+2026-01-14T20:09:57: [pump-coin] All endpoints failed for CgwW9y8aLVJKGSLbjRr23mY1iGSDpwgbQetLAph15fRk: pump.fun coin request failed with status 530
+2026-01-14T20:09:57: [pump-coin] Failed to fetch coin GsDYYF8ZHNidFL3oeXz4ThS7Ffpi1aHPvT5FX2nqoWa3 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:58: [pump-coin] https://frontend-api.pump.fun/coins/GsDYYF8ZHNidFL3oeXz4ThS7Ffpi1aHPvT5FX2nqoWa3 responded with 530
+2026-01-14T20:09:58: [pump-coin] All endpoints failed for GsDYYF8ZHNidFL3oeXz4ThS7Ffpi1aHPvT5FX2nqoWa3: pump.fun coin request failed with status 530
+2026-01-14T20:09:58: [pump-coin] Failed to fetch coin 9U3VyrPwdPxCqja88pYtALHU4DkkGe7P74EQGxWg62mM from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:58: [pump-coin] https://frontend-api.pump.fun/coins/9U3VyrPwdPxCqja88pYtALHU4DkkGe7P74EQGxWg62mM responded with 530
+2026-01-14T20:09:58: [pump-coin] All endpoints failed for 9U3VyrPwdPxCqja88pYtALHU4DkkGe7P74EQGxWg62mM: pump.fun coin request failed with status 530
+2026-01-14T20:09:58: [pump-coin] Failed to fetch coin 6ovHJHkGarQws9z7ChqfAFb8yVsunyjBHzSdiw9YZmLk from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:58: [pump-coin] https://frontend-api.pump.fun/coins/6ovHJHkGarQws9z7ChqfAFb8yVsunyjBHzSdiw9YZmLk responded with 530
+2026-01-14T20:09:58: [pump-coin] All endpoints failed for 6ovHJHkGarQws9z7ChqfAFb8yVsunyjBHzSdiw9YZmLk: pump.fun coin request failed with status 530
+2026-01-14T20:09:58: [pump-coin] Failed to fetch coin DnGoK2oYLyEAvEVgsYDiLHCYBuYUZUdxKd84uPPxpump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:58: [pump-coin] https://frontend-api.pump.fun/coins/DnGoK2oYLyEAvEVgsYDiLHCYBuYUZUdxKd84uPPxpump responded with 530
+2026-01-14T20:09:58: [pump-coin] All endpoints failed for DnGoK2oYLyEAvEVgsYDiLHCYBuYUZUdxKd84uPPxpump: pump.fun coin request failed with status 530
+2026-01-14T20:09:59: [pump-coin] Failed to fetch coin 7NVD35TWpShBSwnVZrMq2vY3sec31U7EDaEYFbfHfUrh from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:59: [pump-coin] https://frontend-api.pump.fun/coins/7NVD35TWpShBSwnVZrMq2vY3sec31U7EDaEYFbfHfUrh responded with 530
+2026-01-14T20:09:59: [pump-coin] All endpoints failed for 7NVD35TWpShBSwnVZrMq2vY3sec31U7EDaEYFbfHfUrh: pump.fun coin request failed with status 530
+2026-01-14T20:10:00: [pump-coin] Failed to fetch coin 4BSdiU2gGPqUXPXBXj8kbQtqtjK53d6PZvZFr1s8C4NB from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:00: [pump-coin] https://frontend-api.pump.fun/coins/4BSdiU2gGPqUXPXBXj8kbQtqtjK53d6PZvZFr1s8C4NB responded with 530
+2026-01-14T20:10:00: [pump-coin] All endpoints failed for 4BSdiU2gGPqUXPXBXj8kbQtqtjK53d6PZvZFr1s8C4NB: pump.fun coin request failed with status 530
+2026-01-14T20:10:03: [pump-coin] Failed to fetch coin CBWnsXToiZAKwJs5vx6YWX3QxrTCFZLgdUgHysfspump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:03: [pump-coin] https://frontend-api.pump.fun/coins/CBWnsXToiZAKwJs5vx6YWX3QxrTCFZLgdUgHysfspump responded with 530
+2026-01-14T20:10:03: [pump-coin] All endpoints failed for CBWnsXToiZAKwJs5vx6YWX3QxrTCFZLgdUgHysfspump: pump.fun coin request failed with status 530
+2026-01-14T20:10:03: [pump-coin] Failed to fetch coin 7XQ7hf3jFbzswf3KBuno7YzJ4NX38FfccmiXjE7Vfb9w from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:03: [pump-coin] https://frontend-api.pump.fun/coins/7XQ7hf3jFbzswf3KBuno7YzJ4NX38FfccmiXjE7Vfb9w responded with 530
+2026-01-14T20:10:03: [pump-coin] All endpoints failed for 7XQ7hf3jFbzswf3KBuno7YzJ4NX38FfccmiXjE7Vfb9w: pump.fun coin request failed with status 530
+2026-01-14T20:10:04: [pump-coin] Failed to fetch coin DbjLAT7Sx4gyShhp7jf9DAdvKZRSJDQtyqeYGVeoX8mf from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:04: [pump-coin] https://frontend-api.pump.fun/coins/DbjLAT7Sx4gyShhp7jf9DAdvKZRSJDQtyqeYGVeoX8mf responded with 530
+2026-01-14T20:10:04: [pump-coin] All endpoints failed for DbjLAT7Sx4gyShhp7jf9DAdvKZRSJDQtyqeYGVeoX8mf: pump.fun coin request failed with status 530
+2026-01-14T20:10:04: [pump-coin] Failed to fetch coin 69aK5KzghBzE5qLJ2q2CF29eUXy3bhrsQKmRHrdrabyh from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:04: [pump-coin] https://frontend-api.pump.fun/coins/69aK5KzghBzE5qLJ2q2CF29eUXy3bhrsQKmRHrdrabyh responded with 530
+2026-01-14T20:10:04: [pump-coin] All endpoints failed for 69aK5KzghBzE5qLJ2q2CF29eUXy3bhrsQKmRHrdrabyh: pump.fun coin request failed with status 530
+2026-01-14T20:10:04: [pump-coin] Failed to fetch coin GBeuJqw4FvKS8MPDLiohCo1GUK5q8rUP9PmbdVv82VjX from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:05: [pump-coin] https://frontend-api.pump.fun/coins/GBeuJqw4FvKS8MPDLiohCo1GUK5q8rUP9PmbdVv82VjX responded with 530
+2026-01-14T20:10:05: [pump-coin] All endpoints failed for GBeuJqw4FvKS8MPDLiohCo1GUK5q8rUP9PmbdVv82VjX: pump.fun coin request failed with status 530
+2026-01-14T20:10:05: [pump-coin] Failed to fetch coin 6CmzHq53AqzdFeziJDFBKjXYhEKcrBCSWqVmBbtHzvuz from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:05: [pump-coin] https://frontend-api.pump.fun/coins/6CmzHq53AqzdFeziJDFBKjXYhEKcrBCSWqVmBbtHzvuz responded with 530
+2026-01-14T20:10:05: [pump-coin] All endpoints failed for 6CmzHq53AqzdFeziJDFBKjXYhEKcrBCSWqVmBbtHzvuz: pump.fun coin request failed with status 530
+2026-01-14T20:10:05: [pump-coin] Failed to fetch coin 6MoDZYCW7ZeRba9i2P8Pru1mQ5fpM4X3hcouewp46y9S from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:05: [pump-coin] https://frontend-api.pump.fun/coins/6MoDZYCW7ZeRba9i2P8Pru1mQ5fpM4X3hcouewp46y9S responded with 530
+2026-01-14T20:10:05: [pump-coin] All endpoints failed for 6MoDZYCW7ZeRba9i2P8Pru1mQ5fpM4X3hcouewp46y9S: pump.fun coin request failed with status 530
+2026-01-14T20:10:05: [pump-coin] Failed to fetch coin 5yUAzNfehpbPPXd8Rnyt2Gs7VMXNrDEAUMqmdcdgpump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:05: [pump-coin] https://frontend-api.pump.fun/coins/5yUAzNfehpbPPXd8Rnyt2Gs7VMXNrDEAUMqmdcdgpump responded with 530
+2026-01-14T20:10:05: [pump-coin] All endpoints failed for 5yUAzNfehpbPPXd8Rnyt2Gs7VMXNrDEAUMqmdcdgpump: pump.fun coin request failed with status 530
+2026-01-14T20:10:06: [pump-coin] Failed to fetch coin 3wv3PFukRzyj1yTUujoy9QgEw84t8vgzw5PNC642pump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:06: [pump-coin] https://frontend-api.pump.fun/coins/3wv3PFukRzyj1yTUujoy9QgEw84t8vgzw5PNC642pump responded with 530
+2026-01-14T20:10:06: [pump-coin] All endpoints failed for 3wv3PFukRzyj1yTUujoy9QgEw84t8vgzw5PNC642pump: pump.fun coin request failed with status 530
+2026-01-14T20:10:24: [pump-coin] Failed to fetch coin DMFqQZHCdbDWgvmNdRdQMJcN2gLo6qmgKERcAC29pump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:24: [pump-coin] https://frontend-api.pump.fun/coins/DMFqQZHCdbDWgvmNdRdQMJcN2gLo6qmgKERcAC29pump responded with 530
+2026-01-14T20:10:24: [pump-coin] All endpoints failed for DMFqQZHCdbDWgvmNdRdQMJcN2gLo6qmgKERcAC29pump: pump.fun coin request failed with status 530
+2026-01-14T20:10:25: [pump-coin] Failed to fetch coin 42TCQRW8URpUsdbXYmhnJzXDb7HuugnraZdbvkdLfRnP from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:25: [pump-coin] https://frontend-api.pump.fun/coins/42TCQRW8URpUsdbXYmhnJzXDb7HuugnraZdbvkdLfRnP responded with 530
+2026-01-14T20:10:25: [pump-coin] All endpoints failed for 42TCQRW8URpUsdbXYmhnJzXDb7HuugnraZdbvkdLfRnP: pump.fun coin request failed with status 530
+2026-01-14T20:10:25: [pump-coin] Failed to fetch coin GDzTUWe7ztH6g7y7g77VJJh6KRBi8fDa6gHo54VMwSSy from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:25: [pump-coin] https://frontend-api.pump.fun/coins/GDzTUWe7ztH6g7y7g77VJJh6KRBi8fDa6gHo54VMwSSy responded with 530
+2026-01-14T20:10:25: [pump-coin] All endpoints failed for GDzTUWe7ztH6g7y7g77VJJh6KRBi8fDa6gHo54VMwSSy: pump.fun coin request failed with status 530
+2026-01-14T20:10:25: [pump-coin] Failed to fetch coin E6HPTSc4wubH4U8xpKSgyS6JXo9KvBkAUcBQqSTYf4uK from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:25: [pump-coin] https://frontend-api.pump.fun/coins/E6HPTSc4wubH4U8xpKSgyS6JXo9KvBkAUcBQqSTYf4uK responded with 530
+2026-01-14T20:10:25: [pump-coin] All endpoints failed for E6HPTSc4wubH4U8xpKSgyS6JXo9KvBkAUcBQqSTYf4uK: pump.fun coin request failed with status 530
+2026-01-14T20:10:25: [pump-coin] Failed to fetch coin zi4dXZzxWPjC5H5YMjedoiVqdzKLes6UY47c6xFpump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:25: [pump-coin] https://frontend-api.pump.fun/coins/zi4dXZzxWPjC5H5YMjedoiVqdzKLes6UY47c6xFpump responded with 530
+2026-01-14T20:10:25: [pump-coin] All endpoints failed for zi4dXZzxWPjC5H5YMjedoiVqdzKLes6UY47c6xFpump: pump.fun coin request failed with status 530
+2026-01-14T20:10:25: [pump-coin] Failed to fetch coin ZGPm6ACPjwMYAuXdn4X7sdLGxU72XZwVqvwBvnwpump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:25: [pump-coin] https://frontend-api.pump.fun/coins/ZGPm6ACPjwMYAuXdn4X7sdLGxU72XZwVqvwBvnwpump responded with 530
+2026-01-14T20:10:25: [pump-coin] All endpoints failed for ZGPm6ACPjwMYAuXdn4X7sdLGxU72XZwVqvwBvnwpump: pump.fun coin request failed with status 530
+2026-01-14T20:10:26: [pump-coin] Failed to fetch coin BhK6TrPiJ9hA3ATR98pXw1gnM2uKbNadkaxZNSavSjvo from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:26: [pump-coin] https://frontend-api.pump.fun/coins/BhK6TrPiJ9hA3ATR98pXw1gnM2uKbNadkaxZNSavSjvo responded with 530
+2026-01-14T20:10:26: [pump-coin] All endpoints failed for BhK6TrPiJ9hA3ATR98pXw1gnM2uKbNadkaxZNSavSjvo: pump.fun coin request failed with status 530
+2026-01-14T20:10:26: [pump-coin] Failed to fetch coin 3hVJC6UqRkMm1RQkG3FHNLX8L3deUb2x5eWzExAh4KBV from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:26: [pump-coin] https://frontend-api.pump.fun/coins/3hVJC6UqRkMm1RQkG3FHNLX8L3deUb2x5eWzExAh4KBV responded with 530
+2026-01-14T20:10:26: [pump-coin] All endpoints failed for 3hVJC6UqRkMm1RQkG3FHNLX8L3deUb2x5eWzExAh4KBV: pump.fun coin request failed with status 530
+2026-01-14T20:10:26: [pump-coin] Failed to fetch coin CNj25crKmMcApqiHkgTC4QRNSjTcp6h1Zrh1bWJGXYX1 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:26: [pump-coin] https://frontend-api.pump.fun/coins/CNj25crKmMcApqiHkgTC4QRNSjTcp6h1Zrh1bWJGXYX1 responded with 530
+2026-01-14T20:10:26: [pump-coin] All endpoints failed for CNj25crKmMcApqiHkgTC4QRNSjTcp6h1Zrh1bWJGXYX1: pump.fun coin request failed with status 530
+2026-01-14T20:10:26: [pump-coin] Failed to fetch coin 9TzbeT4jxducv8UhFh3hqXJwsdo87qrcrPBpwivrji1y from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:26: [pump-coin] https://frontend-api.pump.fun/coins/9TzbeT4jxducv8UhFh3hqXJwsdo87qrcrPBpwivrji1y responded with 530
+2026-01-14T20:10:26: [pump-coin] All endpoints failed for 9TzbeT4jxducv8UhFh3hqXJwsdo87qrcrPBpwivrji1y: pump.fun coin request failed with status 530
+2026-01-14T20:10:26: [pump-coin] Failed to fetch coin 3ZiXL811oAR4eY8XEY3pmKNnZy8JLbpLyybDD5jTornf from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:26: [pump-coin] https://frontend-api.pump.fun/coins/3ZiXL811oAR4eY8XEY3pmKNnZy8JLbpLyybDD5jTornf responded with 530
+2026-01-14T20:10:26: [pump-coin] All endpoints failed for 3ZiXL811oAR4eY8XEY3pmKNnZy8JLbpLyybDD5jTornf: pump.fun coin request failed with status 530
+2026-01-14T20:10:26: [pump-coin] Failed to fetch coin CSwb1hX2WA4xYa5ewTdrytnnDpJ4mFcqqiAWfZziWCXZ from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:27: [pump-coin] https://frontend-api.pump.fun/coins/CSwb1hX2WA4xYa5ewTdrytnnDpJ4mFcqqiAWfZziWCXZ responded with 530
+2026-01-14T20:10:27: [pump-coin] All endpoints failed for CSwb1hX2WA4xYa5ewTdrytnnDpJ4mFcqqiAWfZziWCXZ: pump.fun coin request failed with status 530
+2026-01-14T20:10:27: [pump-coin] Failed to fetch coin 5smab9DE55x3LnJRM5XUyrXw6kk1if2NgWN47rCHq7fP from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:27: [pump-coin] https://frontend-api.pump.fun/coins/5smab9DE55x3LnJRM5XUyrXw6kk1if2NgWN47rCHq7fP responded with 530
+2026-01-14T20:10:27: [pump-coin] All endpoints failed for 5smab9DE55x3LnJRM5XUyrXw6kk1if2NgWN47rCHq7fP: pump.fun coin request failed with status 530
+2026-01-14T20:10:27: [pump-coin] Failed to fetch coin J7SAqHACevpxVAXrYdmv49CtrAK4KjW4CKaCmWTDnZFZ from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:27: [pump-coin] https://frontend-api.pump.fun/coins/J7SAqHACevpxVAXrYdmv49CtrAK4KjW4CKaCmWTDnZFZ responded with 530
+2026-01-14T20:10:27: [pump-coin] All endpoints failed for J7SAqHACevpxVAXrYdmv49CtrAK4KjW4CKaCmWTDnZFZ: pump.fun coin request failed with status 530
+2026-01-14T20:10:27: [pump-coin] Failed to fetch coin CZgAHLgdvrATfoJJoRnx4NCv9G9DsWhEsP3X4DX7yH8a from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:27: [pump-coin] https://frontend-api.pump.fun/coins/CZgAHLgdvrATfoJJoRnx4NCv9G9DsWhEsP3X4DX7yH8a responded with 530
+2026-01-14T20:10:27: [pump-coin] All endpoints failed for CZgAHLgdvrATfoJJoRnx4NCv9G9DsWhEsP3X4DX7yH8a: pump.fun coin request failed with status 530
+2026-01-14T20:12:35: [pump-coin] Failed to fetch coin 9H62dXYm38C5V1TszzYbFyEzkLFP62x1QZxAF7Re1aaM from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:35: [pump-coin] https://frontend-api.pump.fun/coins/9H62dXYm38C5V1TszzYbFyEzkLFP62x1QZxAF7Re1aaM responded with 530
+2026-01-14T20:12:35: [pump-coin] All endpoints failed for 9H62dXYm38C5V1TszzYbFyEzkLFP62x1QZxAF7Re1aaM: pump.fun coin request failed with status 530
+2026-01-14T20:12:35: [pump-coin] Failed to fetch coin BeNLsmXhhCCJAnCLW95xARk1SqhxybzdAKpK85ubUV3p from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:35: [pump-coin] https://frontend-api.pump.fun/coins/BeNLsmXhhCCJAnCLW95xARk1SqhxybzdAKpK85ubUV3p responded with 530
+2026-01-14T20:12:35: [pump-coin] All endpoints failed for BeNLsmXhhCCJAnCLW95xARk1SqhxybzdAKpK85ubUV3p: pump.fun coin request failed with status 530
+2026-01-14T20:12:35: [pump-coin] Failed to fetch coin 2Zx4qheiHNKbSPHNa1ypNVzdWNwKc1Jrhoou8SE9XoJv from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:35: [pump-coin] https://frontend-api.pump.fun/coins/2Zx4qheiHNKbSPHNa1ypNVzdWNwKc1Jrhoou8SE9XoJv responded with 530
+2026-01-14T20:12:35: [pump-coin] All endpoints failed for 2Zx4qheiHNKbSPHNa1ypNVzdWNwKc1Jrhoou8SE9XoJv: pump.fun coin request failed with status 530
+2026-01-14T20:12:35: [pump-coin] Failed to fetch coin DaoLAeA3GpA7HR2NUH23vFmPeiZaTJmYit6ZgTV2TQjh from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:35: [pump-coin] https://frontend-api.pump.fun/coins/DaoLAeA3GpA7HR2NUH23vFmPeiZaTJmYit6ZgTV2TQjh responded with 530
+2026-01-14T20:12:35: [pump-coin] All endpoints failed for DaoLAeA3GpA7HR2NUH23vFmPeiZaTJmYit6ZgTV2TQjh: pump.fun coin request failed with status 530
+2026-01-14T20:12:36: [pump-coin] Failed to fetch coin Gpw8BDVDFrpCGgHmpPpdEQUsodypt2x7YfnGMQ9XVTw1 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:36: [pump-coin] https://frontend-api.pump.fun/coins/Gpw8BDVDFrpCGgHmpPpdEQUsodypt2x7YfnGMQ9XVTw1 responded with 530
+2026-01-14T20:12:36: [pump-coin] All endpoints failed for Gpw8BDVDFrpCGgHmpPpdEQUsodypt2x7YfnGMQ9XVTw1: pump.fun coin request failed with status 530
+2026-01-14T20:12:36: [pump-coin] Failed to fetch coin 5fA3Gepc3Xqzd1GBddXigUEjY5LSb4k6HkZb3jeHtwvh from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:36: [pump-coin] https://frontend-api.pump.fun/coins/5fA3Gepc3Xqzd1GBddXigUEjY5LSb4k6HkZb3jeHtwvh responded with 530
+2026-01-14T20:12:36: [pump-coin] All endpoints failed for 5fA3Gepc3Xqzd1GBddXigUEjY5LSb4k6HkZb3jeHtwvh: pump.fun coin request failed with status 530
+2026-01-14T20:12:36: [pump-coin] Failed to fetch coin 2ast17D5bVtXix3mE3rtspbvFusjPUDFTCx2ZgNqpFmT from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:36: [pump-coin] https://frontend-api.pump.fun/coins/2ast17D5bVtXix3mE3rtspbvFusjPUDFTCx2ZgNqpFmT responded with 530
+2026-01-14T20:12:36: [pump-coin] All endpoints failed for 2ast17D5bVtXix3mE3rtspbvFusjPUDFTCx2ZgNqpFmT: pump.fun coin request failed with status 530
+2026-01-14T20:12:36: [pump-coin] Failed to fetch coin EzudGy5TdRgXNhs3jd4a28V3ARw5VXyjMrZkxQtro8ZH from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:36: [pump-coin] https://frontend-api.pump.fun/coins/EzudGy5TdRgXNhs3jd4a28V3ARw5VXyjMrZkxQtro8ZH responded with 530
+2026-01-14T20:12:36: [pump-coin] All endpoints failed for EzudGy5TdRgXNhs3jd4a28V3ARw5VXyjMrZkxQtro8ZH: pump.fun coin request failed with status 530
+2026-01-14T20:12:37: [pump-coin] Failed to fetch coin 79745PRjSLwDzGVLJboJ2m2MSMRD1zb38UwAMFiZt1Cs from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:37: [pump-coin] https://frontend-api.pump.fun/coins/79745PRjSLwDzGVLJboJ2m2MSMRD1zb38UwAMFiZt1Cs responded with 530
+2026-01-14T20:12:37: [pump-coin] All endpoints failed for 79745PRjSLwDzGVLJboJ2m2MSMRD1zb38UwAMFiZt1Cs: pump.fun coin request failed with status 530
+2026-01-14T20:12:37: [pump-coin] Failed to fetch coin 6wBj2qG1jUPswsqn9G1gnFJgarxzyjizFxidfZH65dKd from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:37: [pump-coin] https://frontend-api.pump.fun/coins/6wBj2qG1jUPswsqn9G1gnFJgarxzyjizFxidfZH65dKd responded with 530
+2026-01-14T20:12:37: [pump-coin] All endpoints failed for 6wBj2qG1jUPswsqn9G1gnFJgarxzyjizFxidfZH65dKd: pump.fun coin request failed with status 530
+2026-01-14T20:12:37: [pump-coin] Failed to fetch coin 13wggeqG3pBU2zo89Fdt2J8YufATCYrKZxYXJwPpkVHw from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:37: [pump-coin] https://frontend-api.pump.fun/coins/13wggeqG3pBU2zo89Fdt2J8YufATCYrKZxYXJwPpkVHw responded with 530
+2026-01-14T20:12:37: [pump-coin] All endpoints failed for 13wggeqG3pBU2zo89Fdt2J8YufATCYrKZxYXJwPpkVHw: pump.fun coin request failed with status 530
+2026-01-14T20:12:37: [pump-coin] Failed to fetch coin 5mCMf3enuvHDhkkHvi33C842m1PqB6dvGtVruaHi7tG9 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:38: [pump-coin] https://frontend-api.pump.fun/coins/5mCMf3enuvHDhkkHvi33C842m1PqB6dvGtVruaHi7tG9 responded with 530
+2026-01-14T20:12:38: [pump-coin] All endpoints failed for 5mCMf3enuvHDhkkHvi33C842m1PqB6dvGtVruaHi7tG9: pump.fun coin request failed with status 530
+2026-01-14T20:12:38: [pump-coin] Failed to fetch coin 6LRA6CnrH6NVgiBySqQnajRs2L1vySHTr7f1e9Dhp4RE from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:38: [pump-coin] https://frontend-api.pump.fun/coins/6LRA6CnrH6NVgiBySqQnajRs2L1vySHTr7f1e9Dhp4RE responded with 530
+2026-01-14T20:12:38: [pump-coin] All endpoints failed for 6LRA6CnrH6NVgiBySqQnajRs2L1vySHTr7f1e9Dhp4RE: pump.fun coin request failed with status 530
+2026-01-14T20:12:38: [pump-coin] Failed to fetch coin 5NA94bui6DUy6WaxhHoHieMrzVLnzToGoBaAmhgGeNmG from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:38: [pump-coin] https://frontend-api.pump.fun/coins/5NA94bui6DUy6WaxhHoHieMrzVLnzToGoBaAmhgGeNmG responded with 530
+2026-01-14T20:12:38: [pump-coin] All endpoints failed for 5NA94bui6DUy6WaxhHoHieMrzVLnzToGoBaAmhgGeNmG: pump.fun coin request failed with status 530
+2026-01-14T20:12:38: [pump-coin] Failed to fetch coin 8MtUJG2GWWbuDZmxtG8jfYcja3fbGGVcMeAKEitZGvmi from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:38: [pump-coin] https://frontend-api.pump.fun/coins/8MtUJG2GWWbuDZmxtG8jfYcja3fbGGVcMeAKEitZGvmi responded with 530
+2026-01-14T20:12:38: [pump-coin] All endpoints failed for 8MtUJG2GWWbuDZmxtG8jfYcja3fbGGVcMeAKEitZGvmi: pump.fun coin request failed with status 530
+2026-01-14T20:12:38: [pump-coin] Failed to fetch coin 5vKcMpui5kTHFBDhyhu5jPs79s24yWwHaQ7X4GWwztJT from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:38: [pump-coin] https://frontend-api.pump.fun/coins/5vKcMpui5kTHFBDhyhu5jPs79s24yWwHaQ7X4GWwztJT responded with 530
+2026-01-14T20:12:38: [pump-coin] All endpoints failed for 5vKcMpui5kTHFBDhyhu5jPs79s24yWwHaQ7X4GWwztJT: pump.fun coin request failed with status 530
+2026-01-14T20:12:38: [pump-coin] Failed to fetch coin 5QnsWhUuDY3Qew8FuNziZWfT2anqwfQGZypLJYkmqdeV from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:38: [pump-coin] https://frontend-api.pump.fun/coins/5QnsWhUuDY3Qew8FuNziZWfT2anqwfQGZypLJYkmqdeV responded with 530
+2026-01-14T20:12:38: [pump-coin] All endpoints failed for 5QnsWhUuDY3Qew8FuNziZWfT2anqwfQGZypLJYkmqdeV: pump.fun coin request failed with status 530
+2026-01-14T20:12:39: [pump-coin] Failed to fetch coin 7uyWBYLiHQYXs16ggHm1DbP2zLzGXanvi8Y8zmHwGpJU from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:39: [pump-coin] https://frontend-api.pump.fun/coins/7uyWBYLiHQYXs16ggHm1DbP2zLzGXanvi8Y8zmHwGpJU responded with 530
+2026-01-14T20:12:39: [pump-coin] All endpoints failed for 7uyWBYLiHQYXs16ggHm1DbP2zLzGXanvi8Y8zmHwGpJU: pump.fun coin request failed with status 530
+2026-01-14T20:12:39: [pump-coin] Failed to fetch coin GQxGfTJgXj9ASrBWyMuESrNKJ4dd12v7zNSL2NzUinRA from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:39: [pump-coin] https://frontend-api.pump.fun/coins/GQxGfTJgXj9ASrBWyMuESrNKJ4dd12v7zNSL2NzUinRA responded with 530
+2026-01-14T20:12:39: [pump-coin] All endpoints failed for GQxGfTJgXj9ASrBWyMuESrNKJ4dd12v7zNSL2NzUinRA: pump.fun coin request failed with status 530
+2026-01-14T20:12:39: [pump-coin] Failed to fetch coin PECazcZMchmn86TfUVDVKeAtVaiKSJFQCZ9BvZfh3km from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:39: [pump-coin] https://frontend-api.pump.fun/coins/PECazcZMchmn86TfUVDVKeAtVaiKSJFQCZ9BvZfh3km responded with 530
+2026-01-14T20:12:39: [pump-coin] All endpoints failed for PECazcZMchmn86TfUVDVKeAtVaiKSJFQCZ9BvZfh3km: pump.fun coin request failed with status 530
+2026-01-14T20:12:39: [pump-coin] Failed to fetch coin 8PW9w3J14mWvb65DJ264bh73L7k1g9NsuWKjmfTBmZXd from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:39: [pump-coin] https://frontend-api.pump.fun/coins/8PW9w3J14mWvb65DJ264bh73L7k1g9NsuWKjmfTBmZXd responded with 530
+2026-01-14T20:12:39: [pump-coin] All endpoints failed for 8PW9w3J14mWvb65DJ264bh73L7k1g9NsuWKjmfTBmZXd: pump.fun coin request failed with status 530
+2026-01-14T20:12:40: [pump-coin] Failed to fetch coin Q3iZj2m3WRbiAar3uAQ1QFEQWW23m6beV8kzFWEmHP7 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:40: [pump-coin] https://frontend-api.pump.fun/coins/Q3iZj2m3WRbiAar3uAQ1QFEQWW23m6beV8kzFWEmHP7 responded with 530
+2026-01-14T20:12:40: [pump-coin] All endpoints failed for Q3iZj2m3WRbiAar3uAQ1QFEQWW23m6beV8kzFWEmHP7: pump.fun coin request failed with status 530
+2026-01-14T20:12:40: [pump-coin] Failed to fetch coin CgwW9y8aLVJKGSLbjRr23mY1iGSDpwgbQetLAph15fRk from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:40: [pump-coin] https://frontend-api.pump.fun/coins/CgwW9y8aLVJKGSLbjRr23mY1iGSDpwgbQetLAph15fRk responded with 530
+2026-01-14T20:12:40: [pump-coin] All endpoints failed for CgwW9y8aLVJKGSLbjRr23mY1iGSDpwgbQetLAph15fRk: pump.fun coin request failed with status 530
+2026-01-14T20:12:40: [pump-coin] Failed to fetch coin GsDYYF8ZHNidFL3oeXz4ThS7Ffpi1aHPvT5FX2nqoWa3 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:40: [pump-coin] https://frontend-api.pump.fun/coins/GsDYYF8ZHNidFL3oeXz4ThS7Ffpi1aHPvT5FX2nqoWa3 responded with 530
+2026-01-14T20:12:40: [pump-coin] All endpoints failed for GsDYYF8ZHNidFL3oeXz4ThS7Ffpi1aHPvT5FX2nqoWa3: pump.fun coin request failed with status 530
+2026-01-14T20:12:40: [pump-coin] Failed to fetch coin 9U3VyrPwdPxCqja88pYtALHU4DkkGe7P74EQGxWg62mM from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:40: [pump-coin] https://frontend-api.pump.fun/coins/9U3VyrPwdPxCqja88pYtALHU4DkkGe7P74EQGxWg62mM responded with 530
+2026-01-14T20:12:40: [pump-coin] All endpoints failed for 9U3VyrPwdPxCqja88pYtALHU4DkkGe7P74EQGxWg62mM: pump.fun coin request failed with status 530
+2026-01-14T20:12:40: [pump-coin] Failed to fetch coin 6ovHJHkGarQws9z7ChqfAFb8yVsunyjBHzSdiw9YZmLk from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:40: [pump-coin] https://frontend-api.pump.fun/coins/6ovHJHkGarQws9z7ChqfAFb8yVsunyjBHzSdiw9YZmLk responded with 530
+2026-01-14T20:12:40: [pump-coin] All endpoints failed for 6ovHJHkGarQws9z7ChqfAFb8yVsunyjBHzSdiw9YZmLk: pump.fun coin request failed with status 530
+2026-01-14T20:12:41: [pump-coin] Failed to fetch coin 7NVD35TWpShBSwnVZrMq2vY3sec31U7EDaEYFbfHfUrh from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:41: [pump-coin] https://frontend-api.pump.fun/coins/7NVD35TWpShBSwnVZrMq2vY3sec31U7EDaEYFbfHfUrh responded with 530
+2026-01-14T20:12:41: [pump-coin] All endpoints failed for 7NVD35TWpShBSwnVZrMq2vY3sec31U7EDaEYFbfHfUrh: pump.fun coin request failed with status 530
+2026-01-14T20:12:43: [pump-coin] Failed to fetch coin 4BSdiU2gGPqUXPXBXj8kbQtqtjK53d6PZvZFr1s8C4NB from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:43: [pump-coin] https://frontend-api.pump.fun/coins/4BSdiU2gGPqUXPXBXj8kbQtqtjK53d6PZvZFr1s8C4NB responded with 530
+2026-01-14T20:12:43: [pump-coin] All endpoints failed for 4BSdiU2gGPqUXPXBXj8kbQtqtjK53d6PZvZFr1s8C4NB: pump.fun coin request failed with status 530
+2026-01-14T20:12:43: [pump-coin] Failed to fetch coin 7XQ7hf3jFbzswf3KBuno7YzJ4NX38FfccmiXjE7Vfb9w from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:43: [pump-coin] https://frontend-api.pump.fun/coins/7XQ7hf3jFbzswf3KBuno7YzJ4NX38FfccmiXjE7Vfb9w responded with 530
+2026-01-14T20:12:43: [pump-coin] All endpoints failed for 7XQ7hf3jFbzswf3KBuno7YzJ4NX38FfccmiXjE7Vfb9w: pump.fun coin request failed with status 530
+2026-01-14T20:12:44: [pump-coin] Failed to fetch coin DbjLAT7Sx4gyShhp7jf9DAdvKZRSJDQtyqeYGVeoX8mf from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:44: [pump-coin] https://frontend-api.pump.fun/coins/DbjLAT7Sx4gyShhp7jf9DAdvKZRSJDQtyqeYGVeoX8mf responded with 530
+2026-01-14T20:12:44: [pump-coin] All endpoints failed for DbjLAT7Sx4gyShhp7jf9DAdvKZRSJDQtyqeYGVeoX8mf: pump.fun coin request failed with status 530
+2026-01-14T20:12:44: [pump-coin] Failed to fetch coin 69aK5KzghBzE5qLJ2q2CF29eUXy3bhrsQKmRHrdrabyh from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:44: [pump-coin] https://frontend-api.pump.fun/coins/69aK5KzghBzE5qLJ2q2CF29eUXy3bhrsQKmRHrdrabyh responded with 530
+2026-01-14T20:12:44: [pump-coin] All endpoints failed for 69aK5KzghBzE5qLJ2q2CF29eUXy3bhrsQKmRHrdrabyh: pump.fun coin request failed with status 530
+2026-01-14T20:12:44: [pump-coin] Failed to fetch coin GBeuJqw4FvKS8MPDLiohCo1GUK5q8rUP9PmbdVv82VjX from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:44: [pump-coin] https://frontend-api.pump.fun/coins/GBeuJqw4FvKS8MPDLiohCo1GUK5q8rUP9PmbdVv82VjX responded with 530
+2026-01-14T20:12:44: [pump-coin] All endpoints failed for GBeuJqw4FvKS8MPDLiohCo1GUK5q8rUP9PmbdVv82VjX: pump.fun coin request failed with status 530
+2026-01-14T20:12:44: [pump-coin] Failed to fetch coin 6CmzHq53AqzdFeziJDFBKjXYhEKcrBCSWqVmBbtHzvuz from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:44: [pump-coin] https://frontend-api.pump.fun/coins/6CmzHq53AqzdFeziJDFBKjXYhEKcrBCSWqVmBbtHzvuz responded with 530
+2026-01-14T20:12:44: [pump-coin] All endpoints failed for 6CmzHq53AqzdFeziJDFBKjXYhEKcrBCSWqVmBbtHzvuz: pump.fun coin request failed with status 530
+2026-01-14T20:12:45: [pump-coin] Failed to fetch coin 6MoDZYCW7ZeRba9i2P8Pru1mQ5fpM4X3hcouewp46y9S from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:12:45: [pump-coin] https://frontend-api.pump.fun/coins/6MoDZYCW7ZeRba9i2P8Pru1mQ5fpM4X3hcouewp46y9S responded with 530
+2026-01-14T20:12:45: [pump-coin] All endpoints failed for 6MoDZYCW7ZeRba9i2P8Pru1mQ5fpM4X3hcouewp46y9S: pump.fun coin request failed with status 530
+2026-01-14T20:13:00: [pump-coin] Failed to fetch coin 42TCQRW8URpUsdbXYmhnJzXDb7HuugnraZdbvkdLfRnP from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:00: [pump-coin] https://frontend-api.pump.fun/coins/42TCQRW8URpUsdbXYmhnJzXDb7HuugnraZdbvkdLfRnP responded with 530
+2026-01-14T20:13:00: [pump-coin] All endpoints failed for 42TCQRW8URpUsdbXYmhnJzXDb7HuugnraZdbvkdLfRnP: pump.fun coin request failed with status 530
+2026-01-14T20:13:00: [pump-coin] Failed to fetch coin GDzTUWe7ztH6g7y7g77VJJh6KRBi8fDa6gHo54VMwSSy from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:01: [pump-coin] https://frontend-api.pump.fun/coins/GDzTUWe7ztH6g7y7g77VJJh6KRBi8fDa6gHo54VMwSSy responded with 530
+2026-01-14T20:13:01: [pump-coin] All endpoints failed for GDzTUWe7ztH6g7y7g77VJJh6KRBi8fDa6gHo54VMwSSy: pump.fun coin request failed with status 530
+2026-01-14T20:13:01: [pump-coin] Failed to fetch coin E6HPTSc4wubH4U8xpKSgyS6JXo9KvBkAUcBQqSTYf4uK from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:01: [pump-coin] https://frontend-api.pump.fun/coins/E6HPTSc4wubH4U8xpKSgyS6JXo9KvBkAUcBQqSTYf4uK responded with 530
+2026-01-14T20:13:01: [pump-coin] All endpoints failed for E6HPTSc4wubH4U8xpKSgyS6JXo9KvBkAUcBQqSTYf4uK: pump.fun coin request failed with status 530
+2026-01-14T20:13:01: [pump-coin] Failed to fetch coin BhK6TrPiJ9hA3ATR98pXw1gnM2uKbNadkaxZNSavSjvo from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:01: [pump-coin] https://frontend-api.pump.fun/coins/BhK6TrPiJ9hA3ATR98pXw1gnM2uKbNadkaxZNSavSjvo responded with 530
+2026-01-14T20:13:01: [pump-coin] All endpoints failed for BhK6TrPiJ9hA3ATR98pXw1gnM2uKbNadkaxZNSavSjvo: pump.fun coin request failed with status 530
+2026-01-14T20:13:01: [pump-coin] Failed to fetch coin 3hVJC6UqRkMm1RQkG3FHNLX8L3deUb2x5eWzExAh4KBV from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:01: [pump-coin] https://frontend-api.pump.fun/coins/3hVJC6UqRkMm1RQkG3FHNLX8L3deUb2x5eWzExAh4KBV responded with 530
+2026-01-14T20:13:01: [pump-coin] All endpoints failed for 3hVJC6UqRkMm1RQkG3FHNLX8L3deUb2x5eWzExAh4KBV: pump.fun coin request failed with status 530
+2026-01-14T20:13:01: [pump-coin] Failed to fetch coin CNj25crKmMcApqiHkgTC4QRNSjTcp6h1Zrh1bWJGXYX1 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:01: [pump-coin] https://frontend-api.pump.fun/coins/CNj25crKmMcApqiHkgTC4QRNSjTcp6h1Zrh1bWJGXYX1 responded with 530
+2026-01-14T20:13:01: [pump-coin] All endpoints failed for CNj25crKmMcApqiHkgTC4QRNSjTcp6h1Zrh1bWJGXYX1: pump.fun coin request failed with status 530
+2026-01-14T20:13:01: [pump-coin] Failed to fetch coin 9TzbeT4jxducv8UhFh3hqXJwsdo87qrcrPBpwivrji1y from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:01: [pump-coin] https://frontend-api.pump.fun/coins/9TzbeT4jxducv8UhFh3hqXJwsdo87qrcrPBpwivrji1y responded with 530
+2026-01-14T20:13:01: [pump-coin] All endpoints failed for 9TzbeT4jxducv8UhFh3hqXJwsdo87qrcrPBpwivrji1y: pump.fun coin request failed with status 530
+2026-01-14T20:13:02: [pump-coin] Failed to fetch coin 3ZiXL811oAR4eY8XEY3pmKNnZy8JLbpLyybDD5jTornf from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:02: [pump-coin] https://frontend-api.pump.fun/coins/3ZiXL811oAR4eY8XEY3pmKNnZy8JLbpLyybDD5jTornf responded with 530
+2026-01-14T20:13:02: [pump-coin] All endpoints failed for 3ZiXL811oAR4eY8XEY3pmKNnZy8JLbpLyybDD5jTornf: pump.fun coin request failed with status 530
+2026-01-14T20:13:02: [pump-coin] Failed to fetch coin CSwb1hX2WA4xYa5ewTdrytnnDpJ4mFcqqiAWfZziWCXZ from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:02: [pump-coin] https://frontend-api.pump.fun/coins/CSwb1hX2WA4xYa5ewTdrytnnDpJ4mFcqqiAWfZziWCXZ responded with 530
+2026-01-14T20:13:02: [pump-coin] All endpoints failed for CSwb1hX2WA4xYa5ewTdrytnnDpJ4mFcqqiAWfZziWCXZ: pump.fun coin request failed with status 530
+2026-01-14T20:13:13: [pump-coin] Failed to fetch coin 9H62dXYm38C5V1TszzYbFyEzkLFP62x1QZxAF7Re1aaM from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:13: [pump-coin] https://frontend-api.pump.fun/coins/9H62dXYm38C5V1TszzYbFyEzkLFP62x1QZxAF7Re1aaM responded with 530
+2026-01-14T20:13:13: [pump-coin] All endpoints failed for 9H62dXYm38C5V1TszzYbFyEzkLFP62x1QZxAF7Re1aaM: pump.fun coin request failed with status 530
+2026-01-14T20:13:13: [pump-coin] Failed to fetch coin BeNLsmXhhCCJAnCLW95xARk1SqhxybzdAKpK85ubUV3p from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:13: [pump-coin] https://frontend-api.pump.fun/coins/BeNLsmXhhCCJAnCLW95xARk1SqhxybzdAKpK85ubUV3p responded with 530
+2026-01-14T20:13:13: [pump-coin] All endpoints failed for BeNLsmXhhCCJAnCLW95xARk1SqhxybzdAKpK85ubUV3p: pump.fun coin request failed with status 530
+2026-01-14T20:13:14: [pump-coin] Failed to fetch coin 2Zx4qheiHNKbSPHNa1ypNVzdWNwKc1Jrhoou8SE9XoJv from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:14: [pump-coin] https://frontend-api.pump.fun/coins/2Zx4qheiHNKbSPHNa1ypNVzdWNwKc1Jrhoou8SE9XoJv responded with 530
+2026-01-14T20:13:14: [pump-coin] All endpoints failed for 2Zx4qheiHNKbSPHNa1ypNVzdWNwKc1Jrhoou8SE9XoJv: pump.fun coin request failed with status 530
+2026-01-14T20:13:14: [pump-coin] Failed to fetch coin DaoLAeA3GpA7HR2NUH23vFmPeiZaTJmYit6ZgTV2TQjh from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:14: [pump-coin] https://frontend-api.pump.fun/coins/DaoLAeA3GpA7HR2NUH23vFmPeiZaTJmYit6ZgTV2TQjh responded with 530
+2026-01-14T20:13:14: [pump-coin] All endpoints failed for DaoLAeA3GpA7HR2NUH23vFmPeiZaTJmYit6ZgTV2TQjh: pump.fun coin request failed with status 530
+2026-01-14T20:13:14: [pump-coin] Failed to fetch coin Gpw8BDVDFrpCGgHmpPpdEQUsodypt2x7YfnGMQ9XVTw1 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:14: [pump-coin] https://frontend-api.pump.fun/coins/Gpw8BDVDFrpCGgHmpPpdEQUsodypt2x7YfnGMQ9XVTw1 responded with 530
+2026-01-14T20:13:14: [pump-coin] All endpoints failed for Gpw8BDVDFrpCGgHmpPpdEQUsodypt2x7YfnGMQ9XVTw1: pump.fun coin request failed with status 530
+2026-01-14T20:13:14: [pump-coin] Failed to fetch coin 5fA3Gepc3Xqzd1GBddXigUEjY5LSb4k6HkZb3jeHtwvh from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:14: [pump-coin] https://frontend-api.pump.fun/coins/5fA3Gepc3Xqzd1GBddXigUEjY5LSb4k6HkZb3jeHtwvh responded with 530
+2026-01-14T20:13:14: [pump-coin] All endpoints failed for 5fA3Gepc3Xqzd1GBddXigUEjY5LSb4k6HkZb3jeHtwvh: pump.fun coin request failed with status 530
+2026-01-14T20:13:14: [pump-coin] Failed to fetch coin 2ast17D5bVtXix3mE3rtspbvFusjPUDFTCx2ZgNqpFmT from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:14: [pump-coin] https://frontend-api.pump.fun/coins/2ast17D5bVtXix3mE3rtspbvFusjPUDFTCx2ZgNqpFmT responded with 530
+2026-01-14T20:13:14: [pump-coin] All endpoints failed for 2ast17D5bVtXix3mE3rtspbvFusjPUDFTCx2ZgNqpFmT: pump.fun coin request failed with status 530
+2026-01-14T20:13:14: [pump-coin] Failed to fetch coin EzudGy5TdRgXNhs3jd4a28V3ARw5VXyjMrZkxQtro8ZH from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:15: [pump-coin] https://frontend-api.pump.fun/coins/EzudGy5TdRgXNhs3jd4a28V3ARw5VXyjMrZkxQtro8ZH responded with 530
+2026-01-14T20:13:15: [pump-coin] All endpoints failed for EzudGy5TdRgXNhs3jd4a28V3ARw5VXyjMrZkxQtro8ZH: pump.fun coin request failed with status 530
+2026-01-14T20:13:15: [pump-coin] Failed to fetch coin 79745PRjSLwDzGVLJboJ2m2MSMRD1zb38UwAMFiZt1Cs from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:15: [pump-coin] https://frontend-api.pump.fun/coins/79745PRjSLwDzGVLJboJ2m2MSMRD1zb38UwAMFiZt1Cs responded with 530
+2026-01-14T20:13:15: [pump-coin] All endpoints failed for 79745PRjSLwDzGVLJboJ2m2MSMRD1zb38UwAMFiZt1Cs: pump.fun coin request failed with status 530
+2026-01-14T20:13:15: [pump-coin] Failed to fetch coin 6wBj2qG1jUPswsqn9G1gnFJgarxzyjizFxidfZH65dKd from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:15: [pump-coin] https://frontend-api.pump.fun/coins/6wBj2qG1jUPswsqn9G1gnFJgarxzyjizFxidfZH65dKd responded with 530
+2026-01-14T20:13:15: [pump-coin] All endpoints failed for 6wBj2qG1jUPswsqn9G1gnFJgarxzyjizFxidfZH65dKd: pump.fun coin request failed with status 530
+2026-01-14T20:13:15: [pump-coin] Failed to fetch coin 13wggeqG3pBU2zo89Fdt2J8YufATCYrKZxYXJwPpkVHw from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:15: [pump-coin] https://frontend-api.pump.fun/coins/13wggeqG3pBU2zo89Fdt2J8YufATCYrKZxYXJwPpkVHw responded with 530
+2026-01-14T20:13:15: [pump-coin] All endpoints failed for 13wggeqG3pBU2zo89Fdt2J8YufATCYrKZxYXJwPpkVHw: pump.fun coin request failed with status 530
+2026-01-14T20:13:15: [pump-coin] Failed to fetch coin 5mCMf3enuvHDhkkHvi33C842m1PqB6dvGtVruaHi7tG9 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:15: [pump-coin] https://frontend-api.pump.fun/coins/5mCMf3enuvHDhkkHvi33C842m1PqB6dvGtVruaHi7tG9 responded with 530
+2026-01-14T20:13:15: [pump-coin] All endpoints failed for 5mCMf3enuvHDhkkHvi33C842m1PqB6dvGtVruaHi7tG9: pump.fun coin request failed with status 530
+2026-01-14T20:13:15: [pump-coin] Failed to fetch coin 6LRA6CnrH6NVgiBySqQnajRs2L1vySHTr7f1e9Dhp4RE from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:15: [pump-coin] https://frontend-api.pump.fun/coins/6LRA6CnrH6NVgiBySqQnajRs2L1vySHTr7f1e9Dhp4RE responded with 530
+2026-01-14T20:13:15: [pump-coin] All endpoints failed for 6LRA6CnrH6NVgiBySqQnajRs2L1vySHTr7f1e9Dhp4RE: pump.fun coin request failed with status 530
+2026-01-14T20:13:16: [pump-coin] Failed to fetch coin 5NA94bui6DUy6WaxhHoHieMrzVLnzToGoBaAmhgGeNmG from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:16: [pump-coin] https://frontend-api.pump.fun/coins/5NA94bui6DUy6WaxhHoHieMrzVLnzToGoBaAmhgGeNmG responded with 530
+2026-01-14T20:13:16: [pump-coin] All endpoints failed for 5NA94bui6DUy6WaxhHoHieMrzVLnzToGoBaAmhgGeNmG: pump.fun coin request failed with status 530
+2026-01-14T20:13:16: [pump-coin] Failed to fetch coin 8MtUJG2GWWbuDZmxtG8jfYcja3fbGGVcMeAKEitZGvmi from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:16: [pump-coin] https://frontend-api.pump.fun/coins/8MtUJG2GWWbuDZmxtG8jfYcja3fbGGVcMeAKEitZGvmi responded with 530
+2026-01-14T20:13:16: [pump-coin] All endpoints failed for 8MtUJG2GWWbuDZmxtG8jfYcja3fbGGVcMeAKEitZGvmi: pump.fun coin request failed with status 530
+2026-01-14T20:13:16: [pump-coin] Failed to fetch coin 5vKcMpui5kTHFBDhyhu5jPs79s24yWwHaQ7X4GWwztJT from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:16: [pump-coin] https://frontend-api.pump.fun/coins/5vKcMpui5kTHFBDhyhu5jPs79s24yWwHaQ7X4GWwztJT responded with 530
+2026-01-14T20:13:16: [pump-coin] All endpoints failed for 5vKcMpui5kTHFBDhyhu5jPs79s24yWwHaQ7X4GWwztJT: pump.fun coin request failed with status 530
+2026-01-14T20:13:16: [pump-coin] Failed to fetch coin 5QnsWhUuDY3Qew8FuNziZWfT2anqwfQGZypLJYkmqdeV from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:16: [pump-coin] https://frontend-api.pump.fun/coins/5QnsWhUuDY3Qew8FuNziZWfT2anqwfQGZypLJYkmqdeV responded with 530
+2026-01-14T20:13:16: [pump-coin] All endpoints failed for 5QnsWhUuDY3Qew8FuNziZWfT2anqwfQGZypLJYkmqdeV: pump.fun coin request failed with status 530
+2026-01-14T20:13:16: [pump-coin] Failed to fetch coin 7uyWBYLiHQYXs16ggHm1DbP2zLzGXanvi8Y8zmHwGpJU from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:16: [pump-coin] https://frontend-api.pump.fun/coins/7uyWBYLiHQYXs16ggHm1DbP2zLzGXanvi8Y8zmHwGpJU responded with 530
+2026-01-14T20:13:16: [pump-coin] All endpoints failed for 7uyWBYLiHQYXs16ggHm1DbP2zLzGXanvi8Y8zmHwGpJU: pump.fun coin request failed with status 530
+2026-01-14T20:13:16: [pump-coin] Failed to fetch coin GQxGfTJgXj9ASrBWyMuESrNKJ4dd12v7zNSL2NzUinRA from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:16: [pump-coin] https://frontend-api.pump.fun/coins/GQxGfTJgXj9ASrBWyMuESrNKJ4dd12v7zNSL2NzUinRA responded with 530
+2026-01-14T20:13:16: [pump-coin] All endpoints failed for GQxGfTJgXj9ASrBWyMuESrNKJ4dd12v7zNSL2NzUinRA: pump.fun coin request failed with status 530
+2026-01-14T20:13:17: [pump-coin] Failed to fetch coin PECazcZMchmn86TfUVDVKeAtVaiKSJFQCZ9BvZfh3km from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:17: [pump-coin] https://frontend-api.pump.fun/coins/PECazcZMchmn86TfUVDVKeAtVaiKSJFQCZ9BvZfh3km responded with 530
+2026-01-14T20:13:17: [pump-coin] All endpoints failed for PECazcZMchmn86TfUVDVKeAtVaiKSJFQCZ9BvZfh3km: pump.fun coin request failed with status 530
+2026-01-14T20:13:17: [pump-coin] Failed to fetch coin 8PW9w3J14mWvb65DJ264bh73L7k1g9NsuWKjmfTBmZXd from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:17: [pump-coin] https://frontend-api.pump.fun/coins/8PW9w3J14mWvb65DJ264bh73L7k1g9NsuWKjmfTBmZXd responded with 530
+2026-01-14T20:13:17: [pump-coin] All endpoints failed for 8PW9w3J14mWvb65DJ264bh73L7k1g9NsuWKjmfTBmZXd: pump.fun coin request failed with status 530
+2026-01-14T20:13:17: [pump-coin] Failed to fetch coin Q3iZj2m3WRbiAar3uAQ1QFEQWW23m6beV8kzFWEmHP7 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:17: [pump-coin] https://frontend-api.pump.fun/coins/Q3iZj2m3WRbiAar3uAQ1QFEQWW23m6beV8kzFWEmHP7 responded with 530
+2026-01-14T20:13:17: [pump-coin] All endpoints failed for Q3iZj2m3WRbiAar3uAQ1QFEQWW23m6beV8kzFWEmHP7: pump.fun coin request failed with status 530
+2026-01-14T20:13:17: [pump-coin] Failed to fetch coin CgwW9y8aLVJKGSLbjRr23mY1iGSDpwgbQetLAph15fRk from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:17: [pump-coin] https://frontend-api.pump.fun/coins/CgwW9y8aLVJKGSLbjRr23mY1iGSDpwgbQetLAph15fRk responded with 530
+2026-01-14T20:13:17: [pump-coin] All endpoints failed for CgwW9y8aLVJKGSLbjRr23mY1iGSDpwgbQetLAph15fRk: pump.fun coin request failed with status 530
+2026-01-14T20:13:18: [pump-coin] Failed to fetch coin GsDYYF8ZHNidFL3oeXz4ThS7Ffpi1aHPvT5FX2nqoWa3 from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:18: [pump-coin] https://frontend-api.pump.fun/coins/GsDYYF8ZHNidFL3oeXz4ThS7Ffpi1aHPvT5FX2nqoWa3 responded with 530
+2026-01-14T20:13:18: [pump-coin] All endpoints failed for GsDYYF8ZHNidFL3oeXz4ThS7Ffpi1aHPvT5FX2nqoWa3: pump.fun coin request failed with status 530
+2026-01-14T20:13:18: [pump-coin] Failed to fetch coin 9U3VyrPwdPxCqja88pYtALHU4DkkGe7P74EQGxWg62mM from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:18: [pump-coin] https://frontend-api.pump.fun/coins/9U3VyrPwdPxCqja88pYtALHU4DkkGe7P74EQGxWg62mM responded with 530
+2026-01-14T20:13:18: [pump-coin] All endpoints failed for 9U3VyrPwdPxCqja88pYtALHU4DkkGe7P74EQGxWg62mM: pump.fun coin request failed with status 530
+2026-01-14T20:13:18: [pump-coin] Failed to fetch coin 6ovHJHkGarQws9z7ChqfAFb8yVsunyjBHzSdiw9YZmLk from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:18: [pump-coin] https://frontend-api.pump.fun/coins/6ovHJHkGarQws9z7ChqfAFb8yVsunyjBHzSdiw9YZmLk responded with 530
+2026-01-14T20:13:18: [pump-coin] All endpoints failed for 6ovHJHkGarQws9z7ChqfAFb8yVsunyjBHzSdiw9YZmLk: pump.fun coin request failed with status 530
+2026-01-14T20:13:18: [pump-coin] Failed to fetch coin 7NVD35TWpShBSwnVZrMq2vY3sec31U7EDaEYFbfHfUrh from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:18: [pump-coin] https://frontend-api.pump.fun/coins/7NVD35TWpShBSwnVZrMq2vY3sec31U7EDaEYFbfHfUrh responded with 530
+2026-01-14T20:13:18: [pump-coin] All endpoints failed for 7NVD35TWpShBSwnVZrMq2vY3sec31U7EDaEYFbfHfUrh: pump.fun coin request failed with status 530
+2026-01-14T20:13:19: [pump-coin] Failed to fetch coin 4BSdiU2gGPqUXPXBXj8kbQtqtjK53d6PZvZFr1s8C4NB from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:19: [pump-coin] https://frontend-api.pump.fun/coins/4BSdiU2gGPqUXPXBXj8kbQtqtjK53d6PZvZFr1s8C4NB responded with 530
+2026-01-14T20:13:19: [pump-coin] All endpoints failed for 4BSdiU2gGPqUXPXBXj8kbQtqtjK53d6PZvZFr1s8C4NB: pump.fun coin request failed with status 530
+2026-01-14T20:13:19: [pump-coin] Failed to fetch coin 7XQ7hf3jFbzswf3KBuno7YzJ4NX38FfccmiXjE7Vfb9w from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:20: [pump-coin] https://frontend-api.pump.fun/coins/7XQ7hf3jFbzswf3KBuno7YzJ4NX38FfccmiXjE7Vfb9w responded with 530
+2026-01-14T20:13:20: [pump-coin] All endpoints failed for 7XQ7hf3jFbzswf3KBuno7YzJ4NX38FfccmiXjE7Vfb9w: pump.fun coin request failed with status 530
+2026-01-14T20:13:20: [pump-coin] Failed to fetch coin DbjLAT7Sx4gyShhp7jf9DAdvKZRSJDQtyqeYGVeoX8mf from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:20: [pump-coin] https://frontend-api.pump.fun/coins/DbjLAT7Sx4gyShhp7jf9DAdvKZRSJDQtyqeYGVeoX8mf responded with 530
+2026-01-14T20:13:20: [pump-coin] All endpoints failed for DbjLAT7Sx4gyShhp7jf9DAdvKZRSJDQtyqeYGVeoX8mf: pump.fun coin request failed with status 530
+2026-01-14T20:13:20: [pump-coin] Failed to fetch coin 69aK5KzghBzE5qLJ2q2CF29eUXy3bhrsQKmRHrdrabyh from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:20: [pump-coin] https://frontend-api.pump.fun/coins/69aK5KzghBzE5qLJ2q2CF29eUXy3bhrsQKmRHrdrabyh responded with 530
+2026-01-14T20:13:20: [pump-coin] All endpoints failed for 69aK5KzghBzE5qLJ2q2CF29eUXy3bhrsQKmRHrdrabyh: pump.fun coin request failed with status 530
+2026-01-14T20:13:20: [pump-coin] Failed to fetch coin GBeuJqw4FvKS8MPDLiohCo1GUK5q8rUP9PmbdVv82VjX from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:20: [pump-coin] https://frontend-api.pump.fun/coins/GBeuJqw4FvKS8MPDLiohCo1GUK5q8rUP9PmbdVv82VjX responded with 530
+2026-01-14T20:13:20: [pump-coin] All endpoints failed for GBeuJqw4FvKS8MPDLiohCo1GUK5q8rUP9PmbdVv82VjX: pump.fun coin request failed with status 530
+2026-01-14T20:13:20: [pump-coin] Failed to fetch coin 6CmzHq53AqzdFeziJDFBKjXYhEKcrBCSWqVmBbtHzvuz from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:20: [pump-coin] https://frontend-api.pump.fun/coins/6CmzHq53AqzdFeziJDFBKjXYhEKcrBCSWqVmBbtHzvuz responded with 530
+2026-01-14T20:13:20: [pump-coin] All endpoints failed for 6CmzHq53AqzdFeziJDFBKjXYhEKcrBCSWqVmBbtHzvuz: pump.fun coin request failed with status 530
+2026-01-14T20:13:21: [pump-coin] Failed to fetch coin 6MoDZYCW7ZeRba9i2P8Pru1mQ5fpM4X3hcouewp46y9S from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:21: [pump-coin] https://frontend-api.pump.fun/coins/6MoDZYCW7ZeRba9i2P8Pru1mQ5fpM4X3hcouewp46y9S responded with 530
+2026-01-14T20:13:21: [pump-coin] All endpoints failed for 6MoDZYCW7ZeRba9i2P8Pru1mQ5fpM4X3hcouewp46y9S: pump.fun coin request failed with status 530
+2026-01-14T20:57:46: [metadata] Slow token 54fgxSjb... took 15323ms
+2026-01-14T20:58:20: [metadata] Slow token H4VvHwE7... took 30001ms
+2026-01-14T20:58:56: [metadata] Slow token 86fpKnMT... took 30000ms
+2026-01-14T20:59:18: [metadata] Timeout for 9H62dXYm... after 15000ms
+2026-01-14T20:59:18: [metadata] Timeout for BeNLsmXh... after 15000ms
+2026-01-14T20:59:18: [metadata] Timeout for 2Zx4qhei... after 15000ms
+2026-01-14T20:59:18: [metadata] Timeout for DaoLAeA3... after 15000ms
+2026-01-14T20:59:19: [metadata] Timeout for Gpw8BDVD... after 15000ms
+2026-01-14T20:59:19: [metadata] Timeout for 5fA3Gepc... after 15000ms
+2026-01-14T20:59:19: [metadata] Timeout for 2ast17D5... after 15000ms
+2026-01-14T20:59:19: [metadata] Timeout for EzudGy5T... after 15000ms
+2026-01-14T20:59:20: [metadata] Timeout for 79745PRj... after 15000ms
+2026-01-14T20:59:20: [metadata] Timeout for 6wBj2qG1... after 15000ms
+2026-01-14T20:59:20: [metadata] Timeout for 13wggeqG... after 15000ms
+2026-01-14T20:59:20: [metadata] Timeout for 5mCMf3en... after 15000ms
+2026-01-14T20:59:20: [metadata] Timeout for 6LRA6Cnr... after 15000ms
+2026-01-14T20:59:21: [metadata] Timeout for 5NA94bui... after 15000ms
+2026-01-14T20:59:21: [metadata] Timeout for 8MtUJG2G... after 15000ms
+2026-01-14T20:59:21: [metadata] Timeout for 5vKcMpui... after 15000ms
+2026-01-14T20:59:21: [metadata] Timeout for 5QnsWhUu... after 15000ms
+2026-01-14T20:59:21: [metadata] Timeout for 7uyWBYLi... after 15000ms
+2026-01-14T20:59:22: [metadata] Timeout for GQxGfTJg... after 15000ms
+2026-01-14T20:59:22: [metadata] Timeout for PECazcZM... after 15000ms
+2026-01-14T20:59:22: [metadata] Timeout for 8PW9w3J1... after 15000ms
+2026-01-14T20:59:22: [metadata] Timeout for FgbRR94n... after 15000ms
+2026-01-14T20:59:23: [metadata] Timeout for Q3iZj2m3... after 15000ms
+2026-01-14T20:59:23: [metadata] Timeout for CgwW9y8a... after 15000ms
+2026-01-14T20:59:23: [metadata] Timeout for GsDYYF8Z... after 15000ms
+2026-01-14T20:59:23: [metadata] Timeout for 9U3VyrPw... after 15000ms
+2026-01-14T20:59:23: [metadata] Timeout for 6ovHJHkG... after 15000ms
+2026-01-14T20:59:24: [metadata] Timeout for 7NVD35TW... after 15000ms
+2026-01-14T20:59:24: [metadata] Timeout for 6sHUDDi6... after 15000ms
+2026-01-14T20:59:24: [metadata] Timeout for 6bRz27mu... after 15000ms
+2026-01-14T20:59:24: [metadata] Timeout for 4BSdiU2g... after 15000ms
+2026-01-14T20:59:25: [metadata] Timeout for 7XQ7hf3j... after 15000ms
+2026-01-14T20:59:25: [metadata] Timeout for DbjLAT7S... after 15000ms
+2026-01-14T20:59:25: [metadata] Timeout for 69aK5Kzg... after 15000ms
+2026-01-14T20:59:25: [metadata] Timeout for GBeuJqw4... after 15000ms
+2026-01-14T20:59:25: [metadata] Timeout for 6CmzHq53... after 15000ms
+2026-01-14T20:59:26: [metadata] Timeout for 8hMsWkGa... after 15000ms
+2026-01-14T20:59:26: [metadata] Timeout for 6MoDZYCW... after 15000ms
+2026-01-14T20:59:26: [metadata] Timeout for 54fgxSjb... after 15000ms
+2026-01-14T20:59:26: [metadata] Slow token 54fgxSjb... took 15001ms
+2026-01-14T20:59:41: [metadata] Timeout for 42TCQRW8... after 15000ms
+2026-01-14T20:59:42: [metadata] Timeout for GDzTUWe7... after 15000ms
+2026-01-14T20:59:42: [metadata] Timeout for E6HPTSc4... after 15000ms
+2026-01-14T20:59:42: [metadata] Timeout for BhK6TrPi... after 15000ms
+2026-01-14T20:59:42: [metadata] Timeout for 3hVJC6Uq... after 15000ms
+2026-01-14T20:59:42: [metadata] Timeout for CNj25crK... after 15000ms
+2026-01-14T20:59:43: [metadata] Timeout for 9TzbeT4j... after 15000ms
+2026-01-14T20:59:43: [metadata] Timeout for 3ZiXL811... after 15000ms
+2026-01-14T20:59:43: [metadata] Timeout for CSwb1hX2... after 15000ms
+2026-01-14T20:59:43: [metadata] Timeout for 5smab9DE... after 15000ms
+2026-01-14T20:59:43: [metadata] Timeout for J7SAqHAC... after 15000ms
+2026-01-14T20:59:44: [metadata] Timeout for CZgAHLgd... after 15000ms
+2026-01-14T20:59:44: [metadata] Timeout for 7ERowrU7... after 15000ms
+2026-01-14T20:59:44: [metadata] Timeout for 5BN47sxE... after 15000ms
+2026-01-14T20:59:44: [metadata] Timeout for 5xHhnqAU... after 15000ms
+2026-01-14T20:59:44: [metadata] Timeout for 3jNDnXEt... after 15000ms
+2026-01-14T20:59:45: [metadata] Timeout for CqQA7rcR... after 15000ms
+2026-01-14T20:59:45: [metadata] Timeout for 6dFDRsrS... after 15000ms
+2026-01-14T20:59:45: [metadata] Timeout for 86fpKnMT... after 15000ms
+2026-01-14T20:59:45: [metadata] Slow token 86fpKnMT... took 15001ms
+2026-01-14T21:00:00: [metadata] Timeout for HzJ73kvi... after 15000ms
+2026-01-14T21:00:03: [metadata] Timeout for 5mytZdyE... after 15000ms
+2026-01-14T21:00:07: [metadata] Timeout for 3obnoAJY... after 15000ms
+2026-01-14T21:00:07: [metadata] Slow token 3obnoAJY... took 15001ms
+2026-01-14T21:00:22: [metadata] Timeout for G4jUNJ3W... after 15000ms
+2026-01-14T21:00:22: [metadata] Slow token G4jUNJ3W... took 15000ms
+2026-01-14T21:00:36: [metadata] Slow token 4ybP3EZQ... took 14017ms
+2026-01-14T21:00:37: [metadata] Timeout for 4ybP3EZQ... after 15000ms
+2026-01-14T21:00:51: [metadata] Slow token 3qMDazu9... took 14922ms
+2026-01-14T21:00:51: [metadata] Timeout for 3qMDazu9... after 15000ms
+2026-01-14T21:01:06: [metadata] Timeout for 4uwyDNBf... after 15000ms
+2026-01-14T21:01:06: [metadata] Slow token 4uwyDNBf... took 15001ms
+2026-01-14T21:01:21: [metadata] Timeout for UxKiHgnY... after 15000ms
+2026-01-14T21:01:21: [metadata] Slow token UxKiHgnY... took 14999ms
+2026-01-14T21:01:36: [metadata] Timeout for Jr4SW2du... after 15000ms
+2026-01-14T21:01:36: [metadata] Slow token Jr4SW2du... took 15000ms
+2026-01-14T21:01:41: [metadata] Slow token F4aJDRbf... took 5575ms
+2026-01-14T21:02:34: [metadata] ⏱️ Timeout for 54fgxSjb... after 10000ms - re-queuing
+2026-01-14T21:03:02: [metadata] ⏱️ Timeout for UxKiHgnY... after 10000ms - re-queuing
+2026-01-14T21:03:29: [metadata] ⏱️ Timeout for ANrWC7XM... after 10000ms - re-queuing
+2026-01-14T21:04:06: [metadata] ⏱️ Timeout for grg2dgwZ... after 10000ms - re-queuing
+2026-01-14T21:04:21: [metadata] ⏱️ Timeout for C9k8pvSd... after 10000ms - re-queuing
+2026-01-14T21:04:31: [metadata] ⏱️ Timeout for HSchPS3U... after 10000ms - re-queuing
+2026-01-14T21:04:47: [metadata] ⏱️ Timeout for 24u8aWcc... after 10000ms - re-queuing
+2026-01-14T21:05:04: [metadata] ⏱️ Timeout for 3EgeZCqt... after 10000ms - re-queuing
+2026-01-14T21:05:21: [metadata] ⏱️ Timeout for FnJ1sDn5... after 10000ms - re-queuing
+2026-01-14T21:05:31: [metadata] ⏱️ Timeout for 6wzxUQqQ... after 10000ms - re-queuing
+2026-01-14T21:05:41: [metadata] ⏱️ Timeout for 5UtiVeiz... after 10000ms - re-queuing
+2026-01-14T21:05:51: [metadata] ⏱️ Timeout for AYRERR1F... after 10000ms - re-queuing
+2026-01-14T21:06:01: [metadata] ⏱️ Timeout for 3XieE6yc... after 10000ms - re-queuing
+2026-01-14T21:06:56: [metadata] ⏱️ Timeout for 54fgxSjb... after 10000ms - re-queuing | Queue: 368
+2026-01-14T21:07:24: [metadata] ⏱️ Timeout for 6wzxUQqQ... after 10000ms - re-queuing | Queue: 350
+2026-01-14T21:07:34: [metadata] ⏱️ Timeout for 5UtiVeiz... after 10000ms - re-queuing | Queue: 351
+2026-01-14T21:07:54: [metadata] ⏱️ Timeout for 3XieE6yc... after 10000ms - re-queuing | Queue: 351
+2026-01-14T21:08:09: [metadata] ⏱️ Timeout for 8HFLK7Lc... after 10000ms - re-queuing | Queue: 352
+2026-01-14T21:08:19: [metadata] ⏱️ Timeout for 2TBkMbdD... after 10000ms - re-queuing | Queue: 353
+2026-01-14T21:08:29: [metadata] ⏱️ Timeout for DK485iXx... after 10000ms - re-queuing | Queue: 356
+2026-01-14T21:08:39: [metadata] ⏱️ Timeout for 7RLkqU5a... after 10000ms - re-queuing | Queue: 358
+2026-01-14T21:08:49: [metadata] ⏱️ Timeout for DaRL3Vrr... after 10000ms - re-queuing | Queue: 358
+2026-01-14T21:08:59: [metadata] ⏱️ Timeout for CMbeFEcq... after 10000ms - re-queuing | Queue: 359
+2026-01-14T21:09:09: [metadata] ⏱️ Timeout for 3z3xrJZW... after 10000ms - re-queuing | Queue: 359
+2026-01-14T21:09:19: [metadata] ⏱️ Timeout for CZcjjXRm... after 10000ms - re-queuing | Queue: 359
+2026-01-14T21:09:29: [metadata] ⏱️ Timeout for GDq9V8uT... after 10000ms - re-queuing | Queue: 360
+2026-01-14T21:10:24: [metadata] ⏱️ Timeout for FzVD7tJX... after 10000ms - re-queuing | Queue: 359
+2026-01-14T21:10:34: [metadata] ⏱️ Timeout for Ao1ZA7FM... after 10000ms - re-queuing | Queue: 360
+2026-01-14T21:11:24: [metadata] ⏱️ Timeout for 54fgxSjb... after 1000ms - re-queuing | Queue: 346
+2026-01-14T21:11:44: [metadata] ⏱️ Timeout for GU9NHEvD... after 1000ms - re-queuing | Queue: 329
+2026-01-14T21:11:45: [metadata] ⏱️ Timeout for 6c4kx2Rq... after 1000ms - re-queuing | Queue: 329
+2026-01-14T21:11:46: [metadata] ⏱️ Timeout for 9uJLgZQu... after 1000ms - re-queuing | Queue: 329
+2026-01-14T21:11:48: [metadata] ⏱️ Timeout for EvPwknTZ... after 1000ms - re-queuing | Queue: 328
+2026-01-14T21:11:50: [metadata] ⏱️ Timeout for 7WS5NVsc... after 1000ms - re-queuing | Queue: 329
+2026-01-14T21:11:51: [metadata] ⏱️ Timeout for AHjT1Mb4... after 1000ms - re-queuing | Queue: 329
+2026-01-14T21:11:53: [metadata] ⏱️ Timeout for 2xu6DXkF... after 1000ms - re-queuing | Queue: 329
+2026-01-14T21:11:55: [metadata] ⏱️ Timeout for 95Xs3z8s... after 1000ms - re-queuing | Queue: 329
+2026-01-14T21:11:56: [metadata] ⏱️ Timeout for F3LkZEtx... after 1000ms - re-queuing | Queue: 329
+2026-01-14T21:11:57: [metadata] ⏱️ Timeout for FX1RbFsC... after 1000ms - re-queuing | Queue: 329
+2026-01-14T21:11:58: [metadata] ⏱️ Timeout for 7MD5fQJk... after 1000ms - re-queuing | Queue: 329
+2026-01-14T21:11:59: [metadata] ⏱️ Timeout for AHWnHKkV... after 1000ms - re-queuing | Queue: 329
+2026-01-14T21:12:00: [metadata] ⏱️ Timeout for JBFnWvRx... after 1000ms - re-queuing | Queue: 329
+2026-01-14T21:12:01: [metadata] ⏱️ Timeout for 8h9TSabe... after 1000ms - re-queuing | Queue: 329
+2026-01-14T21:12:02: [metadata] ⏱️ Timeout for G9e69Esj... after 1000ms - re-queuing | Queue: 329
+2026-01-14T21:12:03: [metadata] ⏱️ Timeout for 5gXkY5Aj... after 1000ms - re-queuing | Queue: 329
+2026-01-14T21:12:04: [metadata] ⏱️ Timeout for L56vQpWA... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:12:05: [metadata] ⏱️ Timeout for 8AjPrZiv... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:12:07: [metadata] ⏱️ Timeout for 98drvC1X... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:12:08: [metadata] ⏱️ Timeout for BkjGMbd6... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:12:11: [metadata] ⏱️ Timeout for 3BYKcF7y... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:12:12: [metadata] ⏱️ Timeout for 8JqHp8xW... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:12:13: [metadata] ⏱️ Timeout for 2UpRi8Tu... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:12:15: [metadata] ⏱️ Timeout for 1hxxMDSn... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:12:16: [metadata] ⏱️ Timeout for 25iGLQEy... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:12:17: [metadata] ⏱️ Timeout for Coibv7f2... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:12:18: [metadata] ⏱️ Timeout for 6zbfHBbZ... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:12:20: [metadata] ⏱️ Timeout for Czf26eLC... after 1000ms - re-queuing | Queue: 329
+2026-01-14T21:12:21: [metadata] ⏱️ Timeout for 2DiN6p55... after 1000ms - re-queuing | Queue: 329
+2026-01-14T21:12:22: [metadata] ⏱️ Timeout for DaLEVkE7... after 1000ms - re-queuing | Queue: 329
+2026-01-14T21:12:23: [metadata] ⏱️ Timeout for 332yPGv1... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:12:25: [metadata] ⏱️ Timeout for 9y9Dfuhp... after 1000ms - re-queuing | Queue: 329
+2026-01-14T21:12:27: [metadata] ⏱️ Timeout for EWfH5Koc... after 1000ms - re-queuing | Queue: 329
+2026-01-14T21:12:29: [metadata] ⏱️ Timeout for 3YEwkjbf... after 1000ms - re-queuing | Queue: 329
+2026-01-14T21:12:30: [metadata] ⏱️ Timeout for CpWzCwe9... after 1000ms - re-queuing | Queue: 329
+2026-01-14T21:12:31: [metadata] ⏱️ Timeout for CgJ4aAc2... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:12:33: [metadata] ⏱️ Timeout for E8bhYg41... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:12:34: [metadata] ⏱️ Timeout for 5apNxzdm... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:12:35: [metadata] ⏱️ Timeout for CrbrHz1C... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:12:36: [metadata] ⏱️ Timeout for BmFWRwzC... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:12:38: [metadata] ⏱️ Timeout for 2fsvNKLa... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:12:39: [metadata] ⏱️ Timeout for 131JDwJg... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:12:40: [metadata] ⏱️ Timeout for HehGmKGP... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:12:42: [metadata] ⏱️ Timeout for AFDmvoXP... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:12:43: [metadata] ⏱️ Timeout for FQu7HRWq... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:12:44: [metadata] ⏱️ Timeout for BXVix1W6... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:12:45: [metadata] ⏱️ Timeout for B35at4uT... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:12:48: [metadata] ⏱️ Timeout for ANaFtbZY... after 1000ms - re-queuing | Queue: 331
+2026-01-14T21:12:49: [metadata] ⏱️ Timeout for HfKCq3jv... after 1000ms - re-queuing | Queue: 331
+2026-01-14T21:12:51: [metadata] ⏱️ Timeout for DC5w9sNR... after 1000ms - re-queuing | Queue: 331
+2026-01-14T21:12:53: [metadata] ⏱️ Timeout for JBDE7PGd... after 1000ms - re-queuing | Queue: 331
+2026-01-14T21:12:54: [metadata] ⏱️ Timeout for CAjUJm6S... after 1000ms - re-queuing | Queue: 331
+2026-01-14T21:12:56: [metadata] ⏱️ Timeout for 3jhMDy2K... after 1000ms - re-queuing | Queue: 331
+2026-01-14T21:12:57: [metadata] ⏱️ Timeout for 9ADH9V3U... after 1000ms - re-queuing | Queue: 331
+2026-01-14T21:12:58: [metadata] ⏱️ Timeout for 57WULY6m... after 1000ms - re-queuing | Queue: 331
+2026-01-14T21:12:59: [metadata] ⏱️ Timeout for 7TDqf7Qz... after 1000ms - re-queuing | Queue: 331
+2026-01-14T21:13:00: [metadata] ⏱️ Timeout for 9s4e2rrm... after 1000ms - re-queuing | Queue: 331
+2026-01-14T21:13:01: [metadata] ⏱️ Timeout for J2iYmcGc... after 1000ms - re-queuing | Queue: 331
+2026-01-14T21:13:02: [metadata] ⏱️ Timeout for HaFCcMHr... after 1000ms - re-queuing | Queue: 331
+2026-01-14T21:13:03: [metadata] ⏱️ Timeout for Ca9uBA3i... after 1000ms - re-queuing | Queue: 331
+2026-01-14T21:13:06: [metadata] ⏱️ Timeout for 6JV6Ltbm... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:13:08: [metadata] ⏱️ Timeout for HofnfhaF... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:13:09: [metadata] ⏱️ Timeout for 8TGwB2oB... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:13:10: [metadata] ⏱️ Timeout for H4Ttpiso... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:13:11: [metadata] ⏱️ Timeout for 8zJPHEKp... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:13:12: [metadata] ⏱️ Timeout for 8sfcntuu... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:13:13: [metadata] ⏱️ Timeout for H62KpTeh... after 1000ms - re-queuing | Queue: 330
+2026-01-14T21:13:14: [metadata] ⏱️ Timeout for 3rNimmNc... after 1000ms - re-queuing | Queue: 331
+2026-01-14T21:13:15: [metadata] ⏱️ Timeout for 2KGTfcai... after 1000ms - re-queuing | Queue: 331
+2026-01-14T21:13:16: [metadata] ⏱️ Timeout for CukP2bRP... after 1000ms - re-queuing | Queue: 331
+2026-01-14T21:13:17: [metadata] ⏱️ Timeout for 6rx188Cj... after 1000ms - re-queuing | Queue: 331
+2026-01-14T21:13:18: [metadata] ⏱️ Timeout for 8ZwDMypa... after 1000ms - re-queuing | Queue: 331
+2026-01-14T21:13:19: [metadata] ⏱️ Timeout for 2QnBJZSJ... after 1000ms - re-queuing | Queue: 331
+2026-01-14T21:13:20: [metadata] ⏱️ Timeout for BTTGGexW... after 1000ms - re-queuing | Queue: 331
+2026-01-14T21:13:21: [metadata] ⏱️ Timeout for HcFqnpyP... after 1000ms - re-queuing | Queue: 331
+2026-01-14T21:13:22: [metadata] ⏱️ Timeout for HaT9rEVs... after 1000ms - re-queuing | Queue: 332
+2026-01-14T21:13:23: [metadata] ⏱️ Timeout for 7Udtw1Wq... after 1000ms - re-queuing | Queue: 333
+2026-01-14T21:13:25: [metadata] ⏱️ Timeout for H2qM8uFN... after 1000ms - re-queuing | Queue: 334
+2026-01-14T21:13:26: [metadata] ⏱️ Timeout for Evt6dVzM... after 1000ms - re-queuing | Queue: 334
+2026-01-14T21:13:27: [metadata] ⏱️ Timeout for BsiwgERR... after 1000ms - re-queuing | Queue: 334
+2026-01-14T21:13:29: [metadata] ⏱️ Timeout for 4gfBHfrn... after 1000ms - re-queuing | Queue: 334
+2026-01-14T21:13:30: [metadata] ⏱️ Timeout for 5SffMPun... after 1000ms - re-queuing | Queue: 335
+2026-01-14T21:13:31: [metadata] ⏱️ Timeout for J3GsSVC4... after 1000ms - re-queuing | Queue: 335
+2026-01-14T21:13:32: [metadata] ⏱️ Timeout for GzRowJEb... after 1000ms - re-queuing | Queue: 335
+2026-01-14T21:13:33: [metadata] ⏱️ Timeout for 8doMWtkq... after 1000ms - re-queuing | Queue: 335
+2026-01-14T21:13:34: [metadata] ⏱️ Timeout for EoZSe553... after 1000ms - re-queuing | Queue: 335
+2026-01-14T21:13:35: [metadata] ⏱️ Timeout for 8E45zX1f... after 1000ms - re-queuing | Queue: 335
+2026-01-14T21:13:36: [metadata] ⏱️ Timeout for FJiATgcz... after 1000ms - re-queuing | Queue: 335
+2026-01-14T21:13:37: [metadata] ⏱️ Timeout for HiNqwbb3... after 1000ms - re-queuing | Queue: 335
+2026-01-14T21:13:38: [metadata] ⏱️ Timeout for 9Fx8b5yZ... after 1000ms - re-queuing | Queue: 335
+2026-01-14T21:13:39: [metadata] ⏱️ Timeout for 46v15NxZ... after 1000ms - re-queuing | Queue: 335
+2026-01-14T21:13:40: [metadata] ⏱️ Timeout for 471x97v5... after 1000ms - re-queuing | Queue: 335
+2026-01-14T21:13:42: [metadata] ⏱️ Timeout for HfTCyEiw... after 1000ms - re-queuing | Queue: 334
+2026-01-14T21:13:43: [metadata] ⏱️ Timeout for 4fJsn9B9... after 1000ms - re-queuing | Queue: 334
+2026-01-14T21:13:44: [metadata] ⏱️ Timeout for 2As2ro1p... after 1000ms - re-queuing | Queue: 334
+2026-01-14T21:13:59: [metadata] ⏱️ Timeout for 9s4e2rrm... after 6000ms - re-queuing
+2026-01-14T21:13:59: [metadata] ⏱️ Timeout for J2iYmcGc... after 6000ms - re-queuing
+2026-01-14T21:13:59: [metadata] ⏱️ Timeout for Ca9uBA3i... after 6000ms - re-queuing
+2026-01-14T21:13:59: [metadata] ⏱️ Timeout for 8ZwDMypa... after 6000ms - re-queuing
+2026-01-14T21:14:05: [metadata] ⏱️ Timeout for 39k4uJkR... after 6000ms - re-queuing
+2026-01-14T21:14:05: [metadata] ⏱️ Timeout for 3fCKmfEm... after 6000ms - re-queuing
+2026-01-14T21:14:05: [metadata] ⏱️ Timeout for EEgRiSqu... after 6000ms - re-queuing
+2026-01-14T21:14:05: [metadata] ⏱️ Timeout for A6c7aHVP... after 6000ms - re-queuing
+2026-01-14T21:14:05: [metadata] ⏱️ Timeout for FDacUPHu... after 6000ms - re-queuing
+2026-01-14T21:14:05: [metadata] ⏱️ Timeout for 4BPJgJ2L... after 6000ms - re-queuing
+2026-01-14T21:14:05: [metadata] ⏱️ Timeout for FWN7eLSP... after 6000ms - re-queuing
+2026-01-14T21:14:05: [metadata] ⏱️ Timeout for 8YhX1qie... after 6000ms - re-queuing
+2026-01-14T21:14:05: [metadata] ⏱️ Timeout for GWteudug... after 6000ms - re-queuing
+2026-01-14T21:14:05: [metadata] ⏱️ Timeout for HQCRj7wE... after 6000ms - re-queuing
+2026-01-14T21:14:05: [metadata] ⏱️ Timeout for BhdKjGnD... after 6000ms - re-queuing
+2026-01-14T21:14:05: [metadata] ⏱️ Timeout for 3pTpYs5a... after 6000ms - re-queuing
+2026-01-14T21:14:05: [metadata] ⏱️ Timeout for 47uP4KLa... after 6000ms - re-queuing
+2026-01-14T21:14:05: [metadata] ⏱️ Timeout for Go8piZAR... after 6000ms - re-queuing
+2026-01-14T21:14:11: [metadata] ⏱️ Timeout for J8fotuFW... after 6000ms - re-queuing
+2026-01-14T21:14:17: [metadata] ⏱️ Timeout for 3EN8Uqw2... after 6000ms - re-queuing
+2026-01-14T21:14:17: [metadata] ⏱️ Timeout for BY5UgehD... after 6000ms - re-queuing
+2026-01-14T21:14:17: [metadata] ⏱️ Timeout for FSRfRSqp... after 6000ms - re-queuing
+2026-01-14T21:14:17: [metadata] ⏱️ Timeout for HVn4rcLL... after 6000ms - re-queuing
+2026-01-14T21:14:17: [metadata] ⏱️ Timeout for 5AFKNXbS... after 6000ms - re-queuing
+2026-01-14T21:14:17: [metadata] ⏱️ Timeout for 4ZpjocKk... after 6000ms - re-queuing
+2026-01-14T21:14:17: [metadata] ⏱️ Timeout for 3WHxmKfM... after 6000ms - re-queuing
+2026-01-14T21:14:17: [metadata] ⏱️ Timeout for B1eiez83... after 6000ms - re-queuing
+2026-01-14T21:14:17: [metadata] ⏱️ Timeout for 38NYRq8A... after 6000ms - re-queuing
+2026-01-14T21:14:17: [metadata] ⏱️ Timeout for vHB437J1... after 6000ms - re-queuing
+2026-01-14T21:14:17: [metadata] ⏱️ Timeout for 3anPiFbM... after 6000ms - re-queuing
+2026-01-14T21:14:17: [metadata] ⏱️ Timeout for HRLWJYUA... after 6000ms - re-queuing
+2026-01-14T21:14:17: [metadata] ⏱️ Timeout for C8X9FDBf... after 6000ms - re-queuing
+2026-01-14T21:14:17: [metadata] ⏱️ Timeout for EkGnscS9... after 6000ms - re-queuing
+2026-01-14T21:14:17: [metadata] ⏱️ Timeout for E1VUgnDv... after 6000ms - re-queuing
+2026-01-14T21:14:23: [metadata] ⏱️ Timeout for GDsRMuru... after 6000ms - re-queuing
+2026-01-14T21:14:23: [metadata] ⏱️ Timeout for Drci9rxr... after 6000ms - re-queuing
+2026-01-14T21:14:23: [metadata] ⏱️ Timeout for AZE5xsyq... after 6000ms - re-queuing
+2026-01-14T21:14:23: [metadata] ⏱️ Timeout for 2wu6LMQa... after 6000ms - re-queuing
+2026-01-14T21:14:23: [metadata] ⏱️ Timeout for CdpF8UKK... after 6000ms - re-queuing
+2026-01-14T21:14:23: [metadata] ⏱️ Timeout for 2bpvWLL6... after 6000ms - re-queuing
+2026-01-14T21:14:23: [metadata] ⏱️ Timeout for FgskcSsp... after 6000ms - re-queuing
+2026-01-14T21:14:23: [metadata] ⏱️ Timeout for Hehd5a6r... after 6000ms - re-queuing
+2026-01-14T21:14:23: [metadata] ⏱️ Timeout for 7QrqcTnM... after 6000ms - re-queuing
+2026-01-14T21:14:23: [metadata] ⏱️ Timeout for 3AAMsPEU... after 6000ms - re-queuing
+2026-01-14T21:14:23: [metadata] ⏱️ Timeout for D6CHUkjW... after 6000ms - re-queuing
+2026-01-14T21:14:23: [metadata] ⏱️ Timeout for C9yMVffC... after 6000ms - re-queuing
+2026-01-14T21:14:23: [metadata] ⏱️ Timeout for Hez9tCTx... after 6000ms - re-queuing
+2026-01-14T21:14:23: [metadata] ⏱️ Timeout for E8AmEbwM... after 6000ms - re-queuing
+2026-01-14T21:14:29: [metadata] ⏱️ Timeout for 9BsyksDn... after 6000ms - re-queuing
+2026-01-14T21:14:29: [metadata] ⏱️ Timeout for H7n5c8UM... after 6000ms - re-queuing
+2026-01-14T21:14:29: [metadata] ⏱️ Timeout for HpDzCjwr... after 6000ms - re-queuing
+2026-01-14T21:14:29: [metadata] ⏱️ Timeout for D2okN46N... after 6000ms - re-queuing
+2026-01-14T21:14:29: [metadata] ⏱️ Timeout for FNqLYWZq... after 6000ms - re-queuing
+2026-01-14T21:14:29: [metadata] ⏱️ Timeout for 9vCwBcbn... after 6000ms - re-queuing
+2026-01-14T21:14:29: [metadata] ⏱️ Timeout for EEQ2Sfz3... after 6000ms - re-queuing
+2026-01-14T21:14:29: [metadata] ⏱️ Timeout for C1jfWMkG... after 6000ms - re-queuing
+2026-01-14T21:14:29: [metadata] ⏱️ Timeout for AkLpLv7K... after 6000ms - re-queuing
+2026-01-14T21:14:29: [metadata] ⏱️ Timeout for 2nVpeC9A... after 6000ms - re-queuing
+2026-01-14T21:14:35: [metadata] ⏱️ Timeout for DqBCx3Rj... after 6000ms - re-queuing
+2026-01-14T21:14:35: [metadata] ⏱️ Timeout for 2cgEbf9o... after 6000ms - re-queuing
+2026-01-14T21:14:35: [metadata] ⏱️ Timeout for 7P6Lec8v... after 6000ms - re-queuing
+2026-01-14T21:14:35: [metadata] ⏱️ Timeout for 97Gt4StP... after 6000ms - re-queuing
+2026-01-14T21:14:35: [metadata] ⏱️ Timeout for Cg5oG1wp... after 6000ms - re-queuing
+2026-01-14T21:14:35: [metadata] ⏱️ Timeout for Fg1grrFy... after 6000ms - re-queuing
+2026-01-14T21:14:35: [metadata] ⏱️ Timeout for ED6s9ws1... after 6000ms - re-queuing
+2026-01-14T21:14:35: [metadata] ⏱️ Timeout for FW2A5sZu... after 6000ms - re-queuing
+2026-01-14T21:14:35: [metadata] ⏱️ Timeout for EcF2FsrQ... after 6000ms - re-queuing
+2026-01-14T21:14:35: [metadata] ⏱️ Timeout for CDBTZhxF... after 6000ms - re-queuing
+2026-01-14T21:14:35: [metadata] ⏱️ Timeout for FdCAkS6p... after 6000ms - re-queuing
+2026-01-14T21:14:41: [metadata] ⏱️ Timeout for D9P43JfK... after 6000ms - re-queuing
+2026-01-14T21:14:41: [metadata] ⏱️ Timeout for HTsLEiu5... after 6000ms - re-queuing
+2026-01-14T21:14:41: [metadata] ⏱️ Timeout for C5LqPLEY... after 6000ms - re-queuing
+2026-01-14T21:14:41: [metadata] ⏱️ Timeout for GGewsUAe... after 6000ms - re-queuing
+2026-01-14T21:14:41: [metadata] ⏱️ Timeout for J6nEXTji... after 6000ms - re-queuing
+2026-01-14T21:14:41: [metadata] ⏱️ Timeout for 2wGyyWht... after 6000ms - re-queuing
+2026-01-14T21:14:41: [metadata] ⏱️ Timeout for 7mewHVBi... after 6000ms - re-queuing
+2026-01-14T21:14:41: [metadata] ⏱️ Timeout for 6XXrdLsA... after 6000ms - re-queuing
+2026-01-14T21:14:41: [metadata] ⏱️ Timeout for 41F4ueJu... after 6000ms - re-queuing
+2026-01-14T21:14:41: [metadata] ⏱️ Timeout for BxCtjPPm... after 6000ms - re-queuing
+2026-01-14T21:14:41: [metadata] ⏱️ Timeout for 4PV8LYTb... after 6000ms - re-queuing
+2026-01-14T21:14:41: [metadata] ⏱️ Timeout for GSHZf6Q1... after 6000ms - re-queuing
+2026-01-14T21:14:41: [metadata] ⏱️ Timeout for DsekB128... after 6000ms - re-queuing
+2026-01-14T21:14:41: [metadata] ⏱️ Timeout for 36Ex2tVC... after 6000ms - re-queuing
+2026-01-14T21:14:41: [metadata] ⏱️ Timeout for 49jnFLj6... after 6000ms - re-queuing
+2026-01-14T21:14:41: [metadata] ⏱️ Timeout for FQp6Ubyo... after 6000ms - re-queuing
+2026-01-14T21:14:47: [metadata] ⏱️ Timeout for EUK22Bra... after 6000ms - re-queuing
+2026-01-14T21:14:47: [metadata] ⏱️ Timeout for cBd9eFk7... after 6000ms - re-queuing
+2026-01-14T21:14:47: [metadata] ⏱️ Timeout for 6jQoRcfT... after 6000ms - re-queuing
+2026-01-14T21:14:47: [metadata] ⏱️ Timeout for G2qfaJjC... after 6000ms - re-queuing
+2026-01-14T21:14:47: [metadata] ⏱️ Timeout for ErWFUMp7... after 6000ms - re-queuing
+2026-01-14T21:14:47: [metadata] ⏱️ Timeout for 2Y2L1ean... after 6000ms - re-queuing
+2026-01-14T21:14:47: [metadata] ⏱️ Timeout for HsF82ppB... after 6000ms - re-queuing
+2026-01-14T21:14:47: [metadata] ⏱️ Timeout for B9SzEgh1... after 6000ms - re-queuing
+2026-01-14T21:14:47: [metadata] ⏱️ Timeout for BdoFgL7Q... after 6000ms - re-queuing
+2026-01-14T21:14:47: [metadata] ⏱️ Timeout for 5EAQGcEk... after 6000ms - re-queuing
+2026-01-14T21:14:47: [metadata] ⏱️ Timeout for EhsZ8wC3... after 6000ms - re-queuing
+2026-01-14T21:14:47: [metadata] ⏱️ Timeout for GxQWRKwK... after 6000ms - re-queuing
+2026-01-14T21:14:47: [metadata] ⏱️ Timeout for HyrhiMSJ... after 6000ms - re-queuing
+2026-01-14T21:14:47: [metadata] ⏱️ Timeout for 8z9sBXgJ... after 6000ms - re-queuing
+2026-01-14T21:14:47: [metadata] ⏱️ Timeout for C1TMATkn... after 6000ms - re-queuing
+2026-01-14T21:14:54: [metadata] ⏱️ Timeout for DS5kA5mz... after 6000ms - re-queuing
+2026-01-14T21:14:54: [metadata] ⏱️ Timeout for 7oAJ3zDQ... after 6000ms - re-queuing
+2026-01-14T21:14:54: [metadata] ⏱️ Timeout for Erpwprnu... after 6000ms - re-queuing
+2026-01-14T21:14:54: [metadata] ⏱️ Timeout for 54fgxSjb... after 6000ms - re-queuing
+2026-01-14T21:15:04: [metadata] ⏱️ Timeout for FSRfRSqp... after 6000ms - re-queuing
+2026-01-14T21:15:10: [metadata] ⏱️ Timeout for 9BsyksDn... after 6000ms - re-queuing
+2026-01-14T21:15:10: [metadata] ⏱️ Timeout for C1jfWMkG... after 6000ms - re-queuing
+2026-01-14T21:15:10: [metadata] ⏱️ Timeout for AkLpLv7K... after 6000ms - re-queuing
+2026-01-14T21:15:10: [metadata] ⏱️ Timeout for 2nVpeC9A... after 6000ms - re-queuing
+2026-01-14T21:15:10: [metadata] ⏱️ Timeout for 7fGyiou6... after 6000ms - re-queuing
+2026-01-14T21:15:10: [metadata] ⏱️ Timeout for 8atSAFuo... after 6000ms - re-queuing
+2026-01-14T21:15:10: [metadata] ⏱️ Timeout for TmhkTHdk... after 6000ms - re-queuing
+2026-01-14T21:15:16: [metadata] ⏱️ Timeout for DqBCx3Rj... after 6000ms - re-queuing
+2026-01-14T21:15:16: [metadata] ⏱️ Timeout for 7P6Lec8v... after 6000ms - re-queuing
+2026-01-14T21:15:16: [metadata] ⏱️ Timeout for 97Gt4StP... after 6000ms - re-queuing
+2026-01-14T21:15:16: [metadata] ⏱️ Timeout for Fg1grrFy... after 6000ms - re-queuing
+2026-01-14T21:15:16: [metadata] ⏱️ Timeout for HTsLEiu5... after 6000ms - re-queuing
+2026-01-14T21:15:16: [metadata] ⏱️ Timeout for C5LqPLEY... after 6000ms - re-queuing
+2026-01-14T21:15:16: [metadata] ⏱️ Timeout for 2wGyyWht... after 6000ms - re-queuing
+2026-01-14T21:15:16: [metadata] ⏱️ Timeout for 41F4ueJu... after 6000ms - re-queuing
+2026-01-14T21:15:16: [metadata] ⏱️ Timeout for GSHZf6Q1... after 6000ms - re-queuing
+2026-01-14T21:15:16: [metadata] ⏱️ Timeout for DsekB128... after 6000ms - re-queuing
+2026-01-14T21:15:22: [metadata] ⏱️ Timeout for 5K4n4ojX... after 6000ms - re-queuing
+2026-01-14T21:15:22: [metadata] ⏱️ Timeout for 2W78DSAe... after 6000ms - re-queuing
+2026-01-14T21:15:22: [metadata] ⏱️ Timeout for GheWom7w... after 6000ms - re-queuing
+2026-01-14T21:15:22: [metadata] ⏱️ Timeout for 4zszH5PJ... after 6000ms - re-queuing
+2026-01-14T21:15:22: [metadata] ⏱️ Timeout for cBd9eFk7... after 6000ms - re-queuing
+2026-01-14T21:15:22: [metadata] ⏱️ Timeout for ErWFUMp7... after 6000ms - re-queuing
+2026-01-14T21:15:22: [metadata] ⏱️ Timeout for 2Y2L1ean... after 6000ms - re-queuing
+2026-01-14T21:15:22: [metadata] ⏱️ Timeout for HsF82ppB... after 6000ms - re-queuing
+2026-01-14T21:15:22: [metadata] ⏱️ Timeout for B9SzEgh1... after 6000ms - re-queuing
+2026-01-14T21:15:28: [metadata] ⏱️ Timeout for 54fgxSjb... after 6000ms - re-queuing
+2026-01-14T21:15:34: [metadata] ⏱️ Timeout for 5K4n4ojX... after 6000ms - re-queuing
+2026-01-14T21:15:34: [metadata] ⏱️ Timeout for 2W78DSAe... after 6000ms - re-queuing
+2026-01-14T21:15:34: [metadata] ⏱️ Timeout for GheWom7w... after 6000ms - re-queuing
+2026-01-14T21:15:34: [metadata] ⏱️ Timeout for 4zszH5PJ... after 6000ms - re-queuing
+2026-01-14T21:15:34: [metadata] ⏱️ Timeout for cBd9eFk7... after 6000ms - re-queuing
+2026-01-14T21:15:34: [metadata] ⏱️ Timeout for 2Y2L1ean... after 6000ms - re-queuing
+2026-01-14T21:15:34: [metadata] ⏱️ Timeout for HsF82ppB... after 6000ms - re-queuing
+2026-01-14T21:15:34: [metadata] ⏱️ Timeout for B9SzEgh1... after 6000ms - re-queuing
+2026-01-14T21:15:41: [metadata] ⏱️ Timeout for EV1jRqse... after 6000ms - re-queuing
+2026-01-14T21:15:41: [metadata] ⏱️ Timeout for 54fgxSjb... after 6000ms - re-queuing
+2026-01-14T21:15:47: [metadata] ⏱️ Timeout for EV1jRqse... after 6000ms - re-queuing
+2026-01-14T21:15:47: [metadata] ⏱️ Timeout for 54fgxSjb... after 6000ms - re-queuing
+2026-01-14T21:15:54: [metadata] ⏱️ Timeout for EV1jRqse... after 6000ms - re-queuing

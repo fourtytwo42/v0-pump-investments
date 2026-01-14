@@ -450,3 +450,1226 @@
 2026-01-13T21:47:27: [pump-coin] Failed to fetch coin 4Ys8q16oT9aEWDRJrNzY2MnJXZdGNytdxiECTjA2pump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
 2026-01-13T21:47:27: [pump-coin] https://frontend-api.pump.fun/coins/4Ys8q16oT9aEWDRJrNzY2MnJXZdGNytdxiECTjA2pump responded with 530
 2026-01-13T21:47:27: [pump-coin] All endpoints failed for 4Ys8q16oT9aEWDRJrNzY2MnJXZdGNytdxiECTjA2pump: pump.fun coin request failed with status 530
+2026-01-14T20:09:37: 
+2026-01-14T20:09:37: > pump-investments@3.0.32 start
+2026-01-14T20:09:37: > next start
+2026-01-14T20:09:37: 
+2026-01-14T20:09:37:    ▲ Next.js 14.1.0
+2026-01-14T20:09:37:    - Local:        http://localhost:3000
+2026-01-14T20:09:37: 
+2026-01-14T20:09:37:  ✓ Ready in 288ms
+2026-01-14T20:09:40: [api/tokens] metadata fetch failed https://ipfs.launchblitz.ai/file/62Df9XbAtu7dp85A66e9WfPSeMsNRKLJVQngwC2jpump.json metadata fetch 404
+2026-01-14T20:09:40: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qme8vKELBtzkT5WDuyYAPYm4K3hBfQpGEq3GkLuCVGMbKe metadata fetch 403
+2026-01-14T20:09:40: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifgjpihkzoaqr3tsxx5cwkiu3azkdapvwwdnni5sb4ya4onm7en5u metadata fetch 403
+2026-01-14T20:09:40: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmVA8swctSHVeg24uscAbG9Qa6VeZ1uPYmZFTYrrb2mdgC metadata fetch 403
+2026-01-14T20:09:40: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibx2dm5t3xltkhd3wmo3ztb2if33vf56xq5sb7dyvfeksil4cchyq metadata fetch 403
+2026-01-14T20:09:40: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmTS1Yj66jC1JbnbAYo8hwpmuF2L8TZn6nwUwG8depXYXb metadata fetch 403
+2026-01-14T20:09:40: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifqpfxlmd5bbrlfd27pzgwcfs2cplnn2bijywqs2rqj5pxylure34 metadata fetch 403
+2026-01-14T20:09:40: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qma4upGHKfcD4bYfJTJBZMJx2aoEeB9u6B6zH5Q96K68vX metadata fetch 403
+2026-01-14T20:09:40: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmbT82viRq1bX1VC9aVFaqDPjCFk5ZUh2FM8cfZbuPn6TV metadata fetch 403
+2026-01-14T20:09:40: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/tg6pkuAB metadata fetch 404
+2026-01-14T20:09:40: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmcoFBK1Ecd2Vru4wVDYJPiXRwaiyZSDJqauZ27XEVxz5K metadata fetch 403
+2026-01-14T20:09:40: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmVjddLADUCdfajiBN2hVBmy2TFfCdTAQcJ838FosDsGRK metadata fetch 403
+2026-01-14T20:09:40: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicddjktnu34katt3a2pnjqxtwgqjfghwbdyit6tn3waee4oy6fhgm metadata fetch 403
+2026-01-14T20:09:40: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmVUuzqss22T6J7kQMw5K8oHh7DpvJVdR4r4tTvBP7nGyV metadata fetch 403
+2026-01-14T20:09:40: [api/tokens] metadata fetch failed https://kimjongnuked.com/json/ti3W metadata fetch 404
+2026-01-14T20:09:40: [api/tokens] metadata fetch failed https://eu-dev.uxento.io/data/cme3sxhgs006qkr1aoaz49lsr metadata fetch 526
+2026-01-14T20:09:41: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidbxl6lzf6jh4gg75kthzoiouvmx6hwyy7qzdegctahcgys2dtrma metadata fetch 403
+2026-01-14T20:09:41: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreif5jdorhrnpyj5ogsiqttkjmhpgjzta427b374756ma6ajcjpt4dm metadata fetch 403
+2026-01-14T20:09:41: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/0f62c5cd51714598.json metadata fetch 403
+2026-01-14T20:09:41: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmU3JK1ksWvRmeRR6e7jDVA5GCJt5Fr4Pf3iu13e9PezRv metadata fetch 403
+2026-01-14T20:09:41: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihm2tiznaxllkdknmukqhbr7gu5w57wfxgkar3hihrtvgr3j3zy2e metadata fetch 403
+2026-01-14T20:09:41: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/94c5f4a1b46b48cb.json metadata fetch 403
+2026-01-14T20:09:41: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmTQvFhJBGypG3pz9xE3MoHVJaEbSgnwdkkEYw3ee14GtW metadata fetch 403
+2026-01-14T20:09:41: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/338f5b96-545e-43ff-ae7b-5082af97a7c2.json metadata fetch 403
+2026-01-14T20:09:41: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qma7Nj7qCdpnRzriGHuaYE71rtBc2iJKVUAtifpPtAcqXm Unexpected token '�', "���� JFIF"... is not valid JSON
+2026-01-14T20:09:41: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmZdzDLagt3jGVfr4VBWhMRnL8YKwoVDijjNb4RWxTag7q metadata fetch 403
+2026-01-14T20:09:41: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibwvvvj5rpan4rpb7v3lx7mfve5qfn7lrfsqdrqehpmoyg5fyclsy metadata fetch 403
+2026-01-14T20:09:41: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmYXmcLxQXEMPNgAgk4qVEYUVACJNPTabTTHEqWLaGLaaH metadata fetch 403
+2026-01-14T20:09:41: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmSUGnDMrKZnELo9QejJfJFGThLw7fqeBEv8nm2JMh17Xc metadata fetch 403
+2026-01-14T20:09:41: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmNnNq21L4jN5Cy6PFmYqUDnryfhN7Lw8oimcLmwAZrYLe metadata fetch 403
+2026-01-14T20:09:41: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidrqyjgyzet5ptrcfso2wwq73v6j46d5q7s3ruxd2gobxy5ntjpu4 metadata fetch 403
+2026-01-14T20:09:41: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmYFtDsz5MHU789jbnPkPW3AjwT15nswz7UMTAT4jPEbqd metadata fetch 403
+2026-01-14T20:09:41: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmXAXs5HdcmorEran9yAgWXSsfgfs7nSFdKWUnMs2TqbJP metadata fetch 403
+2026-01-14T20:09:41: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreid36omx3clgccawhtycuh2sqjpwoqxd7tsniwdzh6hqpgfo3242ve metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmZRugE5ySgybnLF5gE2PvRuFVQR8L3bmcYF7xfSK2YqKG metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihgthop3lrwxzpjhqq6g5eu6dguavflyuqjtlmytn2b7ymbsk3sam metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreid7euyxzruamfmeyf3jqsshypa2fois4fvvsxwv67fkpqhyh6xomu metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmQ7qhfFScBikCMHmfSuWiSNp25XoEKSeXxR3S1TygMurX metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://eu-dev.uxento.io/data/cmekn94550145fa1beha1j4ct metadata fetch 526
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihktgikvd5yhpbaqv3xqvemqszli3oppiwrzt3ptf4pzz75nsalxu metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmRw37t2D59EvAzbmLzjXqdGHrbXMeWHEsaheNcS3mr4Eq metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidrkeza2l5mwgrcq5c7cj7ahzqsw3bsetcq6mqfkzdpyczndjhph4 metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidfrgfr5dbev5an2abp6gkseglwwyigr6wzmf56gwg4xaa3cju4m4 metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmankPtxKur5JHAaDjfrStUNJke5bVrtv4E6uWC4pTFvhM metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmaqQm2YP9X8ZRfGTDtmon2yiLkSRsWtTeriSwsvZYnLyc metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://eu-dev.uxento.io/data/cmdz1i0c80004jj1apirutqom metadata fetch 526
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreic2wjzzv3ybp7yjkty63hj3xfcmbfhhwo5mavrxxck2cminxg7o2m metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://ipfs.launchblitz.ai/file/AiuRXJ6sFuT1nxp4mV7GoYif64G9vC1hbyCYVyZYpump.json metadata fetch 404
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmQTCZHNnUQns7e5mamRrfRR8BVJfJTNqasygsTsa2hJt8 metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigrfsl7y36uomurd7pnfuyptghjtdkjjxst7eq3thf3iczjbvnjgi metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/c1e9bbd850ec4879.json metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicxiy75muugno7fyn444uyoqiv2lpbr4i6abkv7sjky5f7hz6lzhi metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidbag534qk6lfn4n35amhgc3r2p7xfeeeajzkoh66id2pbixqbzti metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiclg5kdbgr2th3on4fmmol7o3kt7gnhsqfwxhhy34lyot7v6pbuv4 metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibuqj7sntudbiekd4km3l5l347lon3p7d5f4kxccbhjjrrbou45ii metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidmnamnhe3g7v6i5dv5ahqoirkcjhscedzidug4yvzjahed76fkrm metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigwiw4caokuuicpj3wxiwzpmluupxug3tlxg6ioh4o5yawah7maqa metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmd4YYLyCmWGZyYrD6sR8HEsvvyu8ygefSaDtFSovKDdhh metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreieuvgi3a7zhthyhymur3ycpyjd7y6vbojdf75ptsknoq2wkosagta metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidey3d6mfsclkq5pzp2wkaqo6dlqkmcypzaliuxfzxzlywdkm3i44 metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigjga44rnqjhs5ueorh6vlbisrinxiosejscqvlw43mxutpsbk37y metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiaojgcpriwrvupxgj5obgmztaxwumzozg6m23v3vscs3xv733rksm metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreib7dj2mjhwt5tniila2bnpuqvvyvu6omtivvhopoywg7mr6zji4ga metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreieqfocqe5dxfh5lagln4omcgdaqppsqhes4jw5onapwzf5z7c6eta metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmb2L22Jhdrh7NZDzcZPqPyFUPBTTyTDQZFGVRpsPq5mr2 metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmRdTTxATg311QaxUUtkUcwCrCMuafurykXC6F9P2S93Qn metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreie22zb67liarsolrfc7igf4pvrauqf6gxxeuj6kv74gxrxoyby3re metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmT9a1aV56fC7bE4KKNMruBxiTnPxSvzXXvo5fphpycJN3 metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigbi322h36a7u3inhzsoyn4k5r7gfxl7btcojw5gj4iq2zjkxjeiu metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidufxes4ogdylcoecujhoiszosxxmncbyq6wiqd4stmx5cvkq64ry metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibrhchmg4qc4kqipzxs7fwl7edowvwujl7pb3xg2piv25q4zzl4zu metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qma4upGHKfcD4bYfJTJBZMJx2aoEeB9u6B6zH5Q96K68vX metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmWj69aAgPBZGqVYdiG3MkjhZJcdNx5mqsgrh8irHtV8ZQ metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmSMCDZeUujQN5YDLx8oCL77jpyVogoTx1vCJHGWH9jksL metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmacyUsDfwbXtE69iAtagj7cQiSo3UcG6F1tW46y3XotbW metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiae35d56qxokit3dncwebsy54gpygtb6nl7ukvy4vjscxomrwyqbm metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmfBfqwG1FjPFUkA1qCVfcX7RvD6GXpnUSpoYY5VUNCNVz metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidj5pwdda6uiaumywl5sg2zu2zuqvghrejgeni72rlhdjq3wt7yw4 metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmPrFnZTVQ6ufNfgQkTqmCFWBLV6NdspkYywULQAJAyvzB metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmeHdbVcykxsTvnnuxpE5zboH2pzTu9Z4QB3nCiubXNV6r metadata fetch 403
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmR3To5V736nGjCFS2YU3mv6Yu7BooELsLBVf14Umm8hYC Unexpected token '�', "���� �Exif"... is not valid JSON
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmVUXjUbCmXsMj1zjqHjMJRFXdCdxD7Mk8A6JCzgazgjXR Unexpected token '�', "���� JFIF"... is not valid JSON
+2026-01-14T20:09:42: [pump-coin] Failed to fetch coin ENMS9D8UvmbhNMzZi6ydTz3q9j9pNDB2KtmhUjHYyFUP from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:09:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmSwjdGxcoHxAGkAgWJDpZddAB2ozKu6L5ms1Q27m5CSmU metadata fetch 403
+2026-01-14T20:09:42: [pump-coin] https://frontend-api.pump.fun/coins/ENMS9D8UvmbhNMzZi6ydTz3q9j9pNDB2KtmhUjHYyFUP responded with 530
+2026-01-14T20:09:42: [pump-coin] All endpoints failed for ENMS9D8UvmbhNMzZi6ydTz3q9j9pNDB2KtmhUjHYyFUP: pump.fun coin request failed with status 530
+2026-01-14T20:09:44: [api/tokens] metadata fetch failed https://faggotnuked.com/json/90b0d1e6-850a-434d-bd00-8f22ab625e3b fetch failed
+2026-01-14T20:09:50: [api/tokens] metadata fetch failed http://149.51.224.102:81/json/aa39c4ff-1501-4b61-b3bf-c790655f5fee fetch failed
+2026-01-14T20:09:52: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmV96AY7DmrukvSQYQ1rpUx9wftP9Wwwbt2Do9QVegVG3V metadata fetch 403
+2026-01-14T20:09:52: [api/tokens] metadata fetch failed https://metadata.pumployer.fun/metadata/aF7TMKcBtiPK metadata fetch 404
+2026-01-14T20:09:58: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmb5t3nYvSu3W7YZ1fqpVc3xrVEWFBF2Ykv3axvuwknh64 metadata fetch 403
+2026-01-14T20:10:00: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/yxzkqnyH metadata fetch 404
+2026-01-14T20:10:00: [api/tokens] metadata fetch failed https://kimjongnuked.com/json/dhRD metadata fetch 404
+2026-01-14T20:10:00: [api/tokens] metadata fetch failed https://kimjongnuked.com/json/otXm metadata fetch 404
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/3ByNyLnR metadata fetch 404
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/k7jtSprx metadata fetch 404
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/fsw2kixA metadata fetch 404
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicec6uh5swfs73tq3s2cfndd575fczecrbw346kuaahzrhhca23zq fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreig7mlitssta4qjdcjm4j36knqs4gztc6m3ymxo2vl7dcoziujdohu fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreice4k7x5sv2rosacmpreohfdyuynbi7sngpwf73o5uyaasxrw2rw4 fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreih5ytqglxjunu4ww4mzy5dhypfdi4oishzafqqvmxkaqcskejychu fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiava3br5pkitwyaux4yb4ltzlu3cjozx55hd5nvxuzlvtrha7mdxi fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreign64h6vrjnpxxs5jmjmqgt3ldeodbfk2i6eiwdptf4himk62g4dq fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmSsdFgg6gNLkL9bUFNXKhjNyzAzZGCSM97jA6cBiKoVmB fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicxsf7rn2b4wwy4vtluw3l5vuysjhrsewuo5pvu7scb6kisqtodha fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicirhuph6yhqybeqrz66jilyfqgftpdunqqhn3eoxastcnektnmoe fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreie4i5pspyrjpyv2pihmeyfnqb6imkzl7fjms5ob3dmgan536yjzty fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreic2j4rgpknw265hcpgbsul7joympjluilhf75im6rvyabazqso62q fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibvmf6rb5ezf3irfdgkormvlkiomav4s75czjncqtz7fdjwmds4ky fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicnkd53edjbmny2z5d75xkgwkbfztb4xlcu5f7idm45bsox3teiza fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiawpi2flfkwiwrpvnuu75feon7qcrgw5zilt6sne57q332rt6zj4y fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifc3nd2iwshycy44d7nwhqzhw2mbtalvxnrl436jgtwfrt6m6mizi fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmTTzLGxafgAaYY2UVPeYE984Rnb8qCYaWnQ2ohC9d4DFs fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicy2wlubeskpyftpqflcactykjoiai4ilrk2cvyn22zo7mxzcjzba fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifhjssdjhnr4kswdb754pfjrh2czkqcvk7srltmjyhquzabgkuioy fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmV6SKH8jGYot3fpzSwSD4DziPNJXJz64pX5zqAZtS74MV fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigsyuxk47xfc56p6omltn6kawto35yxqlcv7vyqrfiir2mh6da7hi fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihp677mxdqnwydbuxhht4zfbivwlz4hxbhbmnxqxfcegqt5dxmj4q fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreieeplkezzl4weuobnbz6v7c2mvhpggs3vo2kl6u6x2jpr6apfntee fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidfytj777mtg2agbvevutef3lqiprymgflyrb3r34vguhl2xegme4 fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihp7lb33wbyyx2dp5nvc7cfebwwjbmz3hp3fc3jaoyc7rabwqgqpu fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmbHQpVmffPYgA9GeGinJqCTEHZiR61fVoVNSCDZULLtU4 fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreie3x7rjg7brjzj4oek6j6hcbs64ije3pstna3b3xcd4dxw6vlivby fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmSDARx9omt3hPJ5u2tce8A5aRycCmYhCw4j1W4x6G2N74 fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihkprfkmufapopsnalcfuntap5noezpspyylu3g4k6j5eyxozjp6u fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiax4vvxee2yipun56l2ykkaz475pwbmyomp346kxa5lerrvyqkxjq fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmedrK7NFoKreoMDs8ZxnVJpkteZFaxN9EojBGPt1BQCeU fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmeHnrE8AStSJWTch8XvLbMebzoFvvzPM9Az3mfh3GAWgz fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreic24ykj5aewvgwgpefw6hmib5uwz4tgjz2pjhf277zvj6llw2ulpq fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreick6aybx4sym4at7rhweid2r5gbb4zezb7csrgwx7qeo2iwsgt5au fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigefy24x3onspktpo6tbs54tpl6ov4wl2ouhtdihszc35qibsg7pa fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiarej3k6zurk36rlcf24bzymhabtvl7ipeszz6syw3uy7yvy3txxy fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmcPvGJ76pUrKxr6wyxVKmJvugXaDmGqTYyqCZmJNMmP6t fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreig2wf26z2wnghf3bzq4twb4sttyx4g7dnxl5nm53rreepivesdv3q fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmUFdw3113YZcfdakVaXNvmjRFdNXEkxhMVYuqLqAiodNb fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmPPQSQ66G9Bwbb69ewe3WszmqiqSAJnuBKptq3E8LyhA6 fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmTJFtnajU4CBRQkzuJYiXqTH21zqiMwMQjWasD6XLQYgF fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidvokpzbmk4muluvvsfvh63rmhsoaiuj3sbk5tw6oo2sk5alawshq fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiafehg27yfi7txcrcws37ljwd7spmv4bofmadwyoc57qfor4tudlm fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmf93Cdx9i2C7mBoS8vcC2nWDQap6w7mqT2M98UZiPRaZz fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigrd6wkwo4prtduhsqwahlg3gx5mnb7bl6yt3agteyy4pjuljiq2e fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihcfqss5m2uq6lrig45xxoppz4p5vgwfjbt4i62i7y4hyv4cf7lfq fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreictfr4weddqw3fy6eq7v3472xafz35t3lms2ku5kt2nnofcykzaai fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifmj6i6n7hj6o4nyfy5yhsaljofkheluhhl7nwiceckmmaz5zt4yq fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifi3ml2ddrwbooipksiao2bpotxfnw332l7jkli72kfxo7x2stcem fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifabpoictapgodehex55r3et7uwohxxtzskkxomyzstqjxla6u62a fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihq2lh4pakib3pb24e5tr5ctwyk2yn3fxn6asq4uhaz3ye7hfumhu fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmZBZQP5fMuKPdipDq3tddETg4tiQ1tvp6wUPyRGPjSdm3 fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreie4brbh5jhkprg4xug7hg4e5cxk46ytutlfl2ic6n2de5b5wqjuq4 fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihtveaqyne7qttikktltame5llt2vwrcxwtrilhuzfwm3w24vrsse fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreico6gnbweccltahmjixutiklly3ex6bhkcqjqtll746kjijhvghfq fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiecw2uqjerhnwzxut3qeaxvzkqm72rm63yjoybxlmz63iopph4w6y fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmRZE8eDZEMJju37Bie7J7FFEPkeBSZHz6wk5LbALtD3Uo metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidiswm74aye6jhrpncrk66ad7zmsvjkorrnyigu6wh65v3aa6xsgq metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihgjxve2come4jmpqyh2b76zyfmukgtxkgruanjljmbmz45pfdkle metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmcZrzxAtd294wVXE6cPi3AmAboaLwWfa6DwzDBgJ3k3Z5 metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmbw9RbEmr7RXycL57oKbRA5dYvHCPrhaS5CFyDa843KxF metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/3a957a2e-9ec7-4d58-b6a9-5f53023c40c2.json metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://auth.flipprtools.com/api/metadata/793tDfp9vf9.json metadata fetch 404
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/f08fb0d8-503e-4caa-9ec4-1bf43dda9f39.json metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/1416cfd0-e9ee-4569-a64f-11195b83bd9f.json metadata fetch 429
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/48e1e61e-4bbb-421b-840f-a5a5a8d13ca6.json metadata fetch 429
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/e45b3dea-4b0f-4080-b4e8-9df33902f35c.json metadata fetch 429
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/ab3ea053-f954-42ed-b2b1-153f1da8bb90.json metadata fetch 429
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/be47cd9f-47a9-4d91-aca6-9d9dad628452.json metadata fetch 429
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/059ce866-f66f-4b42-b717-3fbeef6141b8.json metadata fetch 429
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/96c2a28d-7349-4262-80fb-50743a683753.json metadata fetch 429
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/450bc8e7-e3b6-4475-bf1a-214453b88dcc.json metadata fetch 429
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/bfee9286-6413-41c6-b4aa-8596900fddd9.json metadata fetch 429
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/3e734b72-42b1-4111-8a4f-ac20c9290d57.json metadata fetch 429
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmf9vtci6uqUWnvRj5UiczY1Ftacypv78nw19X19BkUGCi metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiezkfxd2wza4dyqdig44hbp64hbqe2q5cod6vsv2v2ka5vvuofp7a metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmbptCADJfXgiyM9YWXpoAXR2NyubGs4BkepX9UUDAerLg metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifykpc4bq265iiw567a7kzlrmamvixz5kd47fr3jlobugzps4qfhe metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicek2n3z56kvkx5lvevppu2lsqs54ae7gb5t35sxbsyxe7zsgdzw4 metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmRLGhvpUHJxUpaJVWgZgra9xpt7g22N3T6nTz7qTNfyvW metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigmvtsq5agz7mwjzr75vw62x7jbxee25chuale5pawa4rawx7kmm4 metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmd4UWzWkRakFqDstkaDgDNa1JexR6QRFDUdjKn7vaPESn metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.uxento.io/data/312b5ce6-26cc-426f-80b7-13b322dcfdda fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.uxento.io/data/7c758d3a-ac10-46e2-807f-19fd134658f9 fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.uxento.io/data/a1dbdd61-8cac-412f-9a15-a0b97c1e5157 fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/6b0e1fb3-b8a5-4657-8b90-64cf5bbaa94f.json fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.uxento.io/data/02fd0c25-ae11-4ded-a7b2-62320bba1485 fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/31fe397e-ce76-4e6b-a6ea-785e70501425.json fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/6b0e1fb3-b8a5-4657-8b90-64cf5bbaa94f.json fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/6b0e1fb3-b8a5-4657-8b90-64cf5bbaa94f.json fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/6b0e1fb3-b8a5-4657-8b90-64cf5bbaa94f.json fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiditzyofsdjk3ci4qvevqcwmppr457337qmc3g3axzyfur52p4cou fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihdjnaqwe2egrccnyxdupkiymaycmnz7y7hrymmvc67pmtqglwnva fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigeu3byxzzpklzhk4ahnpezgpff5m36avozqoz5x2urxindphpgnq fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibb4n6m5nwd4xuc2exvh36izucvbxjxn77dtzg4gxpopjsnvwtza4 fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmRh8dDb5HZLqXnrqPQ74A5jeu3HUPoveooGZoJjvkUawa fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreia4lf3y44soxxinkeshldv2ktojm63ofi2zeolr4b2cs5z5rsthta fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigdacsj2fi6yj3wps7i2g5rsgpcqyo2dara5fr4pyuafxlbjtjsoa fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidqpvhecfsmueigzsifazehgvlw5gbegvmdbxuknubfgxxeeokn5a fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreieylmhdsxs34e4elm3n5bf3x7v3oghukwdnqjadyi4i3esifngso4 fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicv534vxc5uz2m37we2sxy2oh7xqfhv4myggxgfqxsjghbfgf2r74 fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibvwosmfa4g7kgyyxwq3f5tkr5hfhplpvzkzfadsdgp3bnz7ucdje fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmQM6TqmGfmx4qibaVsWxBqrdm2itqUSrbzG1A1qmPswvr fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmX4o74uAHxFvqojTt2niMmVvoezTecSFF8E93CpKAB8dz fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmb5Xm6zC3vEzbMQJ6uREzNLSQhKtNJsGqcaVYm4R2nVsw fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmV8T78FhnaPBANiUsmDyMQWknB6yJJrHQPS7VBYTwBTxy fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicfzmyvzbbyftyqjviogp4ggdomva36trsma64eygrcj2g46b2uou fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigxlab5ncgyruawqe6mc34hwgnzy2hwdjx5c5gt2xkfdum7ikraaq fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicqcpn2w4m32uqdcuu5egqmkvo66scpib6rfjob5deca6knjtgcg4 fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigoswhb5dpicmsm7mbcg32oodnrslt6rakz54vca35d5dnb3ngsbe fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigxpewbi7cmx66ebi3xbcwvxlvvo37crhhx6c7ljy44hmf5xzrlje fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreih6nx2sydk5phlheda4frt6osgmzzyv3gyvui4og46hvtu5dngtb4 fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiagnxfp5xeuoqbxkc2ixryugpngmlxolsdaqjdxjei4v4kbffljfa fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmeCaQ1RMtzrn8pG4arTdSD2sZsLTBta69bCMMQx7MM35e fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmQ2bDnFnH3KPmpGGUaxhoXpLe9T5xzy9EiMjPKTEXhpMF fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreid7mxwuikadavfrzpj5rzqbjv3an3bmy5ztcpa5qq3t3snkrn7n7e fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiamnovpecutvc6hi4svw3f3c6tefbb4cno372nzhgbagqpizvsyj4 fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmNeRyRM5cbgzHtiao74UF2fS9H2Q9onmBQHSZ4jPzvjPq fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifl6fopu7mpybw3ofxwsqmmwz7egsjpt5oyoyfy6axvwfyrmpkcq4 fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreie2ce6g3gncc6u4t46n65ybadeuudybnk2byslf3idkugsl3iw5im fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmW5Zb4m7x3U38RprQRnxfhJT8qDsVVBzfZsyZnLw2MzNf fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmbYJsHJJUJoqft2fDgm7fMGxx5f3muX5oaxzFBpR9aSMV fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmb2jXw1RjB7hX8L7pkv5VzXUVrVr5B2eouiZUovcprv8d fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibkxngoz7qs7ournnw247r75bozpppig322c3l4dcmlzlvmrione4 fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreic5gzatjx2od5a4kmcjjlmkxwpcqxvjgjif2odfnplx4tp5nzpb5e fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmTwM7ogM6NfT1JK8vew7PVuaRpv7XaafwpSeRYhPkpEko fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiforwchkuvaxf6wgb74bgxv4v6zxp6w5bd7643rgk5iqzehe2beza fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiaguioqy6fdtyws7lqawvamvfknmropaqsj44mxk4pwvxeit35yei fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicfvn7gooe5bwnhdcu32rcr77t27ft7bijqsbyz7a2gfn5ht5bewy fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigof545rmhb3g2bdq57kottqlx4o37anzrqcazdlzkqmhkf7zumcq fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmeUvSJPpqeysk94L7V4rvcd9r3Aw5nAAzBEbKdGNV8Ax7 fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigtg5pky6x52xcrsv4yast2lglh47tvt3cdpppzx5b4emxjg4d4ai fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreie2ce6g3gncc6u4t46n65ybadeuudybnk2byslf3idkugsl3iw5im fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmdFgE8EisYWmPgJDJEzGfurRmgLSBNqqXQnwtkLyGbg3j fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreieo3h5wf2nyr5cfz72uu65xljui6jfhwevxi7l45tr5swgyoejo4i fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmW7xcVoSq44qCSDArHSybhfvnFwnJJQPC5iiswSCQLCrL fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicdeqs3v2onk6doepe32lwlvzyukeqwmc37tp5pp44um7fmi5pg2q fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicd3q6c6k4nlz7ljcmuzefc7abq4fsrnq4btr5ndnl3dwfzgtx2bi fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreic77bvfntukrx47wjurfp7dsf6wpxebya5qhh2bszbu3oqdgjogfi fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibc5fvqyhawjfbhpu3e7gltivmxhyfvt5imjw3hlpkxwfoljx32gy fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmerDBtqJf1mgKJ9rL6Nn8B7u6LUbj6JEdSZ6oCwLZgQF9 fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://storage.proofnetwork.lol/pump-fun-metadata/1767366025359-hgndam.json fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://storage.proofnetwork.lol/pump-fun-metadata/1767904192897-s0jzbdo.json fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmNx2gBfgb3GiJYPYzAZ4ZHxcBqYNFAnNfTxdjujNwtb4Q fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmQKL8eAucGS3t6Rer6B3jkrHMsGsf9WS9qss47y2rd2jT fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiceg23cf23f36psfr5smyznh3hfvyc4hycgoqfy3ny3ynrrvkjcsu fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibnue46ssrascxjzeirf45vesqnlk7sais6ynevdzk3ljvf2lgmxe fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmZxTk2UwNuriuWJzkSxce4MHDduqKVqXQoKNWkP5YcvnH fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmRWZCmhBWkFf5kDEFYCteEQqbpL4aAEQBGouhoqwA4tFm fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmaBnWY98oPEH382tcnFAGFoG21qFxeHBAtdUXWkRva854 fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreib2ujdstrqr5gdavggy35hcih5nvp7hik66g5p67tkm572fx5qh5q fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibfzvbaeiwsdciw5uiguk5by2rsv5veezpip2h4ohwm77slh6q37e fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreia5vqvtro5ugcfb4gor2jldfcyo3temdekc5jqv4mhvjvbyr2hlay fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmcoineE2dA3yBCFwLxUg5NiyKmLYApdEePUzY9AunUQWD fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmPgVcB25JSKZNr1ftcr7ykKGUzPkqGigif4zdPHwjgVvZ fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiffszuqbr7a46gsq2ycykjtmsz3zz2hw7zf2yhlqryh3ahbvgny6e fetch failed
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/5257f111-c08c-4548-bad2-6e7481cb3ec4.json metadata fetch 429
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmYUAevhLxFsEtp2qYF3717wFkvQG6N9nceDxwXmuuLcBr metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/dc32073e-3c01-4b47-bdc7-3afe08fa6ba8.json metadata fetch 429
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/e26b0c2a-7b87-464d-8e19-d09f16836c6a.json metadata fetch 429
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/5443cf7a-bda2-4a3f-95e9-ed8f356c9001.json metadata fetch 429
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihtxuudmx7ftcqqmspaps52ho24aa5thowpat6nmx2bgjgr7fce7u metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmeNhJWQrpXvRaNoJFRGGqxBgqs3uqLhcy7r7fVYZGiW8o metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreif2i4cjduxoy2jnpmi6etbjyyqx376vkpp5jrqffr3giqwh2ktaoi metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifllyhyeqpelge3gh2jvzn4zfkn226uqe6vfx3jdgvm7uajnktsay metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmaoyiVhgdLzV6ofiDwgXou585PtyiG8GdT1Rng352LR9T metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreietaaikjlw2awse3xz76g3qmhoywwu4syy7lrb54lhqdkj6tjvuqq metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmRXgkhqiWej799MvsSrxWSx11QLkp8RnfY1SQEjrKmrMP metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmbspWLBNviZgdhhy7wn8N3BWHqMVTjjDJyH514ehs4vJY metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicjxqzxkmzi4q2ctonvgdkinlczrto24cb2ilmweuxybtmmolnkxa metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmTxatAuK797RUrPTkHGB4MgdYqBeMSEUHu9wTr9czgsgC metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihbkmbahpl2u46ox4n3vz77yn5wqrfh4imvnetaaedoehksk3ymg4 metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/cc63675f-57c9-4c01-b60c-9260be0d133d.json metadata fetch 429
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmdJh67Y4swepV9cYKuW9Fz1ERn8icRPG3bCjuFApQLm5K metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.pumplify.eu/data/Qmdv5QAPZ4zo6SJYgfhcb8rs8KhVe1zY3SThtJGdxJDGvE metadata fetch 429
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmdxrLgFwoQH4K7DbNUbWGfj7gbq4KpPcwuNcXU4S6nwPG metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreid3htflx2bde5k2xv5b2yy7opthqsxip6zjd4tegvka5wfe4uxqma metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihq7qfjkxvwhvljybtkakdg76f3fmtyzdqrjqgno73j5b3sg6qv24 metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihddagto6ogyq7kj4dzvy4ztrexfjblhb5wjbfqrbahpu5xwclzwe metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/cc63675f-57c9-4c01-b60c-9260be0d133d.json metadata fetch 429
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/cc63675f-57c9-4c01-b60c-9260be0d133d.json metadata fetch 429
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmf5cvzGbvxjXzesZGx9CrKRqGLRZFnygPSwFFPkKhRAiy metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/cc63675f-57c9-4c01-b60c-9260be0d133d.json metadata fetch 429
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibzqvckyyfp5tfvm2dlcirufv2jkfrldqvp7gns6fikosjtbnn2oa metadata fetch 403
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/2a99a3ff-9095-4967-aed3-95b20817d65b.json metadata fetch 429
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/6b0e1fb3-b8a5-4657-8b90-64cf5bbaa94f.json metadata fetch 429
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/f41de711-a156-4d9d-8096-ef21bc920136.json metadata fetch 429
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/6b0e1fb3-b8a5-4657-8b90-64cf5bbaa94f.json metadata fetch 429
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/33aa5341-7a92-4610-b17f-17b402989826.json metadata fetch 429
+2026-01-14T20:10:01: [api/tokens] metadata fetch failed https://metadata.pumployer.fun/metadata/8D0qWkjSE2Xg metadata fetch 404
+2026-01-14T20:10:01: [pump-coin] Failed to fetch coin 5iGvXVrerZ6q394R1zXL11eMRZeHb4kVj2KZFLL9Pray from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:01: [pump-coin] https://frontend-api.pump.fun/coins/5iGvXVrerZ6q394R1zXL11eMRZeHb4kVj2KZFLL9Pray responded with 530
+2026-01-14T20:10:01: [pump-coin] All endpoints failed for 5iGvXVrerZ6q394R1zXL11eMRZeHb4kVj2KZFLL9Pray: pump.fun coin request failed with status 530
+2026-01-14T20:10:03: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/fdc6e219-ed55-4e00-935c-bd92345c27e7.json metadata fetch 429
+2026-01-14T20:10:05: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/ba90552e-73f6-4aab-ab30-cafb70b72767.json metadata fetch 429
+2026-01-14T20:10:05: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmYRYvUU9ne55oiCEGhDTyevGJFhfjAChuVng1yQDMpiJX metadata fetch 403
+2026-01-14T20:10:09: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/9ef47665-5cd4-4bd3-9c1b-eaf4ffde1802.json metadata fetch 429
+2026-01-14T20:10:09: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/64d5c20f-7fe1-449f-b88d-10d136ee6b91.json metadata fetch 429
+2026-01-14T20:10:19: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiaf7a3soowwwsmhqohanxbv72cajhdnyr3td6twuyadocqfvdlw5m metadata fetch 403
+2026-01-14T20:10:19: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/b33714f9-44db-429f-9231-939544f6f880.json metadata fetch 429
+2026-01-14T20:10:19: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/211b5ab7-0ca3-48b7-98d9-8d22ba6bda2c.json metadata fetch 403
+2026-01-14T20:10:24: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmUXnAfQRyCLgKm1611pE2jMqjAPo7ov7UzBC1GVaFTCS7 metadata fetch 403
+2026-01-14T20:10:25: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihc33lsk7njxfxnkkzawnuku5l3lrvprlakyseekuenqrwn5adlpu metadata fetch 403
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed http://66.135.23.176:3012/json/2a33a2940961c4e8f43c86bd27c844f8 metadata fetch 404
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/4f0b63a9-a1ff-4643-a823-bbd3a49fc287.json metadata fetch 429
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/26f48489-3ca9-4406-bfc2-5bdfaa82b4e6.json metadata fetch 429
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/b0710f90-ea35-452d-ba74-bb52ff585b6b.json metadata fetch 429
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/57e33b9f-f22b-42d1-874b-2faac7a4a0e7.json metadata fetch 429
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://ipfs.io//ipfs/bafkreiab3jtn64jhptqwl4qxw3fnckml664onfgh6lc2n2ycw6fzoixyqu metadata fetch 500
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/eb7cdf4d-e107-46ab-8d6f-b77e56d553d4.json metadata fetch 429
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/b22ebde3-722f-4493-970d-91335df9ede8.json metadata fetch 429
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://kimjongnuked.com/json/1mPA metadata fetch 404
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/16ac49dd-2362-4bf6-accf-24c7c8bd479c.json metadata fetch 429
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/07401804-360d-4d63-a454-e5412b0465d9.json metadata fetch 429
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/527614f5-d854-41cd-bc57-6684747cbb0d.json metadata fetch 403
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/46908226-d5f3-4dc1-a998-35b21e00d3c4.json metadata fetch 429
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/feaf3117-72a6-4e9c-9417-a703899c79fc.json metadata fetch 429
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/xr9MPWdQ metadata fetch 404
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/1UqgDaNJ metadata fetch 404
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/xr9MPWdQ metadata fetch 404
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/847gO6Ve metadata fetch 404
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/lCyNfMfS metadata fetch 404
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/0Yk45a7r metadata fetch 404
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/UZ73vjFx metadata fetch 404
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/TR8YXo6o metadata fetch 404
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmewHLuVPyjX1fgCcHi7bqy9auFTUpB3sbRknktcsUdVAc metadata fetch 403
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmWhHCYABRzdLtqiJSnbwFADRis9tBJSXbvLjufV751GMk metadata fetch 403
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/c9deb48e-43a0-437f-b041-d5416a6c05ac.json metadata fetch 429
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/d1e30497-4a31-4caf-8db7-1c0389a536f5.json metadata fetch 429
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihqyd4adiuzkjtdjbojts6xn3prosnpenflnqf3yqzwdfrt6n6n6u metadata fetch 403
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmXU99bRXq2omAaC7aL7ocjgr5zr7KSy7dZR6b4MyzybCd metadata fetch 403
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifp5cv7cayqxzau4svdz6nlnmnajjnblqmjnsgcl5eb7gxfdow2ry metadata fetch 403
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/71bfc7c1-dab6-4cb4-9e41-3e27281f6e09.json metadata fetch 429
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://zle6crt3n09ggr-4141.proxy.runpod.net/metadata/O9xTyAIR metadata fetch 404
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmNf9Txy1H1MgTdMWPoEL9CvfQrWVKfPoCMvcudxMCqJaq metadata fetch 403
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/0857c530-a537-466d-849a-96be8559b128.json metadata fetch 429
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/de34dbb8-db01-4343-b402-e8aa23e884a5.json metadata fetch 429
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/c4862f48-58e1-4f24-9a01-25a6a6a8ed67.json metadata fetch 429
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/8f02c4a6-e490-459a-95f3-668ac4e66a50.json metadata fetch 429
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidz6g5fu2haqi7ap6tvlh5xsjssd52ywprakikzgomh2v5wyimdrq metadata fetch 403
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmNhue1fob5gDQwU4xk3Z5RwE5Kcm7V9F2cW9gRjFnEZqb metadata fetch 403
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/85345f5bba1044c6.json metadata fetch 403
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmPrEPBAcpSQPvBCkvRsMarsSyf5UmS3nirN5ArVRyw3qT metadata fetch 403
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/e7ca5063-6018-460b-ad23-710537b11e9b.json metadata fetch 429
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://kimjongnuked.com/json/zG6Z metadata fetch 404
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/bd921e65-6789-4e9c-b883-36574ce6e9da.json metadata fetch 429
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/a859cac8-f5c1-4a23-bdc2-4a552c075dae.json metadata fetch 429
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/137f347e-65d1-4dd2-97f5-cd1997e8384a.json metadata fetch 429
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/9ca8d925-5b4b-47da-9936-785cbfc64fe0.json metadata fetch 429
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/11561185-c404-4472-9477-5a78c78359a6.json metadata fetch 429
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/fe0f43bf-f609-4411-b6f3-9a2cfb753156.json metadata fetch 429
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiedzahkrb6orzbs47buvkzt4fvmtslazkocgg4neeb45jzwytzrj4 metadata fetch 403
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreid7d2mt56d4fxik24tciyfft5ng4f7mp4qexcywzkewlwxjbr67da metadata fetch 403
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihzvlnbkeh2klsn7heqakmuft4tmuqaj4c76f2hfnsitcwdovd5aq metadata fetch 403
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiflmdb3pwc5cxostdp3py2ivvikadr6ggok23psatzwwmhgg3p6ly metadata fetch 403
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmadyqwNJwfRPi48Ao5av5gDSg31UeHZvH774LXDzuBxpA metadata fetch 403
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://metadata.pumplify.eu/data/QmVhy6ieYtZfMcMvZYHF6BUwiXb2nHc72uELP5bHjNd7hL metadata fetch 429
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigxba4qrq6nhytmc6ut4xzgzbjg7eykzl3kkutnhomkwgjqfwyc6y metadata fetch 403
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmWngNsvmJzn7E3jDaMiZKxSkERAdP2eC48kVtukJSUtRv metadata fetch 403
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreieixjliiistypctu7l3z7xet2llx6nucl5akwwliavmbt5pmksyey metadata fetch 403
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmVfgVyJ67R52hAX99pa4yfPTpfos3Cd2GJrGdfCxmuvCb metadata fetch 403
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicfcyehjpozc7cks7aynca5wazlcadcxvgouyyyjz5ayiqvz3y6te metadata fetch 403
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihwl7mox3jm4i4lfiuadztrd3cctripbgrbgtt624eiljh54ksyh4 metadata fetch 403
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmZex4v3US7Rf1gM1sbiY7eAeNHLKvYi29Ek32agNdRLse metadata fetch 403
+2026-01-14T20:10:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiakihr5ihz66uerwt6fm6jb66jbjiousk5mvwanexdieq6qxqkafe metadata fetch 403
+2026-01-14T20:10:27: [api/tokens] metadata fetch failed https://metadata.pumployer.fun/data/417601a1-5fbf-42c4-90ed-73bad8e63648.json metadata fetch 404
+2026-01-14T20:10:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/775c0e1a-785a-40b3-b90e-c59bb8e8024c.json metadata fetch 429
+2026-01-14T20:10:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/8411fd40-cecf-4282-bf18-37bea3b4c172.json metadata fetch 429
+2026-01-14T20:10:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/5b44bb2b-be2b-4f70-bbac-5f11bd89735e.json metadata fetch 429
+2026-01-14T20:10:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/eb552ba4-fc27-46d7-be22-be68e874070d.json metadata fetch 429
+2026-01-14T20:10:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmTg8eUEFHh8uvBoAVM299NPAG88yDwh4xoUbn8zEfwZTS metadata fetch 403
+2026-01-14T20:10:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/5d6c71fb-e455-4f2f-b4a6-5fd24e732d14.json metadata fetch 429
+2026-01-14T20:10:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreics6rn6syd54fv3fkyqrsh27etumszzbdkvboa75epu7nvjyyjg5u metadata fetch 403
+2026-01-14T20:10:27: [api/tokens] metadata fetch failed https://kimjongnuked.com/json/wX9p metadata fetch 404
+2026-01-14T20:10:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiatktlj6syly2ahgjzpxqdyrgtgec2ohfbsp6kzzuiq5mtzjtl74q metadata fetch 403
+2026-01-14T20:10:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicl6z4664uav4lwxr6hl6yshugsqg4v3olrhuwj2mz5b7ugicmvey metadata fetch 403
+2026-01-14T20:10:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmWqoQ8SnYhnWfaEDebgsMws9fzPQ6JbaXsyVkX5goXgB5 metadata fetch 403
+2026-01-14T20:10:27: [api/tokens] metadata fetch failed https://eu-dev.uxento.io/data/cmea15wuw00m2fc1afo9qlcx9 metadata fetch 526
+2026-01-14T20:10:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmNtm57nxK5h7PeJU4zKAZpj49tvfuPqMkVet8sUgAyKDZ metadata fetch 403
+2026-01-14T20:10:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreig2h72q6na5i6h7bcjsrq74cvppir2y34s6boewtqir3ngwi64gi4 metadata fetch 403
+2026-01-14T20:10:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreieyhq7bskv5jdedika3agtwvj5q6yibaci7pwh2olvu634e6ymf4y metadata fetch 403
+2026-01-14T20:10:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibx5cmsrf3vhhqi4fuamo747ye4cburavgbatebiqphjhplft23aa fetch failed
+2026-01-14T20:10:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibv3vwlhowpt5dqzrzj5hm7dx6afkffvyostu7zdeewfwkls5mlci metadata fetch 403
+2026-01-14T20:10:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmPPhLsLSZJi334a7aiZnHTHCMNRWnqzYfW1XNajW64dTm metadata fetch 403
+2026-01-14T20:10:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmPPhLsLSZJi334a7aiZnHTHCMNRWnqzYfW1XNajW64dTm metadata fetch 403
+2026-01-14T20:10:27: [pump-coin] Failed to fetch coin DYx5iNarnVEioTAxCAGo8rVUkDxcWtT6ATtG6RTpywMU from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifsn5j26fbwjp6ewgycxhhq4ow5rqq65k6m6tsn4kc2snhsgltwli metadata fetch 403
+2026-01-14T20:10:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmVJn3pJUEmoSm5bYVGX7TkrQvPKh4YoLLga1TzTqmmaBh metadata fetch 403
+2026-01-14T20:10:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifhwdfxaeozzx5eyhowuttdtapc2j5hp2asxs34stwhgsiwymwvw4 metadata fetch 403
+2026-01-14T20:10:27: [api/tokens] metadata fetch failed https://metadata.pumployer.fun/metadata/5iL0erc-jn-r metadata fetch 404
+2026-01-14T20:10:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigohhjphc37mrk2eh5ye45ixbltsgvarfvwuofs4zbeqc4acoifxa metadata fetch 403
+2026-01-14T20:10:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiao3ohrtqgv4cvzpmyy6n7d6owwdu7kd25k7znq66un6c4atur4li metadata fetch 403
+2026-01-14T20:10:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihh5ihcvs4iol6hzxfjmq36frhiywbuat7b7g7vdfpbdijpcd27ky metadata fetch 403
+2026-01-14T20:10:27: [pump-coin] https://frontend-api.pump.fun/coins/DYx5iNarnVEioTAxCAGo8rVUkDxcWtT6ATtG6RTpywMU responded with 530
+2026-01-14T20:10:27: [pump-coin] All endpoints failed for DYx5iNarnVEioTAxCAGo8rVUkDxcWtT6ATtG6RTpywMU: pump.fun coin request failed with status 530
+2026-01-14T20:10:27: [pump-coin] Failed to fetch coin F3z9u1wD7zgTBjLPX1u9xqVkMbgW7BMKRHfAsRYuNWTF from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:27: [pump-coin] https://frontend-api.pump.fun/coins/F3z9u1wD7zgTBjLPX1u9xqVkMbgW7BMKRHfAsRYuNWTF responded with 530
+2026-01-14T20:10:27: [pump-coin] All endpoints failed for F3z9u1wD7zgTBjLPX1u9xqVkMbgW7BMKRHfAsRYuNWTF: pump.fun coin request failed with status 530
+2026-01-14T20:10:33: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/93165b76-6239-49dd-b47a-a682881b9307.json metadata fetch 429
+2026-01-14T20:10:35: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmZUM2unqwDqFFykWDx9WjuizK4Qm33A43VLJfxkhv9j4B metadata fetch 403
+2026-01-14T20:10:43: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/e7a933c4-4b6c-4b9a-95b5-79b0719b2caa.json metadata fetch 429
+2026-01-14T20:10:43: [pump-coin] Failed to fetch coin eqvtMkZRgLFC2AaUK3i2s5NNgYRWCpXdRHWvWNBpump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:43: [pump-coin] https://frontend-api.pump.fun/coins/eqvtMkZRgLFC2AaUK3i2s5NNgYRWCpXdRHWvWNBpump responded with 530
+2026-01-14T20:10:43: [pump-coin] All endpoints failed for eqvtMkZRgLFC2AaUK3i2s5NNgYRWCpXdRHWvWNBpump: pump.fun coin request failed with status 530
+2026-01-14T20:10:45: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmXohahmvALG7y1YrbmCGD7okuMEKBsoJLfSwX25CUaMqi metadata fetch 403
+2026-01-14T20:10:45: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qme1u6Gk2tLQ5xRzegWbcNcUPiDAicctZUH8iJD8sxVVzd metadata fetch 403
+2026-01-14T20:10:55: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/4c90e445-0746-43bb-80cc-e52c291f2a97.json metadata fetch 429
+2026-01-14T20:10:57: [pump-coin] Failed to fetch coin 5fA3Gepc3Xqzd1GBddXigUEjY5LSb4k6HkZb3jeHtwvh from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:10:57: [pump-coin] https://frontend-api.pump.fun/coins/5fA3Gepc3Xqzd1GBddXigUEjY5LSb4k6HkZb3jeHtwvh responded with 530
+2026-01-14T20:10:57: [pump-coin] All endpoints failed for 5fA3Gepc3Xqzd1GBddXigUEjY5LSb4k6HkZb3jeHtwvh: pump.fun coin request failed with status 530
+2026-01-14T20:10:57: [api/tokens] metadata fetch failed https://mypinata-gateway.net/metadata/477dfb93 metadata fetch 404
+2026-01-14T20:11:02: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/daa5a080-7e57-4fc2-a6cb-eba599f85a7f.json metadata fetch 403
+2026-01-14T20:11:06: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/6beb7e6f4963438f.json metadata fetch 403
+2026-01-14T20:12:35: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmWLnRpGihsHjjrQfthoPamN31Zbqvxcw8sq2kFMCs6kLj metadata fetch 403
+2026-01-14T20:12:35: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/cac6e413b9054959.json metadata fetch 403
+2026-01-14T20:12:51: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/283d8bb11f7f4ed5.json metadata fetch 403
+2026-01-14T20:12:58: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/ef7aa933-2353-4e90-ad31-d97fff7b04f9.json metadata fetch 403
+2026-01-14T20:13:02: 
+2026-01-14T20:13:02: > pump-investments@3.0.32 start
+2026-01-14T20:13:02: > next start
+2026-01-14T20:13:02: 
+2026-01-14T20:13:03:    ▲ Next.js 14.1.0
+2026-01-14T20:13:03:    - Local:        http://localhost:3000
+2026-01-14T20:13:03: 
+2026-01-14T20:13:03:  ✓ Ready in 279ms
+2026-01-14T20:13:04: [api/tokens] metadata fetch failed https://faggotnuked.com/json/90b0d1e6-850a-434d-bd00-8f22ab625e3b fetch failed
+2026-01-14T20:13:05: [api/tokens] metadata fetch failed https://ipfs.launchblitz.ai/file/62Df9XbAtu7dp85A66e9WfPSeMsNRKLJVQngwC2jpump.json metadata fetch 404
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/tg6pkuAB metadata fetch 404
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/AtWkVDz4 metadata fetch 404
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/daa5a080-7e57-4fc2-a6cb-eba599f85a7f.json metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifqpfxlmd5bbrlfd27pzgwcfs2cplnn2bijywqs2rqj5pxylure34 metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://mypinata-gateway.net/metadata/477dfb93 metadata fetch 404
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/6beb7e6f4963438f.json metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidj5pwdda6uiaumywl5sg2zu2zuqvghrejgeni72rlhdjq3wt7yw4 metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/ef7aa933-2353-4e90-ad31-d97fff7b04f9.json metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreid7d2mt56d4fxik24tciyfft5ng4f7mp4qexcywzkewlwxjbr67da metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/cac6e413b9054959.json metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmWLnRpGihsHjjrQfthoPamN31Zbqvxcw8sq2kFMCs6kLj metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/283d8bb11f7f4ed5.json metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/94c5f4a1b46b48cb.json metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidufxes4ogdylcoecujhoiszosxxmncbyq6wiqd4stmx5cvkq64ry metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmSUGnDMrKZnELo9QejJfJFGThLw7fqeBEv8nm2JMh17Xc metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/338f5b96-545e-43ff-ae7b-5082af97a7c2.json metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibrhchmg4qc4kqipzxs7fwl7edowvwujl7pb3xg2piv25q4zzl4zu metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmVA8swctSHVeg24uscAbG9Qa6VeZ1uPYmZFTYrrb2mdgC metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmQ7qhfFScBikCMHmfSuWiSNp25XoEKSeXxR3S1TygMurX metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreif5jdorhrnpyj5ogsiqttkjmhpgjzta427b374756ma6ajcjpt4dm metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmankPtxKur5JHAaDjfrStUNJke5bVrtv4E6uWC4pTFvhM metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihktgikvd5yhpbaqv3xqvemqszli3oppiwrzt3ptf4pzz75nsalxu metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibuqj7sntudbiekd4km3l5l347lon3p7d5f4kxccbhjjrrbou45ii metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmT9a1aV56fC7bE4KKNMruBxiTnPxSvzXXvo5fphpycJN3 metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmTQvFhJBGypG3pz9xE3MoHVJaEbSgnwdkkEYw3ee14GtW metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://kimjongnuked.com/json/ti3W metadata fetch 404
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmTS1Yj66jC1JbnbAYo8hwpmuF2L8TZn6nwUwG8depXYXb metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreid36omx3clgccawhtycuh2sqjpwoqxd7tsniwdzh6hqpgfo3242ve metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qma7Nj7qCdpnRzriGHuaYE71rtBc2iJKVUAtifpPtAcqXm Unexpected token '�', "���� JFIF"... is not valid JSON
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmZdzDLagt3jGVfr4VBWhMRnL8YKwoVDijjNb4RWxTag7q metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/0f62c5cd51714598.json metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qme8vKELBtzkT5WDuyYAPYm4K3hBfQpGEq3GkLuCVGMbKe metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidfrgfr5dbev5an2abp6gkseglwwyigr6wzmf56gwg4xaa3cju4m4 metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmU3JK1ksWvRmeRR6e7jDVA5GCJt5Fr4Pf3iu13e9PezRv metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidrkeza2l5mwgrcq5c7cj7ahzqsw3bsetcq6mqfkzdpyczndjhph4 metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmSMCDZeUujQN5YDLx8oCL77jpyVogoTx1vCJHGWH9jksL metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmYFtDsz5MHU789jbnPkPW3AjwT15nswz7UMTAT4jPEbqd metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreie22zb67liarsolrfc7igf4pvrauqf6gxxeuj6kv74gxrxoyby3re metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmV96AY7DmrukvSQYQ1rpUx9wftP9Wwwbt2Do9QVegVG3V metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihm2tiznaxllkdknmukqhbr7gu5w57wfxgkar3hihrtvgr3j3zy2e metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmbT82viRq1bX1VC9aVFaqDPjCFk5ZUh2FM8cfZbuPn6TV metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreid7euyxzruamfmeyf3jqsshypa2fois4fvvsxwv67fkpqhyh6xomu metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibwvvvj5rpan4rpb7v3lx7mfve5qfn7lrfsqdrqehpmoyg5fyclsy metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmacyUsDfwbXtE69iAtagj7cQiSo3UcG6F1tW46y3XotbW metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicddjktnu34katt3a2pnjqxtwgqjfghwbdyit6tn3waee4oy6fhgm metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmb5t3nYvSu3W7YZ1fqpVc3xrVEWFBF2Ykv3axvuwknh64 metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihgthop3lrwxzpjhqq6g5eu6dguavflyuqjtlmytn2b7ymbsk3sam metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmYRYvUU9ne55oiCEGhDTyevGJFhfjAChuVng1yQDMpiJX metadata fetch 403
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/211b5ab7-0ca3-48b7-98d9-8d22ba6bda2c.json metadata fetch 403
+2026-01-14T20:13:06: [pump-coin] Failed to fetch coin 5fA3Gepc3Xqzd1GBddXigUEjY5LSb4k6HkZb3jeHtwvh from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://eu-dev.uxento.io/data/cmekn94550145fa1beha1j4ct metadata fetch 526
+2026-01-14T20:13:06: [api/tokens] metadata fetch failed https://eu-dev.uxento.io/data/cme3sxhgs006qkr1aoaz49lsr metadata fetch 526
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmcoFBK1Ecd2Vru4wVDYJPiXRwaiyZSDJqauZ27XEVxz5K metadata fetch 403
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/c1e9bbd850ec4879.json metadata fetch 403
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreieqfocqe5dxfh5lagln4omcgdaqppsqhes4jw5onapwzf5z7c6eta metadata fetch 403
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiclg5kdbgr2th3on4fmmol7o3kt7gnhsqfwxhhy34lyot7v6pbuv4 metadata fetch 403
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidrqyjgyzet5ptrcfso2wwq73v6j46d5q7s3ruxd2gobxy5ntjpu4 metadata fetch 403
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreic2wjzzv3ybp7yjkty63hj3xfcmbfhhwo5mavrxxck2cminxg7o2m metadata fetch 403
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigrfsl7y36uomurd7pnfuyptghjtdkjjxst7eq3thf3iczjbvnjgi metadata fetch 403
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmPrFnZTVQ6ufNfgQkTqmCFWBLV6NdspkYywULQAJAyvzB metadata fetch 403
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibx2dm5t3xltkhd3wmo3ztb2if33vf56xq5sb7dyvfeksil4cchyq metadata fetch 403
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmb2L22Jhdrh7NZDzcZPqPyFUPBTTyTDQZFGVRpsPq5mr2 metadata fetch 403
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmVUuzqss22T6J7kQMw5K8oHh7DpvJVdR4r4tTvBP7nGyV metadata fetch 403
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidmnamnhe3g7v6i5dv5ahqoirkcjhscedzidug4yvzjahed76fkrm metadata fetch 403
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicxiy75muugno7fyn444uyoqiv2lpbr4i6abkv7sjky5f7hz6lzhi metadata fetch 403
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmYXmcLxQXEMPNgAgk4qVEYUVACJNPTabTTHEqWLaGLaaH metadata fetch 403
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://metadata.pumployer.fun/data/417601a1-5fbf-42c4-90ed-73bad8e63648.json metadata fetch 404
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://metadata.pumployer.fun/metadata/aF7TMKcBtiPK metadata fetch 404
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiaf7a3soowwwsmhqohanxbv72cajhdnyr3td6twuyadocqfvdlw5m metadata fetch 403
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmUXnAfQRyCLgKm1611pE2jMqjAPo7ov7UzBC1GVaFTCS7 metadata fetch 403
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmXohahmvALG7y1YrbmCGD7okuMEKBsoJLfSwX25CUaMqi metadata fetch 403
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qme1u6Gk2tLQ5xRzegWbcNcUPiDAicctZUH8iJD8sxVVzd metadata fetch 403
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiae35d56qxokit3dncwebsy54gpygtb6nl7ukvy4vjscxomrwyqbm metadata fetch 403
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmZUM2unqwDqFFykWDx9WjuizK4Qm33A43VLJfxkhv9j4B metadata fetch 403
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmdxrLgFwoQH4K7DbNUbWGfj7gbq4KpPcwuNcXU4S6nwPG metadata fetch 403
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidbxl6lzf6jh4gg75kthzoiouvmx6hwyy7qzdegctahcgys2dtrma metadata fetch 403
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifhwdfxaeozzx5eyhowuttdtapc2j5hp2asxs34stwhgsiwymwvw4 metadata fetch 403
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmZRugE5ySgybnLF5gE2PvRuFVQR8L3bmcYF7xfSK2YqKG metadata fetch 403
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreieuvgi3a7zhthyhymur3ycpyjd7y6vbojdf75ptsknoq2wkosagta metadata fetch 403
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmR3To5V736nGjCFS2YU3mv6Yu7BooELsLBVf14Umm8hYC Unexpected token '�', "���� �Exif"... is not valid JSON
+2026-01-14T20:13:07: [pump-coin] https://frontend-api.pump.fun/coins/5fA3Gepc3Xqzd1GBddXigUEjY5LSb4k6HkZb3jeHtwvh responded with 530
+2026-01-14T20:13:07: [pump-coin] All endpoints failed for 5fA3Gepc3Xqzd1GBddXigUEjY5LSb4k6HkZb3jeHtwvh: pump.fun coin request failed with status 530
+2026-01-14T20:13:07: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmSwjdGxcoHxAGkAgWJDpZddAB2ozKu6L5ms1Q27m5CSmU metadata fetch 403
+2026-01-14T20:13:07: [pump-coin] Failed to fetch coin ENMS9D8UvmbhNMzZi6ydTz3q9j9pNDB2KtmhUjHYyFUP from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:07: [pump-coin] https://frontend-api.pump.fun/coins/ENMS9D8UvmbhNMzZi6ydTz3q9j9pNDB2KtmhUjHYyFUP responded with 530
+2026-01-14T20:13:07: [pump-coin] All endpoints failed for ENMS9D8UvmbhNMzZi6ydTz3q9j9pNDB2KtmhUjHYyFUP: pump.fun coin request failed with status 530
+2026-01-14T20:13:15: [api/tokens] metadata fetch failed http://149.51.224.102:81/json/aa39c4ff-1501-4b61-b3bf-c790655f5fee fetch failed
+2026-01-14T20:13:17: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/5073dd7c-cbab-4954-8bcf-d23ba082814e.json metadata fetch 403
+2026-01-14T20:13:17: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreih7y7tfnexgae2ybqxiktso6cszqu5uhfsepqtz3myskh66yzcpye metadata fetch 403
+2026-01-14T20:13:17: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiggkpt5ois42tzcb5iv6kj3ggta4vhyodlzgseroqphmgbslzt7qe metadata fetch 403
+2026-01-14T20:13:17: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibzdpwonqhrx3cxaspy3iuxq3ukntvkjxg5vcyszuppy7cubhwfoe metadata fetch 403
+2026-01-14T20:13:17: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreif2i4cjduxoy2jnpmi6etbjyyqx376vkpp5jrqffr3giqwh2ktaoi metadata fetch 403
+2026-01-14T20:13:26: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/xr9MPWdQ metadata fetch 404
+2026-01-14T20:13:26: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/UZ73vjFx metadata fetch 404
+2026-01-14T20:13:26: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/847gO6Ve metadata fetch 404
+2026-01-14T20:13:26: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/k7jtSprx metadata fetch 404
+2026-01-14T20:13:26: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/3ByNyLnR metadata fetch 404
+2026-01-14T20:13:26: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/TR8YXo6o metadata fetch 404
+2026-01-14T20:13:26: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/yxzkqnyH metadata fetch 404
+2026-01-14T20:13:26: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/f08fb0d8-503e-4caa-9ec4-1bf43dda9f39.json metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibc5fvqyhawjfbhpu3e7gltivmxhyfvt5imjw3hlpkxwfoljx32gy metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibkxngoz7qs7ournnw247r75bozpppig322c3l4dcmlzlvmrione4 metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreic77bvfntukrx47wjurfp7dsf6wpxebya5qhh2bszbu3oqdgjogfi metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreib7dj2mjhwt5tniila2bnpuqvvyvu6omtivvhopoywg7mr6zji4ga metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigwiw4caokuuicpj3wxiwzpmluupxug3tlxg6ioh4o5yawah7maqa metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidbag534qk6lfn4n35amhgc3r2p7xfeeeajzkoh66id2pbixqbzti metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmRdTTxATg311QaxUUtkUcwCrCMuafurykXC6F9P2S93Qn metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidey3d6mfsclkq5pzp2wkaqo6dlqkmcypzaliuxfzxzlywdkm3i44 metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmVjddLADUCdfajiBN2hVBmy2TFfCdTAQcJ838FosDsGRK metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigjga44rnqjhs5ueorh6vlbisrinxiosejscqvlw43mxutpsbk37y metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmRw37t2D59EvAzbmLzjXqdGHrbXMeWHEsaheNcS3mr4Eq metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmQTCZHNnUQns7e5mamRrfRR8BVJfJTNqasygsTsa2hJt8 metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmfBfqwG1FjPFUkA1qCVfcX7RvD6GXpnUSpoYY5VUNCNVz metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiao3ohrtqgv4cvzpmyy6n7d6owwdu7kd25k7znq66un6c4atur4li metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihh5ihcvs4iol6hzxfjmq36frhiywbuat7b7g7vdfpbdijpcd27ky metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifykpc4bq265iiw567a7kzlrmamvixz5kd47fr3jlobugzps4qfhe metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://kimjongnuked.com/json/dhRD metadata fetch 404
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/a2164464-ac8a-449c-a2c5-7f1541b0f6b5.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/bb0c2ab5-eaf5-4b39-8089-bfad21c10e59.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmbptCADJfXgiyM9YWXpoAXR2NyubGs4BkepX9UUDAerLg metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmf9vtci6uqUWnvRj5UiczY1Ftacypv78nw19X19BkUGCi metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicek2n3z56kvkx5lvevppu2lsqs54ae7gb5t35sxbsyxe7zsgdzw4 metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiezkfxd2wza4dyqdig44hbp64hbqe2q5cod6vsv2v2ka5vvuofp7a metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/bfe9fc5c-0cdb-4f61-8d95-06b59a566cb6.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmd4UWzWkRakFqDstkaDgDNa1JexR6QRFDUdjKn7vaPESn metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihbkmbahpl2u46ox4n3vz77yn5wqrfh4imvnetaaedoehksk3ymg4 metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://kimjongnuked.com/json/otXm metadata fetch 404
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/be47cd9f-47a9-4d91-aca6-9d9dad628452.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/96c2a28d-7349-4262-80fb-50743a683753.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://ipfs.launchblitz.ai/file/AiuRXJ6sFuT1nxp4mV7GoYif64G9vC1hbyCYVyZYpump.json metadata fetch 404
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/ab3ea053-f954-42ed-b2b1-153f1da8bb90.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifllyhyeqpelge3gh2jvzn4zfkn226uqe6vfx3jdgvm7uajnktsay metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/450bc8e7-e3b6-4475-bf1a-214453b88dcc.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmXAXs5HdcmorEran9yAgWXSsfgfs7nSFdKWUnMs2TqbJP metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/fbd968f2-86f9-477f-8c76-038a7c97a89d.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmTxatAuK797RUrPTkHGB4MgdYqBeMSEUHu9wTr9czgsgC metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmbw9RbEmr7RXycL57oKbRA5dYvHCPrhaS5CFyDa843KxF metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmaoyiVhgdLzV6ofiDwgXou585PtyiG8GdT1Rng352LR9T metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/46f9fb5d-34cc-499d-a677-aa762ad90d02.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/7752793e-74a1-4c41-98d4-3245ba152b29.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmRXgkhqiWej799MvsSrxWSx11QLkp8RnfY1SQEjrKmrMP metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreietaaikjlw2awse3xz76g3qmhoywwu4syy7lrb54lhqdkj6tjvuqq metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigmvtsq5agz7mwjzr75vw62x7jbxee25chuale5pawa4rawx7kmm4 metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/eeecbc22-565a-486c-af8f-fb1074c08a02.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/e45b3dea-4b0f-4080-b4e8-9df33902f35c.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmeNhJWQrpXvRaNoJFRGGqxBgqs3uqLhcy7r7fVYZGiW8o metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmbspWLBNviZgdhhy7wn8N3BWHqMVTjjDJyH514ehs4vJY metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/3e734b72-42b1-4111-8a4f-ac20c9290d57.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidiswm74aye6jhrpncrk66ad7zmsvjkorrnyigu6wh65v3aa6xsgq metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/7818540c-3cd5-4b19-8ae8-103e1e69f4bc.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmcZrzxAtd294wVXE6cPi3AmAboaLwWfa6DwzDBgJ3k3Z5 metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmRZE8eDZEMJju37Bie7J7FFEPkeBSZHz6wk5LbALtD3Uo metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/450bc8e7-e3b6-4475-bf1a-214453b88dcc.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihgjxve2come4jmpqyh2b76zyfmukgtxkgruanjljmbmz45pfdkle metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/3a957a2e-9ec7-4d58-b6a9-5f53023c40c2.json metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/f0ef22e1-b01e-497a-8fac-b6757b48bf68.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/b30b4f9f-4d4b-43f1-9472-a3bb4b6d1eac.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/b9326e8b-4cf0-481e-b888-b7e153d34a5b.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/e26b0c2a-7b87-464d-8e19-d09f16836c6a.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihq7qfjkxvwhvljybtkakdg76f3fmtyzdqrjqgno73j5b3sg6qv24 metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/31d504a9-93b2-4e53-867e-a30216c42048.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/1416cfd0-e9ee-4569-a64f-11195b83bd9f.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/5257f111-c08c-4548-bad2-6e7481cb3ec4.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/38421337-9b06-409b-a0ec-b960dc844d78.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/4017f6bd-31db-4efd-815c-470d4464b193.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://auth.flipprtools.com/api/metadata/793tDfp9vf9.json metadata fetch 404
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmf5cvzGbvxjXzesZGx9CrKRqGLRZFnygPSwFFPkKhRAiy metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/88c2ddd1-2383-4862-ad34-427399b0440f.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.pumplify.eu/data/Qmdv5QAPZ4zo6SJYgfhcb8rs8KhVe1zY3SThtJGdxJDGvE metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/9954ba03-6b51-4815-a530-39cee9a601cb.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/dc32073e-3c01-4b47-bdc7-3afe08fa6ba8.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/5443cf7a-bda2-4a3f-95e9-ed8f356c9001.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/cc63675f-57c9-4c01-b60c-9260be0d133d.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/cc63675f-57c9-4c01-b60c-9260be0d133d.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/ee7eabc6-74aa-48e5-95ad-5983e6740dc1.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/6b0e1fb3-b8a5-4657-8b90-64cf5bbaa94f.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/cc63675f-57c9-4c01-b60c-9260be0d133d.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/31fe397e-ce76-4e6b-a6ea-785e70501425.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/cc63675f-57c9-4c01-b60c-9260be0d133d.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/6b0e1fb3-b8a5-4657-8b90-64cf5bbaa94f.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/6b0e1fb3-b8a5-4657-8b90-64cf5bbaa94f.json metadata fetch 429
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmPPhLsLSZJi334a7aiZnHTHCMNRWnqzYfW1XNajW64dTm metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmXU99bRXq2omAaC7aL7ocjgr5zr7KSy7dZR6b4MyzybCd metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihtxuudmx7ftcqqmspaps52ho24aa5thowpat6nmx2bgjgr7fce7u metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigohhjphc37mrk2eh5ye45ixbltsgvarfvwuofs4zbeqc4acoifxa metadata fetch 403
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/xr9MPWdQ metadata fetch 404
+2026-01-14T20:13:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmWqoQ8SnYhnWfaEDebgsMws9fzPQ6JbaXsyVkX5goXgB5 metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifp5cv7cayqxzau4svdz6nlnmnajjnblqmjnsgcl5eb7gxfdow2ry metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmRLGhvpUHJxUpaJVWgZgra9xpt7g22N3T6nTz7qTNfyvW metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmVJn3pJUEmoSm5bYVGX7TkrQvPKh4YoLLga1TzTqmmaBh metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmZex4v3US7Rf1gM1sbiY7eAeNHLKvYi29Ek32agNdRLse metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/fsw2kixA metadata fetch 404
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigbi322h36a7u3inhzsoyn4k5r7gfxl7btcojw5gj4iq2zjkxjeiu metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmTg8eUEFHh8uvBoAVM299NPAG88yDwh4xoUbn8zEfwZTS metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihqyd4adiuzkjtdjbojts6xn3prosnpenflnqf3yqzwdfrt6n6n6u metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicjxqzxkmzi4q2ctonvgdkinlczrto24cb2ilmweuxybtmmolnkxa metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiakihr5ihz66uerwt6fm6jb66jbjiousk5mvwanexdieq6qxqkafe metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmdFgE8EisYWmPgJDJEzGfurRmgLSBNqqXQnwtkLyGbg3j Unexpected token '�', "����/�Exif"... is not valid JSON
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://metadata.pumployer.fun/metadata/8D0qWkjSE2Xg metadata fetch 404
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://metadata.pumployer.fun/metadata/5iL0erc-jn-r metadata fetch 404
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/0a37304e-a017-4a2d-a3e6-e680374c94bf.json metadata fetch 429
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://eu-dev.uxento.io/data/cmdz1i0c80004jj1apirutqom metadata fetch 526
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/d61e27fb-7dc9-41a8-9c93-fdd025019d5a.json metadata fetch 429
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/9ef41162-3369-45ac-b062-162e4553c189.json metadata fetch 429
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/6d685494-974d-40cc-bc5f-08d4e386f6ed.json metadata fetch 429
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/2d2e8956-26e8-4d21-b255-64f8a0ac727e.json metadata fetch 429
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/21443462-b778-47ed-86ca-aba6f6a996ec.json metadata fetch 429
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/a59e9c89-a3c4-441e-94cf-823fbd3a46cd.json metadata fetch 429
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/c0d554b3-1f2e-49ca-bd3b-2666a16c85dd.json metadata fetch 429
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/c2800f4f-8626-4e5b-b494-552afa24d397.json metadata fetch 429
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/8eee5fb5-f09e-47f8-9f5b-259b1004c74d.json metadata fetch 429
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/c0d554b3-1f2e-49ca-bd3b-2666a16c85dd.json metadata fetch 429
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/b6f31605-7998-47e2-9844-b0789a459be5.json metadata fetch 429
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/6b0e1fb3-b8a5-4657-8b90-64cf5bbaa94f.json metadata fetch 429
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/2a99a3ff-9095-4967-aed3-95b20817d65b.json metadata fetch 429
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/a29f1fad-63e7-40a8-b25d-2401d0db8487.json metadata fetch 429
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/70b7ddc4-9889-4c10-85ce-921c970b8ccf.json metadata fetch 429
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/6b0e1fb3-b8a5-4657-8b90-64cf5bbaa94f.json metadata fetch 429
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qma4upGHKfcD4bYfJTJBZMJx2aoEeB9u6B6zH5Q96K68vX metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmdJh67Y4swepV9cYKuW9Fz1ERn8icRPG3bCjuFApQLm5K metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qma4upGHKfcD4bYfJTJBZMJx2aoEeB9u6B6zH5Q96K68vX metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmNnNq21L4jN5Cy6PFmYqUDnryfhN7Lw8oimcLmwAZrYLe metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreid3htflx2bde5k2xv5b2yy7opthqsxip6zjd4tegvka5wfe4uxqma metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmeHdbVcykxsTvnnuxpE5zboH2pzTu9Z4QB3nCiubXNV6r metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmYUAevhLxFsEtp2qYF3717wFkvQG6N9nceDxwXmuuLcBr metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihddagto6ogyq7kj4dzvy4ztrexfjblhb5wjbfqrbahpu5xwclzwe metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiaojgcpriwrvupxgj5obgmztaxwumzozg6m23v3vscs3xv733rksm metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmd4YYLyCmWGZyYrD6sR8HEsvvyu8ygefSaDtFSovKDdhh metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreice4k7x5sv2rosacmpreohfdyuynbi7sngpwf73o5uyaasxrw2rw4 metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmedrK7NFoKreoMDs8ZxnVJpkteZFaxN9EojBGPt1BQCeU metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibzqvckyyfp5tfvm2dlcirufv2jkfrldqvp7gns6fikosjtbnn2oa metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmaqQm2YP9X8ZRfGTDtmon2yiLkSRsWtTeriSwsvZYnLyc metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmcPvGJ76pUrKxr6wyxVKmJvugXaDmGqTYyqCZmJNMmP6t metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigsyuxk47xfc56p6omltn6kawto35yxqlcv7vyqrfiir2mh6da7hi metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmV6SKH8jGYot3fpzSwSD4DziPNJXJz64pX5zqAZtS74MV metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifgjpihkzoaqr3tsxx5cwkiu3azkdapvwwdnni5sb4ya4onm7en5u metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmUFdw3113YZcfdakVaXNvmjRFdNXEkxhMVYuqLqAiodNb metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmVUXjUbCmXsMj1zjqHjMJRFXdCdxD7Mk8A6JCzgazgjXR Unexpected token '�', "���� JFIF"... is not valid JSON
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmWj69aAgPBZGqVYdiG3MkjhZJcdNx5mqsgrh8irHtV8ZQ metadata fetch 403
+2026-01-14T20:13:28: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/95ab3dde-a07d-4e3c-a578-17bdc40c6c37.json metadata fetch 429
+2026-01-14T20:13:28: [pump-coin] Failed to fetch coin 5iGvXVrerZ6q394R1zXL11eMRZeHb4kVj2KZFLL9Pray from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:13:28: [pump-coin] https://frontend-api.pump.fun/coins/5iGvXVrerZ6q394R1zXL11eMRZeHb4kVj2KZFLL9Pray responded with 530
+2026-01-14T20:13:28: [pump-coin] All endpoints failed for 5iGvXVrerZ6q394R1zXL11eMRZeHb4kVj2KZFLL9Pray: pump.fun coin request failed with status 530
+2026-01-14T20:14:20: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmXu7LPh4ieGaZVteSDvdQBETFDmuam7hCxjZqbRsHBZZx metadata fetch 403
+2026-01-14T20:14:39: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigldy2vjq6rzloficjqbmmtwzy7433k5xt67g6w4g3kf4f6m45bnm metadata fetch 403
+2026-01-14T20:14:39: [pump-coin] Failed to fetch coin A3RPXNR8FwYw1b3TTgbRD6J19sXehwnVwQNYHWekpump from https://frontend-api-v3.pump.fun: Unexpected end of JSON input
+2026-01-14T20:14:39: [pump-coin] https://frontend-api.pump.fun/coins/A3RPXNR8FwYw1b3TTgbRD6J19sXehwnVwQNYHWekpump responded with 530
+2026-01-14T20:14:39: [pump-coin] All endpoints failed for A3RPXNR8FwYw1b3TTgbRD6J19sXehwnVwQNYHWekpump: pump.fun coin request failed with status 530
+2026-01-14T20:14:44: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihe4h4zyqorfziaungkesbelaywnnm7fq3elpinfdv6awcbpzljym metadata fetch 403
+2026-01-14T20:14:57: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidyf6hrue5pkghrj2q5ak57jkwgli5q6a5lr5wzsmsdvumkactgeu metadata fetch 403
+2026-01-14T20:15:04: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiem6qht5cb4eag3kob6hi3z4xdgs3ekrkq4b3tqq3hwoatjhxv34e metadata fetch 403
+2026-01-14T20:15:11: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibo6acwth3yilpqhyokspe2lbbcbz6op2jrmecbj6gk6owcpb7o3a metadata fetch 403
+2026-01-14T20:15:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreida4uw5fsuhdj43hcaz4xaowbeydmyvkeew5g47ux7vcnugvtewwu metadata fetch 403
+2026-01-14T20:15:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmR1X7QZFKBrjB5dh1f7r3r3aqR2Pr6M7F3UfrPozGxftb metadata fetch 403
+2026-01-14T20:15:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmWngNsvmJzn7E3jDaMiZKxSkERAdP2eC48kVtukJSUtRv metadata fetch 403
+2026-01-14T20:15:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmadyqwNJwfRPi48Ao5av5gDSg31UeHZvH774LXDzuBxpA metadata fetch 403
+2026-01-14T20:15:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmdgE1cbHoGtfTvsBxcUi6c1DF4exPZQHepbp2LSuUyLqV Unexpected token 'R', "RIFFJZ WE"... is not valid JSON
+2026-01-14T20:16:35: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicc4xflllqkaelcyhlfppd7cchttr3lsz7fa44ancwa7e3ahn52yu metadata fetch 403
+2026-01-14T20:17:07: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiceciolkwgcrtgnb2a7xqnb3fcm66gf3v5ws6o4rferldjhw3nroi metadata fetch 403
+2026-01-14T20:17:09: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiajcfspbcebwtciz5gjuhvdmmiu6aus44yq467s5tkqs3cuqpdmga metadata fetch 403
+2026-01-14T20:17:10: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/gC859r76 metadata fetch 404
+2026-01-14T20:17:21: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihcg4z3dsacafvrit45oj6nz2mok6kkf6d4ro7ywwkaucfeyqu2wi metadata fetch 403
+2026-01-14T20:17:29: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreif2ciy5zy666fg2ariv2dc6jrnihfwrrcb7jsru56fa37usamzzce metadata fetch 403
+2026-01-14T20:17:35: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigtfrplabvkx572akbgiwce6hq7scrziiwdtl7nowwmb4g6xdgjqy metadata fetch 403
+2026-01-14T20:17:52: 
+2026-01-14T20:17:52: > pump-investments@3.0.32 start
+2026-01-14T20:17:52: > next start
+2026-01-14T20:17:52: 
+2026-01-14T20:17:52:    ▲ Next.js 14.1.0
+2026-01-14T20:17:52:    - Local:        http://localhost:3000
+2026-01-14T20:17:52: 
+2026-01-14T20:17:52:  ✓ Ready in 284ms
+2026-01-14T20:18:00: [api/tokens] metadata fetch failed https://faggotnuked.com/json/90b0d1e6-850a-434d-bd00-8f22ab625e3b fetch failed
+2026-01-14T20:18:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmcoFBK1Ecd2Vru4wVDYJPiXRwaiyZSDJqauZ27XEVxz5K metadata fetch 403
+2026-01-14T20:18:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreieqfocqe5dxfh5lagln4omcgdaqppsqhes4jw5onapwzf5z7c6eta metadata fetch 403
+2026-01-14T20:18:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmeHdbVcykxsTvnnuxpE5zboH2pzTu9Z4QB3nCiubXNV6r metadata fetch 403
+2026-01-14T20:18:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreic2wjzzv3ybp7yjkty63hj3xfcmbfhhwo5mavrxxck2cminxg7o2m metadata fetch 403
+2026-01-14T20:18:01: [api/tokens] metadata fetch failed https://ipfs.launchblitz.ai/file/62Df9XbAtu7dp85A66e9WfPSeMsNRKLJVQngwC2jpump.json metadata fetch 404
+2026-01-14T20:18:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicxiy75muugno7fyn444uyoqiv2lpbr4i6abkv7sjky5f7hz6lzhi metadata fetch 403
+2026-01-14T20:18:01: [api/tokens] metadata fetch failed https://eu-dev.uxento.io/data/cmekn94550145fa1beha1j4ct metadata fetch 526
+2026-01-14T20:18:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmPrFnZTVQ6ufNfgQkTqmCFWBLV6NdspkYywULQAJAyvzB metadata fetch 403
+2026-01-14T20:18:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigrfsl7y36uomurd7pnfuyptghjtdkjjxst7eq3thf3iczjbvnjgi metadata fetch 403
+2026-01-14T20:18:01: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/c1e9bbd850ec4879.json metadata fetch 403
+2026-01-14T20:18:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmVUuzqss22T6J7kQMw5K8oHh7DpvJVdR4r4tTvBP7nGyV metadata fetch 403
+2026-01-14T20:18:01: [api/tokens] metadata fetch failed https://eu-dev.uxento.io/data/cme3sxhgs006qkr1aoaz49lsr metadata fetch 526
+2026-01-14T20:18:01: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/94c5f4a1b46b48cb.json metadata fetch 403
+2026-01-14T20:18:01: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/338f5b96-545e-43ff-ae7b-5082af97a7c2.json metadata fetch 403
+2026-01-14T20:18:02: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/tg6pkuAB metadata fetch 404
+2026-01-14T20:18:02: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/gC859r76 metadata fetch 404
+2026-01-14T20:18:02: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/ylAu11Fn metadata fetch 404
+2026-01-14T20:18:02: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/AtWkVDz4 metadata fetch 404
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmSMCDZeUujQN5YDLx8oCL77jpyVogoTx1vCJHGWH9jksL metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/211b5ab7-0ca3-48b7-98d9-8d22ba6bda2c.json metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmYRYvUU9ne55oiCEGhDTyevGJFhfjAChuVng1yQDMpiJX metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiaf7a3soowwwsmhqohanxbv72cajhdnyr3td6twuyadocqfvdlw5m metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qme1u6Gk2tLQ5xRzegWbcNcUPiDAicctZUH8iJD8sxVVzd metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmb5t3nYvSu3W7YZ1fqpVc3xrVEWFBF2Ykv3axvuwknh64 metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmdxrLgFwoQH4K7DbNUbWGfj7gbq4KpPcwuNcXU4S6nwPG metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihgthop3lrwxzpjhqq6g5eu6dguavflyuqjtlmytn2b7ymbsk3sam metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreieuvgi3a7zhthyhymur3ycpyjd7y6vbojdf75ptsknoq2wkosagta metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/6beb7e6f4963438f.json metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://mypinata-gateway.net/metadata/477dfb93 metadata fetch 404
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifqpfxlmd5bbrlfd27pzgwcfs2cplnn2bijywqs2rqj5pxylure34 metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidbxl6lzf6jh4gg75kthzoiouvmx6hwyy7qzdegctahcgys2dtrma metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmZRugE5ySgybnLF5gE2PvRuFVQR8L3bmcYF7xfSK2YqKG metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmUXnAfQRyCLgKm1611pE2jMqjAPo7ov7UzBC1GVaFTCS7 metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmZUM2unqwDqFFykWDx9WjuizK4Qm33A43VLJfxkhv9j4B metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmWLnRpGihsHjjrQfthoPamN31Zbqvxcw8sq2kFMCs6kLj metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidj5pwdda6uiaumywl5sg2zu2zuqvghrejgeni72rlhdjq3wt7yw4 metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/cac6e413b9054959.json metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmXohahmvALG7y1YrbmCGD7okuMEKBsoJLfSwX25CUaMqi metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreid7d2mt56d4fxik24tciyfft5ng4f7mp4qexcywzkewlwxjbr67da metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiggkpt5ois42tzcb5iv6kj3ggta4vhyodlzgseroqphmgbslzt7qe metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/5073dd7c-cbab-4954-8bcf-d23ba082814e.json metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreih7y7tfnexgae2ybqxiktso6cszqu5uhfsepqtz3myskh66yzcpye metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiae35d56qxokit3dncwebsy54gpygtb6nl7ukvy4vjscxomrwyqbm metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidyf6hrue5pkghrj2q5ak57jkwgli5q6a5lr5wzsmsdvumkactgeu metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigbi322h36a7u3inhzsoyn4k5r7gfxl7btcojw5gj4iq2zjkxjeiu metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreif2i4cjduxoy2jnpmi6etbjyyqx376vkpp5jrqffr3giqwh2ktaoi metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifhwdfxaeozzx5eyhowuttdtapc2j5hp2asxs34stwhgsiwymwvw4 metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/daa5a080-7e57-4fc2-a6cb-eba599f85a7f.json metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigldy2vjq6rzloficjqbmmtwzy7433k5xt67g6w4g3kf4f6m45bnm metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreida4uw5fsuhdj43hcaz4xaowbeydmyvkeew5g47ux7vcnugvtewwu metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibo6acwth3yilpqhyokspe2lbbcbz6op2jrmecbj6gk6owcpb7o3a metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmNnNq21L4jN5Cy6PFmYqUDnryfhN7Lw8oimcLmwAZrYLe metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmWngNsvmJzn7E3jDaMiZKxSkERAdP2eC48kVtukJSUtRv metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmdgE1cbHoGtfTvsBxcUi6c1DF4exPZQHepbp2LSuUyLqV Unexpected token 'R', "RIFFJZ WE"... is not valid JSON
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiceciolkwgcrtgnb2a7xqnb3fcm66gf3v5ws6o4rferldjhw3nroi metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmR1X7QZFKBrjB5dh1f7r3r3aqR2Pr6M7F3UfrPozGxftb metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreif2ciy5zy666fg2ariv2dc6jrnihfwrrcb7jsru56fa37usamzzce metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigtfrplabvkx572akbgiwce6hq7scrziiwdtl7nowwmb4g6xdgjqy metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmadyqwNJwfRPi48Ao5av5gDSg31UeHZvH774LXDzuBxpA metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/283d8bb11f7f4ed5.json metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmQTCZHNnUQns7e5mamRrfRR8BVJfJTNqasygsTsa2hJt8 metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicc4xflllqkaelcyhlfppd7cchttr3lsz7fa44ancwa7e3ahn52yu metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihe4h4zyqorfziaungkesbelaywnnm7fq3elpinfdv6awcbpzljym metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://metadata.pumployer.fun/metadata/aF7TMKcBtiPK metadata fetch 404
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://metadata.pumployer.fun/data/417601a1-5fbf-42c4-90ed-73bad8e63648.json metadata fetch 404
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/ef7aa933-2353-4e90-ad31-d97fff7b04f9.json metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibx2dm5t3xltkhd3wmo3ztb2if33vf56xq5sb7dyvfeksil4cchyq metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmb2L22Jhdrh7NZDzcZPqPyFUPBTTyTDQZFGVRpsPq5mr2 metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidrqyjgyzet5ptrcfso2wwq73v6j46d5q7s3ruxd2gobxy5ntjpu4 metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmYXmcLxQXEMPNgAgk4qVEYUVACJNPTabTTHEqWLaGLaaH metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmbT82viRq1bX1VC9aVFaqDPjCFk5ZUh2FM8cfZbuPn6TV metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidmnamnhe3g7v6i5dv5ahqoirkcjhscedzidug4yvzjahed76fkrm metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidufxes4ogdylcoecujhoiszosxxmncbyq6wiqd4stmx5cvkq64ry metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiclg5kdbgr2th3on4fmmol7o3kt7gnhsqfwxhhy34lyot7v6pbuv4 metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmSUGnDMrKZnELo9QejJfJFGThLw7fqeBEv8nm2JMh17Xc metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibrhchmg4qc4kqipzxs7fwl7edowvwujl7pb3xg2piv25q4zzl4zu metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihktgikvd5yhpbaqv3xqvemqszli3oppiwrzt3ptf4pzz75nsalxu metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmT9a1aV56fC7bE4KKNMruBxiTnPxSvzXXvo5fphpycJN3 metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmVA8swctSHVeg24uscAbG9Qa6VeZ1uPYmZFTYrrb2mdgC metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreif5jdorhrnpyj5ogsiqttkjmhpgjzta427b374756ma6ajcjpt4dm metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibuqj7sntudbiekd4km3l5l347lon3p7d5f4kxccbhjjrrbou45ii metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmTQvFhJBGypG3pz9xE3MoHVJaEbSgnwdkkEYw3ee14GtW metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreid36omx3clgccawhtycuh2sqjpwoqxd7tsniwdzh6hqpgfo3242ve metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmTS1Yj66jC1JbnbAYo8hwpmuF2L8TZn6nwUwG8depXYXb metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmU3JK1ksWvRmeRR6e7jDVA5GCJt5Fr4Pf3iu13e9PezRv metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmacyUsDfwbXtE69iAtagj7cQiSo3UcG6F1tW46y3XotbW metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qme8vKELBtzkT5WDuyYAPYm4K3hBfQpGEq3GkLuCVGMbKe metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreie22zb67liarsolrfc7igf4pvrauqf6gxxeuj6kv74gxrxoyby3re metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qma7Nj7qCdpnRzriGHuaYE71rtBc2iJKVUAtifpPtAcqXm Unexpected token '�', "���� JFIF"... is not valid JSON
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicddjktnu34katt3a2pnjqxtwgqjfghwbdyit6tn3waee4oy6fhgm metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/0f62c5cd51714598.json metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmYFtDsz5MHU789jbnPkPW3AjwT15nswz7UMTAT4jPEbqd metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreid7euyxzruamfmeyf3jqsshypa2fois4fvvsxwv67fkpqhyh6xomu metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmZdzDLagt3jGVfr4VBWhMRnL8YKwoVDijjNb4RWxTag7q metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmV96AY7DmrukvSQYQ1rpUx9wftP9Wwwbt2Do9QVegVG3V metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidrkeza2l5mwgrcq5c7cj7ahzqsw3bsetcq6mqfkzdpyczndjhph4 metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibwvvvj5rpan4rpb7v3lx7mfve5qfn7lrfsqdrqehpmoyg5fyclsy metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidfrgfr5dbev5an2abp6gkseglwwyigr6wzmf56gwg4xaa3cju4m4 metadata fetch 403
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://kimjongnuked.com/json/ti3W metadata fetch 404
+2026-01-14T20:18:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihm2tiznaxllkdknmukqhbr7gu5w57wfxgkar3hihrtvgr3j3zy2e metadata fetch 403
+2026-01-14T20:18:04: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigohhjphc37mrk2eh5ye45ixbltsgvarfvwuofs4zbeqc4acoifxa metadata fetch 403
+2026-01-14T20:18:04: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiem6qht5cb4eag3kob6hi3z4xdgs3ekrkq4b3tqq3hwoatjhxv34e metadata fetch 403
+2026-01-14T20:18:04: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibzdpwonqhrx3cxaspy3iuxq3ukntvkjxg5vcyszuppy7cubhwfoe metadata fetch 403
+2026-01-14T20:18:04: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihcg4z3dsacafvrit45oj6nz2mok6kkf6d4ro7ywwkaucfeyqu2wi metadata fetch 403
+2026-01-14T20:18:04: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifykpc4bq265iiw567a7kzlrmamvixz5kd47fr3jlobugzps4qfhe metadata fetch 403
+2026-01-14T20:18:04: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmRZE8eDZEMJju37Bie7J7FFEPkeBSZHz6wk5LbALtD3Uo metadata fetch 403
+2026-01-14T20:18:04: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiajcfspbcebwtciz5gjuhvdmmiu6aus44yq467s5tkqs3cuqpdmga metadata fetch 403
+2026-01-14T20:18:04: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmankPtxKur5JHAaDjfrStUNJke5bVrtv4E6uWC4pTFvhM metadata fetch 403
+2026-01-14T20:18:04: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmQ7qhfFScBikCMHmfSuWiSNp25XoEKSeXxR3S1TygMurX metadata fetch 403
+2026-01-14T20:18:04: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmXu7LPh4ieGaZVteSDvdQBETFDmuam7hCxjZqbRsHBZZx metadata fetch 403
+2026-01-14T20:18:04: [api/tokens] metadata fetch failed http://snowballv2.fun/api/metadata/7JLRrF9YVs1zQ6WsrtiV896hahdKx2vx8zogPkXr1EkJ metadata fetch 404
+2026-01-14T20:18:04: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmR3To5V736nGjCFS2YU3mv6Yu7BooELsLBVf14Umm8hYC Unexpected token '�', "���� �Exif"... is not valid JSON
+2026-01-14T20:18:04: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmSwjdGxcoHxAGkAgWJDpZddAB2ozKu6L5ms1Q27m5CSmU metadata fetch 403
+2026-01-14T20:18:13: [api/tokens] metadata fetch failed http://149.51.224.102:81/json/aa39c4ff-1501-4b61-b3bf-c790655f5fee fetch failed
+2026-01-14T20:18:15: [api/tokens] metadata fetch failed http://149.51.224.102:81/json/aa39c4ff-1501-4b61-b3bf-c790655f5fee fetch failed
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qma4upGHKfcD4bYfJTJBZMJx2aoEeB9u6B6zH5Q96K68vX metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmbM9gsMWetMW3M8cZadnwAJhTQGWa1mNw7R797Euh6bHK metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmX64ntD8pSh15YowuULMTiGub4dWqZDrDBCHLL63iuD47 metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmb24mkkxeuSZvsXhyUdzfJxP6kKjpk5f11titdsAGcDcE metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmfBfqwG1FjPFUkA1qCVfcX7RvD6GXpnUSpoYY5VUNCNVz metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/fe034af5337044af.json metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qme3KweNmszJobvohiaeNui2EbNVSsyc2QMLHwN8hGnZsE metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreic77bvfntukrx47wjurfp7dsf6wpxebya5qhh2bszbu3oqdgjogfi metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigwiw4caokuuicpj3wxiwzpmluupxug3tlxg6ioh4o5yawah7maqa metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidbag534qk6lfn4n35amhgc3r2p7xfeeeajzkoh66id2pbixqbzti metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibkxngoz7qs7ournnw247r75bozpppig322c3l4dcmlzlvmrione4 metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiaojgcpriwrvupxgj5obgmztaxwumzozg6m23v3vscs3xv733rksm metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmXAXs5HdcmorEran9yAgWXSsfgfs7nSFdKWUnMs2TqbJP metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qma4upGHKfcD4bYfJTJBZMJx2aoEeB9u6B6zH5Q96K68vX metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/b98b4db1-6b2d-4df4-b784-71c8009e2037.json metadata fetch 429
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/b98b4db1-6b2d-4df4-b784-71c8009e2037.json metadata fetch 429
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/b98b4db1-6b2d-4df4-b784-71c8009e2037.json metadata fetch 429
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/b98b4db1-6b2d-4df4-b784-71c8009e2037.json metadata fetch 429
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/2d2e8956-26e8-4d21-b255-64f8a0ac727e.json metadata fetch 429
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/6d685494-974d-40cc-bc5f-08d4e386f6ed.json metadata fetch 429
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/fe3b025a-a9c0-4572-a35a-2f2b19452ff0.json metadata fetch 429
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/d61e27fb-7dc9-41a8-9c93-fdd025019d5a.json metadata fetch 429
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/9ef41162-3369-45ac-b062-162e4553c189.json metadata fetch 429
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/9954ba03-6b51-4815-a530-39cee9a601cb.json metadata fetch 429
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/21443462-b778-47ed-86ca-aba6f6a996ec.json metadata fetch 429
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/c2800f4f-8626-4e5b-b494-552afa24d397.json metadata fetch 429
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/a59e9c89-a3c4-441e-94cf-823fbd3a46cd.json metadata fetch 429
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/c0d554b3-1f2e-49ca-bd3b-2666a16c85dd.json metadata fetch 429
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/f36b3ead-c23c-4e5e-9716-8a12d3bcd6de.json metadata fetch 429
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/c2800f4f-8626-4e5b-b494-552afa24d397.json metadata fetch 429
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/c0d554b3-1f2e-49ca-bd3b-2666a16c85dd.json metadata fetch 429
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/8eee5fb5-f09e-47f8-9f5b-259b1004c74d.json metadata fetch 429
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/960e1e6f-4e2b-4188-b2b3-f64600a4c88e.json metadata fetch 429
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/d585401a-d8fe-4ad7-8220-e072e7f61617.json metadata fetch 429
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/1ed945e1-be17-4317-b331-115d205c00fc.json metadata fetch 429
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/1ed945e1-be17-4317-b331-115d205c00fc.json metadata fetch 429
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmaqQm2YP9X8ZRfGTDtmon2yiLkSRsWtTeriSwsvZYnLyc metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihgjxve2come4jmpqyh2b76zyfmukgtxkgruanjljmbmz45pfdkle metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmcPvGJ76pUrKxr6wyxVKmJvugXaDmGqTYyqCZmJNMmP6t metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmYUAevhLxFsEtp2qYF3717wFkvQG6N9nceDxwXmuuLcBr metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmUFdw3113YZcfdakVaXNvmjRFdNXEkxhMVYuqLqAiodNb metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifgjpihkzoaqr3tsxx5cwkiu3azkdapvwwdnni5sb4ya4onm7en5u metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmcZrzxAtd294wVXE6cPi3AmAboaLwWfa6DwzDBgJ3k3Z5 metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmd4YYLyCmWGZyYrD6sR8HEsvvyu8ygefSaDtFSovKDdhh metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmedrK7NFoKreoMDs8ZxnVJpkteZFaxN9EojBGPt1BQCeU metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibc5fvqyhawjfbhpu3e7gltivmxhyfvt5imjw3hlpkxwfoljx32gy metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://ipfs.launchblitz.ai/file/AiuRXJ6sFuT1nxp4mV7GoYif64G9vC1hbyCYVyZYpump.json metadata fetch 404
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/a59e9c89-a3c4-441e-94cf-823fbd3a46cd.json metadata fetch 429
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreib7dj2mjhwt5tniila2bnpuqvvyvu6omtivvhopoywg7mr6zji4ga metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/0a37304e-a017-4a2d-a3e6-e680374c94bf.json metadata fetch 429
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigjga44rnqjhs5ueorh6vlbisrinxiosejscqvlw43mxutpsbk37y metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmVjddLADUCdfajiBN2hVBmy2TFfCdTAQcJ838FosDsGRK metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmRdTTxATg311QaxUUtkUcwCrCMuafurykXC6F9P2S93Qn metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidey3d6mfsclkq5pzp2wkaqo6dlqkmcypzaliuxfzxzlywdkm3i44 metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://eu-dev.uxento.io/data/cmdz1i0c80004jj1apirutqom metadata fetch 526
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmRw37t2D59EvAzbmLzjXqdGHrbXMeWHEsaheNcS3mr4Eq metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmTPXUw3eYT5zHh15TGSq7UrzVuXQa9kh9xqSujS1PYVz4 metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://metadata.pumployer.fun/metadata/8D0qWkjSE2Xg metadata fetch 404
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmdFgE8EisYWmPgJDJEzGfurRmgLSBNqqXQnwtkLyGbg3j Unexpected token '�', "����/�Exif"... is not valid JSON
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/95ab3dde-a07d-4e3c-a578-17bdc40c6c37.json metadata fetch 429
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmWj69aAgPBZGqVYdiG3MkjhZJcdNx5mqsgrh8irHtV8ZQ metadata fetch 403
+2026-01-14T20:18:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmUVGMhAhi4kSwyuwnHbqqeDiXrkqy1Tv38FexCe3hQVf5 metadata fetch 403
+2026-01-14T20:18:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmVUXjUbCmXsMj1zjqHjMJRFXdCdxD7Mk8A6JCzgazgjXR Unexpected token '�', "���� JFIF"... is not valid JSON
+2026-01-14T20:18:59: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/80455f3a-253a-4e2b-bf8b-519a90eaf7d2.json metadata fetch 429
+2026-01-14T20:18:59: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/f89feb8b-0613-456d-b460-0a459020c77b.json metadata fetch 429
+2026-01-14T20:18:59: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/cda1f76d-e280-4f63-8143-68ae322bd0f1.json metadata fetch 429
+2026-01-14T20:18:59: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/2e2012db-e4f5-4514-8c15-70ac1fc73725.json metadata fetch 429
+2026-01-14T20:18:59: [api/tokens] metadata fetch failed https://eu-dev.uxento.io/data/cme6733gj00eji31aunv8m7bs metadata fetch 526
+2026-01-14T20:18:59: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/58e2b86b-26d6-4801-a190-9453491c9fe1.json metadata fetch 403
+2026-01-14T20:18:59: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/5b3f9b1f57c84c5a.json metadata fetch 403
+2026-01-14T20:18:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmWb75TBwzP6zvoGhkuLoiYpW48uBBCkBd7ZeRmk1tHcD9 metadata fetch 403
+2026-01-14T20:18:59: [api/tokens] metadata fetch failed https://metadata.pumployer.fun/metadata/e0cG04KqG1bX metadata fetch 404
+2026-01-14T20:19:05: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/fb2506bd-0cdf-4d43-bb36-b01bc2f5cc4d.json metadata fetch 429
+2026-01-14T20:19:05: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/3f177c1c-4af0-4e66-9a9c-8b2cdba31500.json metadata fetch 429
+2026-01-14T20:19:05: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/684f6fc905fa4f92.json metadata fetch 403
+2026-01-14T20:19:05: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiebkr6mhpajf7xuib4jd2bezznxrekbsczzzwurmrpuu43jmc6pzq metadata fetch 403
+2026-01-14T20:19:05: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmaV7QLCQt8esLf2oguLQhytnGxt2qZonhpiPqceLr3hPJ metadata fetch 403
+2026-01-14T20:19:13: Error: Failed to find Server Action "x". This request might be from an older or newer deployment. Original error: Cannot read properties of undefined (reading 'workers')
+2026-01-14T20:19:13:     at rv (/home/hendo420/pumpInvestments/v0-pump-investments/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:16:1666)
+2026-01-14T20:19:13:     at /home/hendo420/pumpInvestments/v0-pump-investments/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:16:301
+2026-01-14T20:19:13:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-01-14T20:19:13:     at async rg (/home/hendo420/pumpInvestments/v0-pump-investments/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:15:6309)
+2026-01-14T20:19:13:     at async rz (/home/hendo420/pumpInvestments/v0-pump-investments/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:16:24709)
+2026-01-14T20:19:13:     at async doRender (/home/hendo420/pumpInvestments/v0-pump-investments/node_modules/next/dist/server/base-server.js:1394:30)
+2026-01-14T20:19:13:     at async cacheEntry.responseCache.get.routeKind (/home/hendo420/pumpInvestments/v0-pump-investments/node_modules/next/dist/server/base-server.js:1555:28)
+2026-01-14T20:19:13:     at async NextNodeServer.renderToResponseWithComponentsImpl (/home/hendo420/pumpInvestments/v0-pump-investments/node_modules/next/dist/server/base-server.js:1463:28)
+2026-01-14T20:19:13:     at async NextNodeServer.renderPageComponent (/home/hendo420/pumpInvestments/v0-pump-investments/node_modules/next/dist/server/base-server.js:1856:24)
+2026-01-14T20:19:13:     at async NextNodeServer.renderToResponseImpl (/home/hendo420/pumpInvestments/v0-pump-investments/node_modules/next/dist/server/base-server.js:1894:32)
+2026-01-14T20:19:25: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/5805d307-6a76-405d-b46c-0e1390172a28.json metadata fetch 429
+2026-01-14T20:19:25: [api/tokens] metadata fetch failed https://metadata.rapidlaunch.io/metadata/d303e219-5817-40ef-87e8-b67a89a9d08a.json metadata fetch 429
+2026-01-14T20:19:25: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/6f87e2d42f5d42ec.json metadata fetch 403
+2026-01-14T20:19:25: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidrnkdp7e5gdo6u2otjex5hjdlfoosbszh664ohqhr364bqtprr2i metadata fetch 403
+2026-01-14T20:19:25: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmdbDCcFwFTNpx38bui4WZX8NSaHzya6SbESGokrs2E63H metadata fetch 403
+2026-01-14T20:19:25: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicjxqzxkmzi4q2ctonvgdkinlczrto24cb2ilmweuxybtmmolnkxa metadata fetch 403
+2026-01-14T20:19:25: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicji4vbgf4dswqdx3imbxjutkx7vv6c5klwhcngk57fad4xe6pmqe metadata fetch 403
+2026-01-14T20:19:25: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibzqvckyyfp5tfvm2dlcirufv2jkfrldqvp7gns6fikosjtbnn2oa metadata fetch 403
+2026-01-14T20:19:25: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihkap77q67xr7hn24uhnjl26sghzcucl3ler3inkpideb3mpc5psa metadata fetch 403
+2026-01-14T20:19:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmWcjtENRqNCB3ih9bqt1T2wWqvZJT7KQbPKStkqwmtuMK Unexpected token '�', "���� JFIF"... is not valid JSON
+2026-01-14T20:19:59: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/45db97d8-f489-42f6-8213-c3f5ba47463e.json metadata fetch 403
+2026-01-14T20:19:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiambusoytzzeztka4pvbgvnaux2pwroanjn2lwbh5mz72r4u53mpe metadata fetch 403
+2026-01-14T20:19:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihgblhzsye7vcdafeyten3uvs4c47sa23e2plvxhav7q6slmv6zia metadata fetch 403
+2026-01-14T20:19:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/metadata/0c17670f83bf4472 metadata fetch 400
+2026-01-14T20:19:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreid3htflx2bde5k2xv5b2yy7opthqsxip6zjd4tegvka5wfe4uxqma metadata fetch 403
+2026-01-14T20:19:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreif27hoxreia764vaipv74hcljuj6czy4wgio2xavxep7oczu3gesa metadata fetch 403
+2026-01-14T20:20:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmcS4MfaifxBrFDAGKtMrp4DtNBLoa3KJop3RNNcyDZV5J metadata fetch 403
+2026-01-14T20:20:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihwfjzie5l7sqzzxzlcntpljwdfjbtltj2opsn7vpyjl572aqyy4a metadata fetch 403
+2026-01-14T20:20:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmbptCADJfXgiyM9YWXpoAXR2NyubGs4BkepX9UUDAerLg metadata fetch 403
+2026-01-14T20:20:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmdwHPUqp6DdDZb6ro4ARn4vSJsYzeeZde7P4bH8Twr3VG metadata fetch 403
+2026-01-14T20:20:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreic7ybqhkcgj55qoto7ficacmnn3p4y3dqvynu3kvsphdpke2bwyvq metadata fetch 403
+2026-01-14T20:20:05: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmV6SKH8jGYot3fpzSwSD4DziPNJXJz64pX5zqAZtS74MV metadata fetch 403
+2026-01-14T20:20:05: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmZHp3HRsGYeHsEG3uQnoYT38pgCxGH8dxT9jkfKT6tsPL metadata fetch 403
+2026-01-14T20:20:05: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmSDkjEJMoUjD95mNMyr5PrgCmskL62VgEbM7VDVm71s3b metadata fetch 403
+2026-01-14T20:20:25: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigsc4olsz4kq3mvfdvp5padu45wq6vitouczerqura25tbqexujou metadata fetch 403
+2026-01-14T20:20:25: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmPNxra8yEDdtuPXQTZBzyQCA119FtbDwXxeLRKEhaAKmr metadata fetch 403
+2026-01-14T20:20:25: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmeC23AMJheUaWaA58ASxXGot2dUbzLRsPABUo5XH9CKmc metadata fetch 403
+2026-01-14T20:20:25: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreic6on7pk62ubhm33gozqyd47tcv4fo5lu3sw45k6cv4g4w7gffdia metadata fetch 403
+2026-01-14T20:20:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreic3otqia5vj7aa42wwwrfjuuv6fefl4vsufr5g4vc52i3ic6qftwm metadata fetch 403
+2026-01-14T20:20:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihjkkaocf7rcqciaguqdoyvqmvc6fuwk3kw6wjsw7d3agr26ppwga metadata fetch 403
+2026-01-14T20:21:25: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreieks3yeiwdrlnse3eh64rcjwjvogflwghekw7qexwfrxvrcwdx5ve metadata fetch 403
+2026-01-14T20:21:25: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmaveV4E9EkbA4pR5thnWd3n6i4ak8QWnzFRz9JDFq3fPZ metadata fetch 403
+2026-01-14T20:21:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmcsxi8hV7XBVziXmpwuG8KCLEwJEYAxrdR8vRFYCAuPou metadata fetch 403
+2026-01-14T20:21:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmSRWdj5t1VX9BRB5YpQ4ZUYAAaceRzmsdkk7XobJ2ECDd metadata fetch 403
+2026-01-14T20:22:05: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifllyhyeqpelge3gh2jvzn4zfkn226uqe6vfx3jdgvm7uajnktsay metadata fetch 403
+2026-01-14T20:22:09: [api/tokens] metadata fetch failed http://103.7.55.101:9021/retrieve/658cf2dc40c52226f55bfff6d923951e5ac83a75b0ff181756c05f94e8720f52 fetch failed
+2026-01-14T20:22:15: [api/tokens] metadata fetch failed http://103.7.55.101:9021/retrieve/658cf2dc40c52226f55bfff6d923951e5ac83a75b0ff181756c05f94e8720f52 fetch failed
+2026-01-14T20:22:25: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/66a6c3e0f6014708.json metadata fetch 403
+2026-01-14T20:22:25: [api/tokens] metadata fetch failed https://metadata.pumployer.fun/metadata/IU-apDRlm9Qj metadata fetch 404
+2026-01-14T20:22:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifz4afr6pvp6ekjfabq6jv4oxe5erwqy3uwcbblgai6yp62bklcti metadata fetch 403
+2026-01-14T20:22:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidafwwgwc53espe26na7wxxr74h5gndfi5nsakfn663i4ike567su metadata fetch 403
+2026-01-14T20:23:25: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmeA7WQ6gbGnUwg3KGzKy1vPK8oQh1crnb5h6iZfsxPiZJ metadata fetch 403
+2026-01-14T20:23:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiecfjnxdly5xk5jozuczj2bmqt4bnxm46mgrm2ytzz6ai7gexx4hm metadata fetch 403
+2026-01-14T20:24:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmYg1dzhaTwAFJ5GBGyKLLWkftfcnVmMV6CDZXGtCAGTQM Unexpected token '�', "����Exif"... is not valid JSON
+2026-01-14T20:24:05: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreied3jdaipqcjfdqtqzevubue7arhkdkso44mwzuaio62rhpaexj4y metadata fetch 403
+2026-01-14T20:24:25: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibxuyuevvigygmfe6lr55fczk5wklvgs35crxkfshluc6y5iqoxau metadata fetch 403
+2026-01-14T20:24:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreie5f7dwnby5a4eqnsswfxpnxmofpx3nstsb4gflyajneuqylojorq metadata fetch 403
+2026-01-14T20:25:25: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmd87DWUZXvENzDU2JiYANCJiUXuu35NN4kGaofSi9yvdP metadata fetch 403
+2026-01-14T20:25:59: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/1b18566dd2844f99.json metadata fetch 403
+2026-01-14T20:26:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmQ4JnFHpqkJFCzGbhEFbxM5iwrBo7TSUVgMNHoh37fj73 Unexpected token '�', "���� XExif"... is not valid JSON
+2026-01-14T20:26:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreih7t74wfpnfij5ajztcadqvnltswjkqt3wenimchhewn3vecndkx4 metadata fetch 403
+2026-01-14T20:26:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmNskTYnYdFAUxRWspQu9dBs2JzR6EBQB2hF3i9w3YVmbw metadata fetch 403
+2026-01-14T20:26:59: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/LZEMbTK0 metadata fetch 404
+2026-01-14T20:26:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidabatspaxbahc7ajieeupyab6ybxhlp2m4rmi6yibncb6ued57la metadata fetch 403
+2026-01-14T20:26:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmQUHyuupSD4Tt1VgfPFmJ6PNZjhop2T8vQpgdN6UuGgdL metadata fetch 403
+2026-01-14T20:26:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmWjJXjtYYuqs2NgqE58E1QfzQDKguANVxEDZrSmSnUPNP metadata fetch 403
+2026-01-14T20:26:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmNskTYnYdFAUxRWspQu9dBs2JzR6EBQB2hF3i9w3YVmbw metadata fetch 403
+2026-01-14T20:26:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmQUHyuupSD4Tt1VgfPFmJ6PNZjhop2T8vQpgdN6UuGgdL metadata fetch 403
+2026-01-14T20:26:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifaqd6tj36stoxmboeschqif6wonj2ixbiaop3fayvo6ies26agye metadata fetch 403
+2026-01-14T20:26:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidbllzoofx6tpstbsibtlx6zyqhqtlcbwgxvaxzz6oqjzyr4q3yt4 metadata fetch 403
+2026-01-14T20:27:58: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiavfon2ntldyndyhrmcjbcem2vtyk6qhkxaq2ti4ujf3cwtykyuiy metadata fetch 403
+2026-01-14T20:27:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmWS7TsuAHv6EEFG3JKmaM5UXrtmF9FPfM6LE4WiNJNRZH metadata fetch 403
+2026-01-14T20:28:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmWk2jL65giDGNwykRrepE9FsPkJnULwYcrh269bDEw3WZ metadata fetch 403
+2026-01-14T20:28:06: [api/tokens] metadata fetch failed https://1ea5c9284bee4d1c815c8bd0.blob.core.windows.net/deploy/382d9e61-e414-4e4f-98ba-cf6caa532230.json metadata fetch 404
+2026-01-14T20:28:16: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/metadata/03d6c6ff6c9e416d metadata fetch 400
+2026-01-14T20:28:41: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifragjm3cbrlv2mbq5j4od3nwrejtzyusuzxpm6wglfbfzsrsfhpq metadata fetch 403
+2026-01-14T20:28:49: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmeFD5AciYX6Z3XxSDdmsH8FJAPeRL5TCgWbGnccdmL3U2 metadata fetch 403
+2026-01-14T20:29:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiauskxvlwpt47mthsln3iocxjyelilissb2ejcw5lk2ksljsjmhwy metadata fetch 403
+2026-01-14T20:29:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigfrt4yfmdg2ptycwxa6z6fysr6w6lyzz2zg4q7hmoso6vzwxhk34 metadata fetch 403
+2026-01-14T20:29:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmdnjzKmEzTC8yA7fSw8Grh4Et7zQQVoLGmqKamJ1UqvNL metadata fetch 403
+2026-01-14T20:30:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreic47vwpvkqqr3goau6nau2bidmdp6hho2oltd42wrm6bhew5v6xuu metadata fetch 403
+2026-01-14T20:30:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicmzet7ddcq7cdjbhgtvbqbiwnqkl2qfwdvhyyxyczfrwdgrbxi3m metadata fetch 403
+2026-01-14T20:30:59: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/LF5IbDDu metadata fetch 404
+2026-01-14T20:30:59: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/kXNA0YZ7 metadata fetch 404
+2026-01-14T20:30:59: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/O30A5G2N metadata fetch 404
+2026-01-14T20:30:59: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/8InTUimL metadata fetch 404
+2026-01-14T20:30:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreielounqpvufe4xps27xbhqqoocnsmxib7y3y6vetqaaqdoc5vu7wa metadata fetch 403
+2026-01-14T20:30:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmRLGhvpUHJxUpaJVWgZgra9xpt7g22N3T6nTz7qTNfyvW metadata fetch 403
+2026-01-14T20:30:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidz6g5fu2haqi7ap6tvlh5xsjssd52ywprakikzgomh2v5wyimdrq metadata fetch 403
+2026-01-14T20:30:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmSwmhHjpmwwkVqgD6wnpJr8QqV7BERzHcb9jfj3irjMvY metadata fetch 403
+2026-01-14T20:30:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmRt58Maj8G8y1Hh2Z3d58WPSmMew1yT52gSwKqod6t3qN metadata fetch 403
+2026-01-14T20:31:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmbBKcHZKraEREfbFRbRYQyAMf9yw2pmvmG8Wau2bRUPFM Unexpected token '�', "�PNG
+2026-01-14T20:31:00: 
+2026-01-14T20:31:00:   "... is not valid JSON
+2026-01-14T20:31:05: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmUgtRa7c3QuDQyas79mtu8L6vtBZ8azCNrLdDhS9UMFdv metadata fetch 403
+2026-01-14T20:31:34: [api/tokens] metadata fetch failed https://kimjongnuked.com/json/NXUz metadata fetch 404
+2026-01-14T20:31:34: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreih5pct62lvomalemoixyn2ilen74kgh3fsfkc64mgdwgzgsksagaq metadata fetch 403
+2026-01-14T20:31:43: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmPj2pfzotht8xkA6fYnF2sjtud4BpaazTdntRLoLbDHC2 metadata fetch 403
+2026-01-14T20:31:56: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidvmvcaj2a4im5xezf2supjekxh2rgd3xcwdv4icpk3oev7znw7ra metadata fetch 403
+2026-01-14T20:32:12: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmVb3SFdrYNnJCtuYbJkMD15aEBAhtG7rEaew4gReuypRX metadata fetch 403
+2026-01-14T20:32:22: [api/tokens] metadata fetch failed https://workers-playground-bold-tooth-cee5.jake-98f.workers.dev/metadata/5xi4g8vb.json metadata fetch 404
+2026-01-14T20:32:35: [api/tokens] metadata fetch failed https://knrwddrlgpohaclereid.supabase.co/storage/v1/object/public/images/019b7160-d57d-7000-80b8-932827fce12e-1000_x_1000.png Unexpected token '�', "�PNG
+2026-01-14T20:32:35: 
+2026-01-14T20:32:35:   "... is not valid JSON
+2026-01-14T20:32:57: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmeUGtBdYi7aNQhnUrSbeuHq6M7fk6YQ9hoiyfj6nz1Lov metadata fetch 403
+2026-01-14T20:33:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmRtjVciDa7BJ2pfo4kSeRnNGDs8vdsKUGwzvCQBeT3R7n metadata fetch 403
+2026-01-14T20:33:22: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmUSrg5rD7j7MFooLrWuP8b1qgEwLbkmhPMBPXJmkw2Y1G metadata fetch 403
+2026-01-14T20:33:24: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/GCsgxgfA metadata fetch 404
+2026-01-14T20:33:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmcDEGnHpDEmkpVK28B2uXYDgFKq8B8yC7UTYUKn25LGiE metadata fetch 403
+2026-01-14T20:34:00: [PumpAPI] Request error: https://frontend-api-v3.pump.fun/coins/DGX9ZMzBXPPJoLUCephTPSJFXA1jZHhYvzeYkHaRpump :: Unexpected end of JSON input
+2026-01-14T20:34:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidog2xcku3irnchz65mi3bjriygchrw7vw2ipiuy3oivc4ixf7lkm metadata fetch 403
+2026-01-14T20:34:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifca6ppyb2gpchnsepgx774xxkvasprtxvtugasojasm5lrciuh4y metadata fetch 403
+2026-01-14T20:35:05: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmS2JDUteLePaiofy9ZJ9JunSAtMWajpcXGyrvVmmJfQkT metadata fetch 403
+2026-01-14T20:35:05: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmPgqbPJwJ8wzefvdzPwRQeyo47dan3nBAjPSAxvwv8nnL metadata fetch 403
+2026-01-14T20:35:10: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicek2n3z56kvkx5lvevppu2lsqs54ae7gb5t35sxbsyxe7zsgdzw4 metadata fetch 403
+2026-01-14T20:35:20: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmT4rjrL5uk8mpRNPNrMJYhm6rgjjk5ghRYE3VQeWCbSXs Unexpected token '�', "�PNG
+2026-01-14T20:35:20: 
+2026-01-14T20:35:20:   "... is not valid JSON
+2026-01-14T20:35:30: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidnp5cq62xgdv3gj6c5b232a2jw7yopi2ake2flrtqnlpii7akuqu metadata fetch 403
+2026-01-14T20:35:32: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmWpNmRHwpXnmNV9EdfvsBPJMvxKvsdNk6Mw7zLM7tdNqF metadata fetch 403
+2026-01-14T20:35:41: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigmvtsq5agz7mwjzr75vw62x7jbxee25chuale5pawa4rawx7kmm4 metadata fetch 403
+2026-01-14T20:35:43: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreia42cv6b6ep2tbx44w5zipbmlyjdh6fucl4mn67b3m5j7vq263ofm metadata fetch 403
+2026-01-14T20:35:45: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmUshJtJpUid35co5BYz2XHcJf73ML8sQxqKEtMPmZ2KBZ metadata fetch 403
+2026-01-14T20:35:57: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihqyd4adiuzkjtdjbojts6xn3prosnpenflnqf3yqzwdfrt6n6n6u metadata fetch 403
+2026-01-14T20:36:03: [api/tokens] metadata fetch failed https://kimjongnuked.com/json/XuMq metadata fetch 404
+2026-01-14T20:36:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmPCAAMtm5ZeJGMSJNugwzCmkPP5YsUxVTKRtRormafJ3d metadata fetch 403
+2026-01-14T20:37:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreieb3opohtgan2g7gg5da3ar7glehvtbgyeiytuvftjxgfyl7ohzre metadata fetch 403
+2026-01-14T20:37:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihbkmbahpl2u46ox4n3vz77yn5wqrfh4imvnetaaedoehksk3ymg4 metadata fetch 403
+2026-01-14T20:37:05: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreideznxo2dp45bvqluv3gl7d3hbqck7lu7utvhwalxrm7fzijpknu4 metadata fetch 403
+2026-01-14T20:38:00: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/vLxekNk6 metadata fetch 404
+2026-01-14T20:38:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmR1tp1TL62S4ZGudJ8AQZRydzj3LnCogodfSs7jeTpPaR metadata fetch 403
+2026-01-14T20:38:00: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/CdARiQ9D metadata fetch 404
+2026-01-14T20:38:00: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/Lq7N4v1T metadata fetch 404
+2026-01-14T20:38:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibq422q3ksblq2pkpia7zgflhfx5opbn4sl3tq4sucxdmwpsb2jbu metadata fetch 403
+2026-01-14T20:38:59: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/f75d01f0ad8f48f0.json metadata fetch 403
+2026-01-14T20:38:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmTczAnMvMoQJu9fUQXpEC9WcfPXpinZ58iXw3hjpWiWPB metadata fetch 403
+2026-01-14T20:38:59: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/sMnLtGvf metadata fetch 404
+2026-01-14T20:38:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreic7gqhjgscwfbaztuwgagyoq2qmxmochbf7vkcbnnfrv3at424kw4 metadata fetch 403
+2026-01-14T20:38:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreieywmedhnl4ieiv3wsosthtbk6kz63zuihnwwi622ycugpjjnblnq metadata fetch 403
+2026-01-14T20:38:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmR5m7yzz33zYYToDzSKad8AHe4XMfaQCry4FVesqtvLp5 metadata fetch 403
+2026-01-14T20:39:05: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiav2ijusfruat4mgs66gqqbdcqj7jxgurjakwtluxqzj6gactkd3a metadata fetch 403
+2026-01-14T20:39:05: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifpm2gqepjfhsdevdxlbjdvvcf2ndrblr2eqeyacjehlkiybluoau metadata fetch 403
+2026-01-14T20:39:18: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidii5zlwugqbarelkfnoasx4aizx7odtkk5t4ekbq6piwjf62qc6y metadata fetch 403
+2026-01-14T20:39:18: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidm4n5i54gpxd7gyb7dd5eufd6fn6avjctkixtpb32qki2iplflwe metadata fetch 403
+2026-01-14T20:39:18: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmU4Uph1mGkgb7xEpCB7wjop2UCSGi31u4fNHHs3enz55i metadata fetch 403
+2026-01-14T20:39:30: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreif455hypdepaj4letdk6z5ocbh7xnm7o3d5ucfjt6bkqiurr7ypq4 metadata fetch 403
+2026-01-14T20:39:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmTg8eUEFHh8uvBoAVM299NPAG88yDwh4xoUbn8zEfwZTS metadata fetch 403
+2026-01-14T20:39:46: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmXoFw4AqFd8W6eo5qGxKMpgNskjvNGrGdQfU6uSFb2mT9 metadata fetch 403
+2026-01-14T20:39:48: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreif6kdzyqphvwdysxnbiuortyjxm5p3lyxamjl653yu4hgswl74uhq metadata fetch 403
+2026-01-14T20:39:50: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmSFmatgXysMc5j73myXKknbaZtL5d3eeyjYQBvVfiwGK7 metadata fetch 403
+2026-01-14T20:39:53: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiczhywiabke72uqhmqdwfekocnaa6wtkstuluij54ijr66ir2vvlu metadata fetch 403
+2026-01-14T20:40:01: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreic2ib3lx7upo7qevgqjsbna6glxxzbg2m4kdhcwhoslq6j5frns6i metadata fetch 403
+2026-01-14T20:40:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmaJWDAo4A5YaQQESGNnHVsfHjmrfqgrgKTw1GtbwgJ1D5 Unexpected token '�', "�PNG
+2026-01-14T20:40:06: 
+2026-01-14T20:40:06:   "... is not valid JSON
+2026-01-14T20:40:12: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiakrdvrizidaqdd225c63q3kf2o5qmos4ttdniobj7i7nalhw5kz4 metadata fetch 403
+2026-01-14T20:40:18: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihqmbfswa36vxwafc3rwj6eb5yy4qstauwelalqu7i4mbminkcr74 metadata fetch 403
+2026-01-14T20:40:29: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmeN9pF89teWzjJHrNof26uehN9kWXEo8gGrGjTadQMJ5m metadata fetch 403
+2026-01-14T20:40:37: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmPECkhEMuxy3CDSowVwYNrsiE8kAtWoKgbzZNd14nn7RR metadata fetch 403
+2026-01-14T20:40:37: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigthcxw6vysexu5hzcbnuzoalwrluw2wecrg5o7iiw3e4szwop2la metadata fetch 403
+2026-01-14T20:40:37: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmZUg6b5u9unZKV6V54fgCXGAHFM5tyj25Q9ezHSY4BNM8 metadata fetch 403
+2026-01-14T20:40:40: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmUckAUs8AkCptkwKBdDJWewwnBqMEy3xaq5BTmpRZ8WKY metadata fetch 403
+2026-01-14T20:40:44: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmR9MKzqMszYmHdpGKhESq6XYhLv6d1TyG9YCe5uE2a1Sy metadata fetch 403
+2026-01-14T20:40:44: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmZ3W8k7rdnsXVN7pjqY7xD4LNHjZX8QmyPtiiST6Kd65L metadata fetch 403
+2026-01-14T20:40:46: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmWhtYHEw1eTsFxecXxkEn7JJTu46Kfyj1M4b3EJ3bgRzB metadata fetch 403
+2026-01-14T20:40:50: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmVkia3AEyW2Tor4eFCNt5t1QLjVvQbtLJLWh4hqtHFZD8 metadata fetch 403
+2026-01-14T20:40:52: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmefKFfHVMHWN7sh7wc3D4Vea3KdYF6PVFvobuorQ8x11w metadata fetch 403
+2026-01-14T20:40:58: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiace4mficjizli7qc3yfujpdawrrmizbwuouyqydktpnzlb5jwp3e metadata fetch 403
+2026-01-14T20:41:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmT7dhdX5pQJrkpCqWvNhazP22tBV3uetpNgrVTcWaFnoX Unexpected token '�', "����WExif"... is not valid JSON
+2026-01-14T20:41:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmT7dhdX5pQJrkpCqWvNhazP22tBV3uetpNgrVTcWaFnoX Unexpected token '�', "����WExif"... is not valid JSON
+2026-01-14T20:41:02: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmcdkLA3e1wPfzcvipkWVPxDn95Dy2BZdL3MHhX1aQZmPT metadata fetch 403
+2026-01-14T20:41:08: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiboudbwdhtz4ujkwju2fgb43x3i2jrr4bhsrr3rvfur5dsghg3xvi metadata fetch 403
+2026-01-14T20:41:11: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifmdgavrwwzckualhzgo7rrokbobbsvk5lzash6zhhug3uydk33sa metadata fetch 403
+2026-01-14T20:41:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreic6fcxj6oxhlzloimynfzjsnm3v26xzmxqhahhwvhqpcx32pjppue metadata fetch 403
+2026-01-14T20:41:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigtj7ljm37weh3fiwivejmrygs3ej26np6nx5x5ztfuldganirusa metadata fetch 403
+2026-01-14T20:41:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifwhk5hqakrt7hok3ujpndms6wzkpz5hyno2q4jvnkpklphj3v3im metadata fetch 403
+2026-01-14T20:41:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmWm7PyCYM8XqSLJfSKGWmHf2qW5P9n6VuvheMoMrBE7mG metadata fetch 403
+2026-01-14T20:41:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmWCGAv36JbYUCQYxoYcKw1byj3sjyfKhVgtVtRox9TNPu metadata fetch 403
+2026-01-14T20:41:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigvthlrjvwexdmp4zhsdscszvqvj62o4xrpjfuv6urlseubw4xzje metadata fetch 403
+2026-01-14T20:41:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreif6wb7dwnqppysbls35lqtkac5ae3bt5v6pzkzqj5kjsthw6yrsu4 metadata fetch 403
+2026-01-14T20:41:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmf6dhtWuqV2K9mzGY8LHcz1Nxk25Bifox38dB1HqTs5kG metadata fetch 403
+2026-01-14T20:42:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigvwb6ndmlxlyq4mjepl6lgnai7vadyus2us6afdbctud6fyxkiau metadata fetch 403
+2026-01-14T20:42:59: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/1UqgDaNJ metadata fetch 404
+2026-01-14T20:42:59: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/ED50WoTf metadata fetch 404
+2026-01-14T20:43:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreie7ynxfhgg7lzoxhtanjt6hrmuw2lzqcio3cs2j3cpnw2n2h2s3ye metadata fetch 403
+2026-01-14T20:43:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmdHfZLYEHaZNeY3qSr2JWVSv86eTKBhsjmKWavfvbyj5w metadata fetch 403
+2026-01-14T20:43:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibbzeodmnvlztobmyl4muremw225k6h2znwmono3yb4mlxsbz3vhe metadata fetch 403
+2026-01-14T20:43:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicjhyfjx77irkg62qo6xpvs4zj7e2tkmittntyvy373ykg3qlmz3i metadata fetch 403
+2026-01-14T20:43:59: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/96a569f34b8e4ef8.json metadata fetch 403
+2026-01-14T20:43:59: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/063acb50-0816-49df-8060-b86f2ed38198.json metadata fetch 403
+2026-01-14T20:44:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiczgxdjs4zc2mvtm57h2l7mjvvesppgeufnoycgwsoeyo4yckbvlu metadata fetch 403
+2026-01-14T20:44:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmZnV2JryzMh2h3ck3ftX1Zw8nc6Yh4jxngkkzghaJHqCG Unexpected token '�', "���� JFIF"... is not valid JSON
+2026-01-14T20:44:59: [api/tokens] metadata fetch failed https://example.com/two.json metadata fetch 404
+2026-01-14T20:44:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigx3tttfdflvfrwfw67ipnno2pbdz5qmr7rh7jdmwbgtpjyyi67yq metadata fetch 403
+2026-01-14T20:44:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiecpaqqxyffvniuhnlkqqeagicu4tue32g2tp4qcsaiqtlhjddniy metadata fetch 403
+2026-01-14T20:44:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmVPkw5T1wGEMBLvTQfgMsUaSixJvEVhW6Tc9UPTXbMezm metadata fetch 403
+2026-01-14T20:45:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmc2eWHnYaBpQsLes5EpVWHiaQJRMgFUgCGey7owjqwUdt Unexpected token '�', "����_Exif"... is not valid JSON
+2026-01-14T20:45:59: [api/tokens] metadata fetch failed https://example.com/three.json metadata fetch 404
+2026-01-14T20:45:59: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/3562bb9198df4220.json metadata fetch 403
+2026-01-14T20:46:05: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmYGXK5RMmDcFvSVfUuiRY9J3tuPC6cwrMsiNy5pQ2nND8 metadata fetch 403
+2026-01-14T20:46:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmcx5zKrmrokL73hyock9wDj5n3uY38LkfLDDqLwTaDF83 metadata fetch 403
+2026-01-14T20:47:59: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/3a957a2e-9ec7-4d58-b6a9-5f53023c40c2.json metadata fetch 403
+2026-01-14T20:47:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreib7xze7fnu4rq6gwd46rldbp7y4fddqr7wotyktax3mjirkdl4n74 metadata fetch 403
+2026-01-14T20:48:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmPwRQABB3cF3uAyQvrY6HUPja1AJSPiacpkkWeCYnSha9 metadata fetch 403
+2026-01-14T20:48:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreih6mbsilsrhtya3oubklhornbksdei2wfprokdihjgbdgkoeksnjm metadata fetch 403
+2026-01-14T20:48:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmYD4okVYEbc84NcAwQbD3CG1rimz4xpyJgbrCRbCLHyuN metadata fetch 403
+2026-01-14T20:48:00: [api/tokens] metadata fetch failed https://1ea5c9284bee4d1c815c8bd0.blob.core.windows.net/deploy/259b861b-9fc5-4447-bd4a-9f011606ad02.json metadata fetch 404
+2026-01-14T20:48:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmdVHN1L2tTRPYd1wGc7KcuGFXhMp2PZF8W5PigvMeY7QC Unexpected token '�', "�PNG
+2026-01-14T20:48:06: 
+2026-01-14T20:48:06:   "... is not valid JSON
+2026-01-14T20:48:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmTsxTCCpVaLP86GsXn77HJ1ZUyVALQfSQtcis3w4Xtqcj metadata fetch 403
+2026-01-14T20:48:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicyubb3nurh3efxxtsrt7h5pgxqrk4n4uhncoetocftx36n3rt6ra metadata fetch 403
+2026-01-14T20:49:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmZqUdNhCkMyUd78RLPPbLJw2e2jC8YFbsMgKj8rMKSLai Unexpected token '�', "���� JFIF"... is not valid JSON
+2026-01-14T20:50:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreies3dgubad6od22kufsitteznhzk5bs5h7np5gba4f7gdsn3cnoge metadata fetch 403
+2026-01-14T20:50:15: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmaZ1dqVAJU837cCXsGx1Wk7izUBa61hqFaaP1YgbdpU4A metadata fetch 403
+2026-01-14T20:50:15: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmdZqPozytpk7hPbk9LJyfLgLeeG1kkpEZUtVNx53TYkQK metadata fetch 403
+2026-01-14T20:50:18: [api/tokens] metadata fetch failed https://metadata.pumplify.eu/data/Qmb9u1tsqKCeFDUnBALiEw2oHYWU3wvUUnpwzhpkLdGdTG metadata fetch 429
+2026-01-14T20:50:26: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafybeid52njlnzkq3ig7jjplrz7t7zvnoc3u4e7ca5iafuf2schmxqpezm Unexpected token '�', "���� JFIF"... is not valid JSON
+2026-01-14T20:50:28: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qme927FPGsT4kfjbgDKuvdjJ1CUEnRJCChZgnfuyGbKs9w metadata fetch 403
+2026-01-14T20:50:36: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/JlyAVCip metadata fetch 404
+2026-01-14T20:50:40: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmUzaELxiBUyGNPMYXyz3btDcQUsZ3ERpxksFpUuyL2XZe metadata fetch 403
+2026-01-14T20:50:44: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmYFLDG9bM7L1BaKWo9aYUdvNYPJDhPDQvefzqbtsS163f metadata fetch 403
+2026-01-14T20:50:46: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidztvzneiux6erjngdkqq2k7u3pqfnf7itvyzizvfttmw257aiqge metadata fetch 403
+2026-01-14T20:50:58: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmbBxZe4Zfivx83k6eZuQWwDsDBbAekzhb61Agfuw6rVYg metadata fetch 403
+2026-01-14T20:50:58: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreif5m75hdenrmaqtrk4z5q7lz5axhrejznn7lpgv4vodu5hk62clsi metadata fetch 403
+2026-01-14T20:51:03: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmee7FW3Ft8GzppKjFQqBJ6qMyNqQGB5akYGLuaD1MhZkd metadata fetch 403
+2026-01-14T20:51:17: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmNZ9NFUuZdftyt9Y3QxpvHQMNVPckqZ1zhjftSf8FVezi metadata fetch 403
+2026-01-14T20:51:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreignc5nu5fkfxjjm5oglsgwmrgm2rpxh7ow6bcqxlsleyu554qr6q4 metadata fetch 403
+2026-01-14T20:51:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiguqb6n2analtw2kjcyvxoyhknivihkxmxzmbhyah27m6otmqqnuy metadata fetch 403
+2026-01-14T20:51:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibpuiwclwlhelohsc547iajfyzrotwgz2b6afb22x4jlac5kmwt4q metadata fetch 403
+2026-01-14T20:51:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmdXY5Hz6JyfdSgVzvAyCmdeVX7PobmdPJf4SLYsvc9chR metadata fetch 403
+2026-01-14T20:51:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmQmHFXnQYt2V37mi2sgFgDDp5NtRTgzAfCNJLogXZmYyK metadata fetch 403
+2026-01-14T20:53:31: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmTcQaNkzDCQLPiWZ5Nx731y6Nc6c3ovw4LvbSx1p283Ph metadata fetch 403
+2026-01-14T20:54:26: [api/tokens] metadata fetch failed https://kimjongnuked.com/json/1mPA metadata fetch 404
+2026-01-14T20:54:40: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihwovnfuvuff2c6f6qih3fxvlg27acdbr2cmit5xvsx3h632jswui metadata fetch 403
+2026-01-14T20:55:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihddagto6ogyq7kj4dzvy4ztrexfjblhb5wjbfqrbahpu5xwclzwe metadata fetch 403
+2026-01-14T20:55:05: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmUXjaCKj59BNM7iKzv4vkRKZTzY9vhvz4NcC5T5ccXzzR metadata fetch 403
+2026-01-14T20:56:00: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/b2c1324c-f69c-4a86-87e4-60c71d527f6e.json metadata fetch 403
+2026-01-14T20:56:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidwnbueueo3p5hv5zockdsj4yx523f4h2j6qwwzpnqty5amsacyp4 metadata fetch 403
+2026-01-14T20:56:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmPtyebovT24QFSZQ9f7h3LJNLuVkL6e7iSq4TfEidSULe metadata fetch 403
+2026-01-14T20:56:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiawxzp4moydciond5du7equm6eopjguqnuiurmqtwjlln464ehy4m metadata fetch 403
+2026-01-14T20:56:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihaqsvjlc3nko2vwaklkkz5h2o74lbha233452f7ygalphhsd5ncm metadata fetch 403
+2026-01-14T20:56:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmRwrXN6GuUVqozjEDYMWZs5gZ2RquTk3vfPUiYZhAdsTU metadata fetch 403
+2026-01-14T20:56:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiatatzhdx77ckx6sm4hy7wvsoaawncqeicxqjbpsomorv3smcgkma metadata fetch 403
+2026-01-14T20:56:59: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/NYu1WcI9 metadata fetch 404
+2026-01-14T20:56:59: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/VmjHIsa5 metadata fetch 404
+2026-01-14T20:56:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreie4jiv3efwuk4jzprtqg2swljgouqb4jehj4mmysmgmwafao6gm6u metadata fetch 403
+2026-01-14T20:56:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmVAMmGxfCWGz8FKeaYxhYbn4uQn94G1GLfDv4xhhS1syU metadata fetch 403
+2026-01-14T20:57:06: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmb8d5ZXGJptuE8mriPxokodaNvZa156iWj9uqcqnTH1fx metadata fetch 403
+2026-01-14T20:57:27: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreid4npjalofwmxnazukrjx4xekpwfvcbgvupgjnydappdxn773nxgm metadata fetch 403
+2026-01-14T20:57:38: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmQoX1BaAxCFRLJH5Gn6pEk6xPwg5xxsfeNnFAFfWytNMP Unexpected token '�', "���� XExif"... is not valid JSON
+2026-01-14T20:57:59: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/b0edd49b-d80f-4bce-b20b-e57f81bfa7d3.json metadata fetch 403
+2026-01-14T20:58:05: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmYQpeeGgyryfcXZfRjuoYU7XzFgV41QECKUAou4evr2YS Unexpected token '�', "���� XExif"... is not valid JSON
+2026-01-14T20:58:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihuacbhqs4jhep4bnwlvqoloxwt2arqmqy5mqd2y3tpkg7dz6lipe metadata fetch 403
+2026-01-14T20:58:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibgvynq2sanputhc447le47mfbis6qwbwqn3llwyfb4pecnv6c5vm metadata fetch 403
+2026-01-14T20:59:05: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/fcd0db0f-4d69-4217-8fba-815718f3545f.json metadata fetch 403
+2026-01-14T20:59:34: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmekdHcB5cAgeh6d6NDhSXGp7nwKvNu7LBNFQ1XN3yHSaR metadata fetch 403
+2026-01-14T20:59:34: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidp7cturnggunwjn4axb67mpsnnpliiiqor57cjwvvsfpjw5zmms4 metadata fetch 403
+2026-01-14T20:59:35: [api/tokens] metadata fetch failed https://metadata.pumplify.eu/data/QmNo6LLY9xm4gMYXrmoZwhfCZkTW4jDpgDgxAjWRa7j6nT metadata fetch 429
+2026-01-14T21:01:16: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifnfxttou5mhyfrn4ol7mhzinstbqqpxdyle6ggze3hgt6qotomay metadata fetch 403
+2026-01-14T21:02:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmQsxF9Q9jmsixZfR5QTBCNS5DFMCDVVxMwtc4JVGprVvi metadata fetch 403
+2026-01-14T21:02:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmQsxF9Q9jmsixZfR5QTBCNS5DFMCDVVxMwtc4JVGprVvi metadata fetch 403
+2026-01-14T21:02:13: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmTBhdrUuzq5Cfw66u3Aw3UhUqfMdB8gfpNsNZUNrRBAGo metadata fetch 403
+2026-01-14T21:02:39: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmf8ZR3X3etYUQgmTovVhSHi5SBJ6ktCZSPFJcVavHudsp metadata fetch 403
+2026-01-14T21:02:39: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreienzxaz75fmkboedhhryoqhbcrhsamev3zxnimmtoqtnjlciegpt4 metadata fetch 403
+2026-01-14T21:02:40: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigxba4qrq6nhytmc6ut4xzgzbjg7eykzl3kkutnhomkwgjqfwyc6y metadata fetch 403
+2026-01-14T21:02:44: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/be6eccfcefc24dd1.json metadata fetch 403
+2026-01-14T21:02:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmTgsRB9aqt2qaXnuwceU5rmzG9xYbd3yn73v6G5TZ8Vxm metadata fetch 403
+2026-01-14T21:03:25: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/ea53f486-f0e0-4af0-b1d2-e393c5632cc6.json metadata fetch 403
+2026-01-14T21:03:59: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/8a2461a0-6a86-4a1b-a728-6a813a308cd3.json metadata fetch 403
+2026-01-14T21:04:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmNoeM4WTojRUoxpQBuNDV3f7YmCEpHtLyHCLGExQpboqy metadata fetch 403
+2026-01-14T21:04:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreibzm3aghbr35ctd3qxc35lbsjh7pmgwgj3utfhak72hkrvbfc2zgm metadata fetch 403
+2026-01-14T21:04:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicegc62gbku3uwvbsi7wftp6lhcyudi7r367t4ihooi6p5kyzqj6u metadata fetch 403
+2026-01-14T21:05:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmXsGXYSFKi2cTRTfH2ad3cbJfUyy8XV4vXNUrtnisNV9M metadata fetch 403
+2026-01-14T21:05:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreihov2kcfxwigrxkwhahe5iayt2anilg2oyntcbttsa7zbty4lnhmy metadata fetch 403
+2026-01-14T21:05:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifl67ehtz26t5mfq24smeqkeeppqzboxogpcn6xpcl3pgiwvddvky metadata fetch 403
+2026-01-14T21:06:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmaC3VBL9ZYfRoLkc2sqKp7rQy2JAHx9FRnSTQHYFdJkeW metadata fetch 403
+2026-01-14T21:07:42: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreict2lnmxeqb4xkdjxhferex6mte5qluyz3eucwq3l375zitzbpjqe metadata fetch 403
+2026-01-14T21:07:55: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmRzCjeG4kx43RwdV1uPS6XHERFho4Fekpid9eQUPHMJEC metadata fetch 403
+2026-01-14T21:08:12: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmf9vtci6uqUWnvRj5UiczY1Ftacypv78nw19X19BkUGCi metadata fetch 403
+2026-01-14T21:08:59: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/gvMdlw05 metadata fetch 404
+2026-01-14T21:08:59: [api/tokens] metadata fetch failed https://eu-dev.uxento.io/data/cmdz4m1u9002jg31a2g7yx2ue metadata fetch 526
+2026-01-14T21:08:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifhlwirz4e2bmbz3imelel6ubowxz4cs5oib2he62xpslzlqzafjm metadata fetch 403
+2026-01-14T21:09:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmVdbApTfojA4C4WZJAL1wM8dWZNkejM94dqhKPBZeBivy Unexpected token '�', "���� JFIF"... is not valid JSON
+2026-01-14T21:09:59: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/fa27210a-0965-4122-9433-7c2ff04d3696.json metadata fetch 403
+2026-01-14T21:09:59: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/1146cdce-cb60-4f10-84cc-8531dcae124d.json metadata fetch 403
+2026-01-14T21:09:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qmf5ngm1v3CwkKJHadwUtxwJmYEsgYf1wVXBiMWK1S8YHq metadata fetch 403
+2026-01-14T21:09:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreib5rwpg46kajnjcg4xia4av6fmfipbvgbsvjdpkipi5eeisdumuhq metadata fetch 403
+2026-01-14T21:10:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmZ2SzVHw8peudR6TrzeU4SvzzyUfUyk6kURf6GStiHaT2 Unexpected token '�', "���� JFIF"... is not valid JSON
+2026-01-14T21:10:05: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/a0925242-ac0c-4ee2-a86e-f8d4e596322f.json metadata fetch 403
+2026-01-14T21:10:59: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/d4162565-187b-4442-8493-37ae5d0cb1f8.json metadata fetch 403
+2026-01-14T21:10:59: [api/tokens] metadata fetch failed https://rapidlaunch.io/temp/metadata/bfdf5147-73d1-4180-b9b1-f47fb8d16c25.json metadata fetch 403
+2026-01-14T21:10:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreicq7vapntfsm7yqvhqigsdulbbzh3pf4nup52wwuhomf2xed6wfam metadata fetch 403
+2026-01-14T21:10:59: [api/tokens] metadata fetch failed http://93.205.10.67:4141/metadata/IUXvor7K metadata fetch 404
+2026-01-14T21:10:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmW2htx1bDq9rgq1VuDZpR8wMCPZSWW2CpFQqjhBBCRsgk metadata fetch 403
+2026-01-14T21:11:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmVcbyEnimWMMA4uiwZPx7bvxQRAnDWaTak1EX4ScRSfhZ metadata fetch 403
+2026-01-14T21:11:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmZXvc1boGXND4woGZ8ZTKyJHbBDenPHyax1qdgE51wxhA metadata fetch 403
+2026-01-14T21:12:05: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmU5TFYqQX4XRJGhw59FLh5P6ECWC6Ew8VRxmZxqj5y33G metadata fetch 403
+2026-01-14T21:12:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmVHs6PReyui6XRaBLGFARqZmdnJRZ3Cbp6EQnQsxppjtF metadata fetch 403
+2026-01-14T21:12:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiayj6xs7nvqw3ksnfjtrynplfzl42yoiqxqzn6nf6erzyesjfnnqq metadata fetch 403
+2026-01-14T21:12:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreidpwhwop6hcgpm4w525o27vprrakliii2z225sumqvyi7k5rtdjay metadata fetch 403
+2026-01-14T21:12:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmcsvwmHBQgHm3m7bXNjCwh9Fm1CQMaJvRukXfmvZywZUV metadata fetch 403
+2026-01-14T21:13:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmYkJmjFZYqQcfosCyBQW3v9yjzhTN7ZJoX2f4KjA6uX1p Unexpected token '�', "���� JFIF"... is not valid JSON
+2026-01-14T21:14:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmWyuVYmgput9UNA17covZwYYBRWKYgKMWWnbvo1RNqoB4 metadata fetch 403
+2026-01-14T21:14:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmeqdkNU6A7sihgD7FTEZHZDCWrVu2D6FrNe3b7rHyT5Ph metadata fetch 403
+2026-01-14T21:14:00: [api/tokens] metadata fetch failed https://metadata.j7tracker.com/metadata/9e41f1eb079f4152.json metadata fetch 403
+2026-01-14T21:14:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreid4z47o7bwyzgk7bu7o2l5sgj6cmfsn6fjtk42s4jpos5pbk4rdcu metadata fetch 403
+2026-01-14T21:14:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmYYTybWYfwSojdXW2HVxzED7BpBLcqV3JviCKyrTJaN9m metadata fetch 403
+2026-01-14T21:14:00: [api/tokens] metadata fetch failed https://metadata.pumployer.fun/metadata/OZPSYTKjh4hC metadata fetch 404
+2026-01-14T21:14:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiesjm2wjkt43yf6uybc6b2qkuku4uujo7zxy3id4faxuppmq4gg3u metadata fetch 403
+2026-01-14T21:14:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmXU99bRXq2omAaC7aL7ocjgr5zr7KSy7dZR6b4MyzybCd metadata fetch 403
+2026-01-14T21:14:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreigautk5md4z5w4mqavtkcace5p3t7u643eruoio732y4z3cbrgaga metadata fetch 403
+2026-01-14T21:15:05: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifj74yztawmjgae7ckqlstzf7inx7nzn2du5iwijdvzbsaq6sjv3u metadata fetch 403
+2026-01-14T21:15:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreiaaftssdv4vdetviu5iqyll4mge2boj7a5gv7cxvgpylb3oxxj5t4 metadata fetch 403
+2026-01-14T21:15:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmVu7bn5SVKmMFbs8fQnn5tLuvz4xebjZJJvDUmnhGJzJb metadata fetch 403
+2026-01-14T21:16:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmSEbXkJUihbbkvc5jSbhKBHSrvNGB95KNakZ681Z7jYv4 metadata fetch 403
+2026-01-14T21:16:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmRHKDA3kXWTrKv8193P9vaA4VvD9g1xRGJpPWDGKVwXvv metadata fetch 403
+2026-01-14T21:17:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmcRTWTkXVu588QVCCnFXaGn5wnx23zePTCDKUPzAEJ3m7 Unexpected token '�', "���� XExif"... is not valid JSON
+2026-01-14T21:17:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmcMnaPNw1YtKtNNWBAKuUQ3YU3REg8P1gyiQAwsXKNUT7 Unexpected token '�', "�PNG
+2026-01-14T21:17:00: 
+2026-01-14T21:17:00:   "... is not valid JSON
+2026-01-14T21:17:05: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreifzrqgdpqddj45qe6kv7d7mm3z4yfwum2blertdwtn77ly6jqt3dy metadata fetch 403
+2026-01-14T21:17:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmePU6q4gK8Jsu6wRusbX9uoA19zf7g5jNJAUUXnB7r8ZR metadata fetch 403
+2026-01-14T21:17:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/bafkreih7tvmuyuaalaijyde6zxzgpm5v7bnfh36uhaqi5ba36cyxmgtoea metadata fetch 403
+2026-01-14T21:17:59: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/Qme7dRtDBaunGiQBifTh2hCp8Aw9m2GkqvT1UMEjVAxHGp metadata fetch 403
+2026-01-14T21:18:00: [api/tokens] metadata fetch failed https://pump.mypinata.cloud/ipfs/QmWsz6tTXEjMwNYvr7fQjMt7ULRmGgBxWEWTC6Eds5CkYe Unexpected token '�', "���� XExif"... is not valid JSON

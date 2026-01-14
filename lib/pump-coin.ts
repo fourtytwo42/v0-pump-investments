@@ -12,8 +12,15 @@ const FRONTEND_ENDPOINTS = [
 
 const COIN_CACHE = new Map<string, any | null>()
 const COIN_FETCH_PROMISES = new Map<string, Promise<any | null>>()
+// Cache failed requests (404, 530) to avoid retrying
+const FAILED_CACHE = new Set<string>()
 
 async function requestPumpCoin(mint: string): Promise<any | null> {
+  // Check if we've already failed for this mint
+  if (FAILED_CACHE.has(mint)) {
+    return null
+  }
+
   let lastError: Error | null = null
 
   for (const baseUrl of FRONTEND_ENDPOINTS) {
@@ -25,26 +32,56 @@ async function requestPumpCoin(mint: string): Promise<any | null> {
         headers: PUMP_HEADERS,
       })
 
-        if (!response.ok) {
-          if (response.status === 404) {
-            return null
-          }
+      if (!response.ok) {
+        // Treat 404 and 530 as "token not found" - cache to avoid retrying
+        if (response.status === 404 || response.status === 530) {
+          FAILED_CACHE.add(mint)
+          return null
+        }
+        // For other errors, log but don't cache (might be temporary)
         lastError = new Error(`pump.fun coin request failed with status ${response.status}`)
-        console.warn(`[pump-coin] ${url} responded with ${response.status}`)
+        // Only log non-530 errors to reduce noise
+        if (response.status !== 530) {
+          console.warn(`[pump-coin] ${url} responded with ${response.status}`)
+        }
         continue
       }
 
-      const json = await response.json()
-      COIN_CACHE.set(mint, json)
-      return json
+      // Check if response has content before trying to parse JSON
+      const contentType = response.headers.get("content-type") || ""
+      const contentLength = response.headers.get("content-length")
+      
+      // If content-length is 0 or content-type doesn't indicate JSON, skip parsing
+      if (contentLength === "0" || (!contentType.includes("json") && !contentType.includes("text"))) {
+        continue
+      }
+
+      try {
+        const text = await response.text()
+        // If response is empty, treat as not found
+        if (!text || text.trim().length === 0) {
+          FAILED_CACHE.add(mint)
+          return null
+        }
+        
+        const json = JSON.parse(text)
+        COIN_CACHE.set(mint, json)
+        return json
+      } catch (parseError) {
+        // If response is not valid JSON (e.g., empty response from 530), treat as not found
+        FAILED_CACHE.add(mint)
+        return null
+      }
     } catch (error) {
       lastError = error as Error
-      console.warn(`[pump-coin] Failed to fetch coin ${mint} from ${baseUrl}:`, (error as Error).message)
+      // Don't log errors - they're usually network issues or tokens not on pump.fun
+      // Silently continue to next endpoint
     }
   }
 
+  // Cache failures silently - don't retry tokens that don't exist on pump.fun
   if (lastError) {
-    console.warn(`[pump-coin] All endpoints failed for ${mint}:`, lastError.message)
+    FAILED_CACHE.add(mint)
   }
 
   return null
