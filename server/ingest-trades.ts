@@ -34,6 +34,11 @@ const TRADE_RETENTION_HOURS = process.env.TRADE_RETENTION_HOURS
 const CLEANUP_INTERVAL_MS = 60 * 60 * 1000
 const CLEANUP_BATCH_SIZE = 1000
 
+// Candle generation configuration
+const ENABLE_CANDLE_GENERATION = process.env.ENABLE_CANDLE_GENERATION === "true"
+const CANDLE_GENERATION_INTERVAL_MS = 60 * 1000 // Run every minute
+const CANDLE_BATCH_SIZE = 100 // Process 100 tokens per cycle
+
 // Logging throttling
 const LOG_INTERVAL_MS = 30 * 1000 // Log every 30 seconds max
 let lastLogTime = 0
@@ -1057,6 +1062,140 @@ async function seedMetadataRetryQueue(): Promise<void> {
 }
 
 void seedMetadataRetryQueue()
+
+// =============================================================================
+// Candle Generation (Background Process)
+// =============================================================================
+
+async function generateFeaturesForCandles(): Promise<number> {
+  if (!ENABLE_CANDLE_GENERATION) return 0
+
+  try {
+    // Generate features for candles that don't have features yet
+    // Features: return, range, body, dlog_volume, ret_mean_15, ret_std_15, ret_mean_60, ret_std_60
+    // Using a CTE to calculate returns first, then window functions for rolling stats
+    const featureResult = await prisma.$executeRawUnsafe(`
+      WITH candle_returns AS (
+        SELECT 
+          c.token_id,
+          c.timestamp,
+          c.open,
+          c.high,
+          c.low,
+          c.close,
+          c.volume_usd,
+          LAG(c.close, 1) OVER (PARTITION BY c.token_id ORDER BY c.timestamp) as prev_close,
+          CASE 
+            WHEN LAG(c.close, 1) OVER (PARTITION BY c.token_id ORDER BY c.timestamp) > 0 
+            THEN (c.close - LAG(c.close, 1) OVER (PARTITION BY c.token_id ORDER BY c.timestamp)) / LAG(c.close, 1) OVER (PARTITION BY c.token_id ORDER BY c.timestamp)
+            ELSE NULL
+          END as return_val
+        FROM pump_candles_1m c
+        WHERE NOT EXISTS (
+          SELECT 1 FROM pump_features_1m f
+          WHERE f.token_id = c.token_id
+            AND f.timestamp = c.timestamp
+        )
+      )
+      INSERT INTO pump_features_1m (token_id, timestamp, "return", range, body, dlog_volume, ret_mean_15, ret_std_15, ret_mean_60, ret_std_60)
+      SELECT 
+        cr.token_id,
+        cr.timestamp,
+        cr.return_val as "return",
+        (cr.high - cr.low) as range,
+        (cr.close - cr.open) as body,
+        CASE 
+          WHEN cr.volume_usd > 0 THEN LN(cr.volume_usd + 1)
+          ELSE NULL
+        END as dlog_volume,
+        AVG(cr.return_val) OVER (PARTITION BY cr.token_id ORDER BY cr.timestamp ROWS BETWEEN 14 PRECEDING AND CURRENT ROW) as ret_mean_15,
+        STDDEV(cr.return_val) OVER (PARTITION BY cr.token_id ORDER BY cr.timestamp ROWS BETWEEN 14 PRECEDING AND CURRENT ROW) as ret_std_15,
+        AVG(cr.return_val) OVER (PARTITION BY cr.token_id ORDER BY cr.timestamp ROWS BETWEEN 59 PRECEDING AND CURRENT ROW) as ret_mean_60,
+        STDDEV(cr.return_val) OVER (PARTITION BY cr.token_id ORDER BY cr.timestamp ROWS BETWEEN 59 PRECEDING AND CURRENT ROW) as ret_std_60
+      FROM candle_returns cr
+    `)
+
+    return Number(featureResult)
+  } catch (error) {
+    console.error("[features] Error generating features:", (error as Error).message)
+    return 0
+  }
+}
+
+async function generateCandlesAndCleanupTrades(): Promise<void> {
+  if (!ENABLE_CANDLE_GENERATION) return
+
+  const startTime = Date.now()
+  try {
+    // Only process trades that are at least 1 minute old (complete minutes)
+    const oneMinuteAgo = BigInt(Date.now() - 60 * 1000)
+    
+    // Generate candles using SQL aggregation (efficient batch processing)
+    // This generates 1-minute candles for all tokens that have unprocessed trades
+    // Using NOT EXISTS to prevent duplicates (no ON CONFLICT since constraint might not exist)
+    const insertResult = await prisma.$executeRawUnsafe(`
+      INSERT INTO pump_candles_1m (token_id, timestamp, open, high, low, close, volume_usd, volume_sol, trades)
+      SELECT 
+        token_id,
+        DATE_TRUNC('minute', TO_TIMESTAMP(timestamp::bigint / 1000.0)) as timestamp,
+        (array_agg(price_usd ORDER BY timestamp ASC))[1] as open,
+        MAX(price_usd) as high,
+        MIN(price_usd) as low,
+        (array_agg(price_usd ORDER BY timestamp DESC))[1] as close,
+        SUM(amount_usd) as volume_usd,
+        SUM(amount_sol) as volume_sol,
+        COUNT(*)::integer as trades
+      FROM trades
+      WHERE timestamp < ${oneMinuteAgo}
+        AND NOT EXISTS (
+          SELECT 1 FROM pump_candles_1m pc
+          WHERE pc.token_id = trades.token_id
+            AND pc.timestamp = DATE_TRUNC('minute', TO_TIMESTAMP(trades.timestamp::bigint / 1000.0))
+        )
+      GROUP BY token_id, DATE_TRUNC('minute', TO_TIMESTAMP(timestamp::bigint / 1000.0))
+    `)
+
+    const candlesGenerated = Number(insertResult)
+
+    // Generate features for all candles that don't have features yet (non-blocking)
+    // This includes both newly generated candles and any existing candles that need features
+    let featuresGenerated = 0
+    try {
+      featuresGenerated = await generateFeaturesForCandles()
+    } catch (error) {
+      console.error("[features] Error (non-fatal):", (error as Error).message)
+    }
+
+    // Delete processed trades (no retention period - delete immediately)
+    // Delete trades that have been processed into candles and are at least 1 minute old
+    const deleteResult = await prisma.$executeRawUnsafe(`
+      DELETE FROM trades
+      WHERE timestamp < ${oneMinuteAgo}
+        AND EXISTS (
+          SELECT 1 FROM pump_candles_1m pc
+          WHERE pc.token_id = trades.token_id
+            AND pc.timestamp = DATE_TRUNC('minute', TO_TIMESTAMP(trades.timestamp::bigint / 1000.0))
+        )
+    `)
+
+    const deletedCount = Number(deleteResult)
+    const duration = Date.now() - startTime
+    
+    if (candlesGenerated > 0 || deletedCount > 0 || featuresGenerated > 0) {
+      console.log(`[candles] Generated ${candlesGenerated} candles, ${featuresGenerated} features, deleted ${deletedCount} trades (${duration}ms)`)
+    }
+  } catch (error) {
+    console.error("[candles] Error:", (error as Error).message)
+  }
+}
+
+if (ENABLE_CANDLE_GENERATION) {
+  console.log("[candles] Candle generation enabled - will process trades every minute")
+  // Start after 2 minutes to let some trades accumulate
+  setTimeout(() => void generateCandlesAndCleanupTrades(), 2 * 60 * 1000)
+  // Run every minute
+  setInterval(() => void generateCandlesAndCleanupTrades(), CANDLE_GENERATION_INTERVAL_MS)
+}
 
 // =============================================================================
 // WebSocket / NATS Connection

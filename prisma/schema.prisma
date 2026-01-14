@@ -26,8 +26,10 @@ model Token {
   associatedBondingCurve String?  @map("associated_bonding_curve")
   updatedAt              DateTime @default(now()) @updatedAt @map("updated_at")
 
-  price  TokenPrice?
-  trades Trade[]
+  price      TokenPrice?
+  trades     Trade[]
+  candles1m  PumpCandle1m[]
+  features1m PumpFeature1m[]
 
   @@index([completed, kingOfTheHillTimestamp])
   @@index([createdTimestamp])
@@ -65,4 +67,55 @@ model Trade {
   @@index([tokenId, timestamp])
   @@index([timestamp])
   @@map("trades")
+}
+
+model PumpCandle1m {
+  id        Int      @id @default(autoincrement())
+  tokenId   String   @map("token_id")
+  timestamp DateTime
+  open      Decimal  @db.Decimal(20, 8)
+  high      Decimal  @db.Decimal(20, 8)
+  low       Decimal  @db.Decimal(20, 8)
+  close     Decimal  @db.Decimal(20, 8)
+  volumeUsd Decimal  @map("volume_usd") @db.Decimal(24, 8)
+  volumeSol Decimal  @map("volume_sol") @db.Decimal(24, 8)
+  trades    Int
+  createdAt DateTime @default(now()) @map("created_at")
+  token     Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@unique([tokenId, timestamp])
+  @@index([tokenId, timestamp])
+  @@index([timestamp])
+  @@map("pump_candles_1m")
+}
+
+model PumpFeature1m {
+  id         Int      @id @default(autoincrement())
+  tokenId    String   @map("token_id")
+  timestamp  DateTime
+  return     Decimal? @map("return") @db.Decimal(20, 8)
+  range      Decimal? @db.Decimal(20, 8)
+  body       Decimal? @db.Decimal(20, 8)
+  dlogVolume Decimal? @map("dlog_volume") @db.Decimal(20, 8)
+  retMean15  Decimal? @map("ret_mean_15") @db.Decimal(20, 8)
+  retStd15   Decimal? @map("ret_std_15") @db.Decimal(20, 8)
+  retMean60  Decimal? @map("ret_mean_60") @db.Decimal(20, 8)
+  retStd60   Decimal? @map("ret_std_60") @db.Decimal(20, 8)
+  createdAt  DateTime @default(now()) @map("created_at")
+  token      Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@unique([tokenId, timestamp])
+  @@index([tokenId, timestamp])
+  @@index([timestamp])
+  @@map("pump_features_1m")
+}
+
+model PumpSolPrice {
+  id            Int      @id @default(autoincrement())
+  hourTimestamp BigInt   @unique @map("hour_timestamp")
+  priceUsd      Decimal  @map("price_usd") @db.Decimal(20, 8)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([hourTimestamp])
+  @@map("pump_sol_prices")
 }
