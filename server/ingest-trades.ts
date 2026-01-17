@@ -39,6 +39,10 @@ const LOG_INTERVAL_MS = 30 * 1000 // Log every 30 seconds max
 let lastLogTime = 0
 let logBatchCount = 0
 
+// Track when the service started - only process tokens with trades from this point forward
+// This avoids backfilling old data and focuses on active tokens
+const SERVICE_START_TIMESTAMP = BigInt(Date.now())
+
 // NATS connection
 const NATS_URL = "wss://unified-prod.nats.realtime.pump.fun/"
 const NATS_HEADERS = {
@@ -281,9 +285,14 @@ function prepareTrade(trade: PumpUnifiedTrade, solPriceUsd: number): PreparedTra
   ) ?? null
 
   const program = typeof trade.program === "string" ? trade.program.toLowerCase() : ""
-  // completed = true when token has graduated (isBondingCurve === false means off bonding curve)
-  // The websocket isBondingCurve flag is the authoritative source
-  const isCompleted = trade.isBondingCurve === false
+  // completed = true when token has graduated
+  // The API uses "complete" (boolean), not "completed"
+  // Note: bonding curve address persists even after graduation, so we can't rely on it
+  // The websocket isBondingCurve flag is also unreliable - use API "complete" field when available
+  const coinInfoComplete = coinMeta.complete ?? coinMeta.completed ?? coinMeta.isCompleted
+  const isCompleted = typeof coinInfoComplete === "boolean" 
+    ? coinInfoComplete 
+    : (trade.isBondingCurve === false) // Fallback to websocket flag if coinMeta doesn't have complete status
   
   // KOTH is a milestone during bonding (about halfway), not graduation
   // We'll determine KOTH separately - for now, we don't set it from trade data
@@ -740,7 +749,14 @@ async function refreshTokenMetadata(mint: string): Promise<boolean> {
       updates.website = metadata.website
     }
 
-    if (token.completed) {
+    // Update completed status from coinInfo if available
+    // The API uses "complete" (boolean), not "completed"
+    const coinInfoComplete = coinRecord.complete ?? coinRecord.completed ?? coinRecord.isCompleted
+    if (typeof coinInfoComplete === "boolean") {
+      updates.completed = coinInfoComplete
+    }
+
+    if (token.completed || (typeof coinInfoComplete === "boolean" && coinInfoComplete)) {
       const dexCreatedAt = await getDexPairCreatedAt(mint)
       if (dexCreatedAt && (!token.createdTimestamp || dexCreatedAt < Number(token.createdTimestamp))) {
         updates.createdTimestamp = BigInt(dexCreatedAt)
@@ -948,30 +964,92 @@ if (TRADE_RETENTION_HOURS > 0) {
 
 async function seedMetadataRetryQueue(): Promise<void> {
   try {
-    // Only seed tokens missing BOTH metadataUri AND imageUri (not just description)
-    // AND filter out invalid/fake mint addresses
-    const candidates = await prisma.token.findMany({
+    // Only seed tokens that have recent trades (from service start time forward)
+    // This avoids backfilling old data and focuses on active tokens
+    const nowTimestamp = BigInt(Date.now())
+    
+    // Count total tokens missing metadata (for logging only)
+    const totalMissing = await prisma.token.count({
       where: {
         OR: [
-          { metadataUri: null, imageUri: null }, // Missing both
-          { metadataUri: null }, // Missing metadataUri only
-          { imageUri: null }, // Missing imageUri only
+          { metadataUri: null, imageUri: null },
+          { metadataUri: null },
+          { imageUri: null },
         ],
       },
-      select: { mintAddress: true },
-      take: 5000,
     })
 
-    let validCount = 0
-    for (const token of candidates) {
-      if (token.mintAddress && isValidSolanaAddress(token.mintAddress)) {
-        scheduleMetadataRetry(token.mintAddress)
-        validCount++
+    // Count tokens with recent trades (from service start) that are missing metadata
+    const activeMissing = await prisma.token.count({
+      where: {
+        OR: [
+          { metadataUri: null, imageUri: null },
+          { metadataUri: null },
+          { imageUri: null },
+        ],
+        price: {
+          lastTradeTimestamp: {
+            gte: SERVICE_START_TIMESTAMP,
+          },
+        },
+      },
+    })
+
+    // Only seed tokens missing metadata AND having recent trades (from service start forward)
+    // Process in batches to avoid memory issues and stop if queue gets too large
+    const batchSize = 5000
+    let totalSeeded = 0
+    let totalInvalid = 0
+    let offset = 0
+    let hasMore = true
+
+    while (hasMore && metadataRetryQueue.size < 10000) {
+      const candidates = await prisma.token.findMany({
+        where: {
+          OR: [
+            { metadataUri: null, imageUri: null },
+            { metadataUri: null },
+            { imageUri: null },
+          ],
+          price: {
+            lastTradeTimestamp: {
+              gte: SERVICE_START_TIMESTAMP,
+            },
+          },
+        },
+        select: { mintAddress: true },
+        skip: offset,
+        take: batchSize,
+      })
+
+      if (candidates.length === 0) {
+        hasMore = false
+        break
+      }
+
+      let validCount = 0
+      let invalidCount = 0
+      for (const token of candidates) {
+        if (token.mintAddress && isValidSolanaAddress(token.mintAddress)) {
+          scheduleMetadataRetry(token.mintAddress)
+          validCount++
+        } else {
+          invalidCount++
+        }
+      }
+
+      totalSeeded += validCount
+      totalInvalid += invalidCount
+      offset += batchSize
+
+      // Stop if we've processed all or if queue is getting too large
+      if (candidates.length < batchSize) {
+        hasMore = false
       }
     }
 
-    if (validCount > 0) {
-      console.log(`[metadata] Seeded ${validCount} valid tokens (${candidates.length - validCount} invalid filtered out)`)
+    if (totalSeeded > 0) {
+      console.log(`[metadata] Seeded ${totalSeeded} active tokens (${totalInvalid} invalid filtered) | Active missing: ${activeMissing} | Total missing: ${totalMissing}`)
     }
   } catch (error) {
     console.warn("[metadata] Seed failed:", (error as Error).message)
