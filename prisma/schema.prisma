@@ -30,6 +30,7 @@ model Token {
   trades     Trade[]
   candles1m  PumpCandle1m[]
   features1m PumpFeature1m[]
+  marketCaps TokenMarketCap[]
 
   @@index([completed, kingOfTheHillTimestamp])
   @@index([createdTimestamp])
@@ -118,4 +119,18 @@ model PumpSolPrice {
 
   @@index([hourTimestamp])
   @@map("pump_sol_prices")
+}
+
+model TokenMarketCap {
+  tokenId      String   @map("token_id")
+  timestamp    BigInt   @map("timestamp")
+  marketCapUsd Decimal  @map("market_cap_usd") @db.Decimal(24, 8)
+  source       String   @default("trade")
+  createdAt    DateTime @default(now()) @map("created_at")
+  token        Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@id([tokenId, timestamp])
+  @@index([timestamp])
+  @@index([tokenId, timestamp])
+  @@map("token_market_caps")
 }

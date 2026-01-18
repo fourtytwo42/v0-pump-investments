@@ -221,6 +221,7 @@ interface PreparedTrade {
   associatedBondingCurve: string | null
   isCompleted: boolean
   kingOfTheHillTimestamp: number | null
+  raw: PumpUnifiedTrade | null // Store full raw payload including marketCap
 }
 
 // =============================================================================
@@ -334,6 +335,7 @@ function prepareTrade(trade: PumpUnifiedTrade, solPriceUsd: number): PreparedTra
     associatedBondingCurve,
     isCompleted,
     kingOfTheHillTimestamp,
+    raw: trade, // Store full raw payload including marketCap, supply, etc.
   }
 }
 
@@ -365,7 +367,7 @@ async function persistTradesBulk(trades: PreparedTrade[]): Promise<void> {
       const cachedId = tokenIdCache.get(t.mint)
       if (cachedId) {
         mintToId.set(t.mint, cachedId)
-      } else {
+          } else {
         uncachedTokens.push(t)
       }
     }
@@ -429,7 +431,7 @@ async function persistTradesBulk(trades: PreparedTrade[]): Promise<void> {
       }
     }
 
-    // Step 2: Run price and trade inserts in PARALLEL for speed
+    // Step 2: Run price, market cap history, and trade inserts in PARALLEL for speed
     const priceTokens = uniqueTokens.filter((t) => mintToId.has(t.mint))
     const validTrades = trades.filter((t) => mintToId.has(t.mint))
 
@@ -472,7 +474,41 @@ async function persistTradesBulk(trades: PreparedTrade[]): Promise<void> {
       }
     }
 
-    // Trade insert
+    // Market cap history insert (store time series of market cap per trade)
+    if (validTrades.length > 0) {
+      const marketCapValues = validTrades
+        .map((t) => {
+          const tokenId = mintToId.get(t.mint)
+          if (!tokenId) return null
+          // Convert Decimal to string for SQL
+          const marketCapUsd = t.marketCapUsd.toString()
+          return `(${escapeSQL(tokenId)},${t.timestampMs},${marketCapUsd},'trade',NOW())`
+        })
+        .filter((v): v is string => v !== null)
+        .join(",")
+
+      if (marketCapValues.length > 0) {
+        parallelOps.push(
+          prisma.$executeRawUnsafe(`
+            INSERT INTO token_market_caps (token_id,timestamp,market_cap_usd,source,created_at)
+            VALUES ${marketCapValues}
+            ON CONFLICT (token_id, timestamp) DO NOTHING
+          `).catch((error) => {
+            const errMsg = (error as Error).message
+            // Non-fatal: market cap history insert failures shouldn't block trade ingestion
+            if (errMsg.includes("connector") || errMsg.includes("connection")) {
+              console.warn(`[ingest] Connection issue on market cap history insert, skipping`)
+              return Promise.resolve()
+            }
+            // Only log, don't throw - market cap history is secondary to trade ingestion
+            console.warn(`[ingest] Market cap history insert failed (non-fatal):`, errMsg)
+            return Promise.resolve()
+          })
+        )
+      }
+    }
+
+    // Trade insert (with raw JSONB payload including marketCap)
     if (validTrades.length > 0) {
       const tradeValues = validTrades
         .map((t) => {
@@ -484,7 +520,9 @@ async function persistTradesBulk(trades: PreparedTrade[]): Promise<void> {
           const baseAmount = t.baseAmount.toString()
           const priceSol = t.priceSol.toString()
           const priceUsd = t.priceUsd.toString()
-          return `(${escapeSQL(tokenId)},${escapeSQL(t.tx)},${escapeSQL(t.userAddress)},${t.isBuy},${amountSol},${amountUsd},${baseAmount},${priceSol},${priceUsd},${t.timestampMs},NOW())`
+          // Store raw payload as JSONB (includes marketCap, supply, etc.)
+          const rawJson = t.raw ? escapeSQL(JSON.stringify(t.raw)) : "NULL"
+          return `(${escapeSQL(tokenId)},${escapeSQL(t.tx)},${escapeSQL(t.userAddress)},${t.isBuy},${amountSol},${amountUsd},${baseAmount},${priceSol},${priceUsd},${t.timestampMs},${rawJson}::jsonb,NOW())`
         })
         .filter((v): v is string => v !== null)
         .join(",")
@@ -492,7 +530,7 @@ async function persistTradesBulk(trades: PreparedTrade[]): Promise<void> {
       if (tradeValues.length > 0) {
         parallelOps.push(
           prisma.$executeRawUnsafe(`
-            INSERT INTO trades (token_id,tx_signature,user_address,is_buy,amount_sol,amount_usd,base_amount,price_sol,price_usd,timestamp,created_at)
+            INSERT INTO trades (token_id,tx_signature,user_address,is_buy,amount_sol,amount_usd,base_amount,price_sol,price_usd,timestamp,raw,created_at)
             VALUES ${tradeValues}
             ON CONFLICT (tx_signature) DO NOTHING
           `).catch((error) => {
@@ -1148,7 +1186,7 @@ async function generateFeaturesForCandles(): Promise<number> {
     `)
 
     return Number(featureResult)
-  } catch (error) {
+    } catch (error) {
     console.error("[features] Error generating features:", (error as Error).message)
     return 0
   }
@@ -1194,7 +1232,7 @@ async function generateCandlesAndCleanupTrades(): Promise<void> {
     let featuresGenerated = 0
     try {
       featuresGenerated = await generateFeaturesForCandles()
-    } catch (error) {
+      } catch (error) {
       console.error("[features] Error (non-fatal):", (error as Error).message)
     }
 
