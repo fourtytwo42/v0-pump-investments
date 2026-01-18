@@ -22,6 +22,9 @@ async function wipeDatabase() {
     console.log("Truncating pump_features_1m...")
     await prisma.$executeRawUnsafe(`TRUNCATE TABLE pump_features_1m RESTART IDENTITY CASCADE`)
 
+    console.log("Truncating token_market_caps...")
+    await prisma.$executeRawUnsafe(`TRUNCATE TABLE token_market_caps RESTART IDENTITY CASCADE`)
+
     console.log("Truncating pump_sol_prices...")
     await prisma.$executeRawUnsafe(`TRUNCATE TABLE pump_sol_prices RESTART IDENTITY CASCADE`)
 

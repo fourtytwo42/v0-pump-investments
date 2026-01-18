@@ -109,6 +109,25 @@ async function checkTables() {
     `
     console.log(`\n✅ SOL Prices: ${solPriceCount[0]?.count || 0} records`)
 
+    // Check token_market_caps table
+    const marketCapCount = await prisma.$queryRaw<Array<{ count: bigint }>>`
+      SELECT COUNT(*)::bigint as count FROM token_market_caps
+    `
+    console.log(`\n✅ Market Caps: ${marketCapCount[0]?.count || 0} records`)
+
+    if (Number(marketCapCount[0]?.count || 0) > 0) {
+      const newestMarketCap = await prisma.$queryRaw<Array<{ token_id: string; timestamp: bigint; market_cap_usd: number }>>`
+        SELECT token_id, timestamp, market_cap_usd 
+        FROM token_market_caps 
+        ORDER BY timestamp DESC 
+        LIMIT 1
+      `
+      if (newestMarketCap.length > 0) {
+        const marketCapAge = Math.floor((Date.now() - Number(newestMarketCap[0].timestamp)) / 1000 / 60)
+        console.log(`   Newest market cap: ${marketCapAge} minutes ago ($${Number(newestMarketCap[0].market_cap_usd).toLocaleString()})`)
+      }
+    }
+
     // Check for any trades that should have been processed but haven't been
     const unprocessedTrades = await prisma.$queryRaw<Array<{ count: bigint }>>`
       SELECT COUNT(*)::bigint as count
