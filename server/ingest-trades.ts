@@ -412,7 +412,7 @@ async function persistTradesBulk(trades: PreparedTrade[]): Promise<void> {
       const mints = uncachedTokens.map((t) => t.mint)
       const tokenIds = await prisma.token.findMany({
         where: { mintAddress: { in: mints } },
-        select: { id: true, mintAddress: true, metadataUri: true, imageUri: true },
+        select: { id: true, mintAddress: true, metadataUri: true, imageUri: true, completed: true },
       })
       for (const row of tokenIds) {
         mintToId.set(row.mintAddress, row.id)
@@ -524,6 +524,32 @@ async function persistTradesBulk(trades: PreparedTrade[]): Promise<void> {
             // Don't throw - continue with other operations
           }
         }
+      }
+    }
+
+    // Step 3: Update completion status for tokens with market cap > $60k
+    // Assume tokens over $60k have graduated from bonding curve
+    if (priceTokens.length > 0) {
+      const graduatedTokens = priceTokens.filter((t) => {
+        const marketCap = t.marketCapUsd.toNumber()
+        return marketCap > 60000
+      })
+
+      if (graduatedTokens.length > 0) {
+        const graduatedMints = graduatedTokens.map((t) => t.mint)
+        // Update tokens to completed = true if market cap > $60k
+        await prisma.token.updateMany({
+          where: {
+            mintAddress: { in: graduatedMints },
+            completed: false, // Only update if not already completed
+          },
+          data: {
+            completed: true,
+          },
+        }).catch((error) => {
+          // Don't fail the whole batch if this update fails
+          console.warn(`[ingest] Failed to update completion status for ${graduatedTokens.length} tokens:`, (error as Error).message)
+        })
       }
     }
 
@@ -696,8 +722,13 @@ async function refreshTokenMetadata(mint: string): Promise<boolean> {
 
     if (!token) return true
 
-    // Skip if token already has both metadataUri and imageUri
-    if (token.metadataUri && token.imageUri) {
+    // Only fetch metadata if token is missing it
+    // We'll update completed status when we fetch metadata, but we can't fetch for every token on every trade
+    const shouldFetchMetadata = !token.metadataUri || !token.imageUri
+    
+    // If token already has metadata, skip to avoid rate limits
+    // Completion status will be updated when metadata is fetched for tokens that need it
+    if (!shouldFetchMetadata) {
       return true
     }
 
@@ -709,7 +740,7 @@ async function refreshTokenMetadata(mint: string): Promise<boolean> {
       return false
     }
 
-      const coinRecord = coinInfo as Record<string, unknown>
+    const coinRecord = coinInfo as Record<string, unknown>
     const rawUri = firstString(coinRecord.metadataUri, coinRecord.metadata_uri, coinRecord.uri)
     const metadataUri = rawUri ? normalizeIpfsUri(rawUri) : null
 
@@ -741,6 +772,13 @@ async function refreshTokenMetadata(mint: string): Promise<boolean> {
     if (imageUri && !token.imageUri) {
       updates.imageUri = imageUri
     }
+
+    // Update completed status from API when we fetch metadata (authoritative source)
+    // This is the only time we check completion status to avoid rate limits
+    const coinInfoComplete = coinRecord.complete ?? coinRecord.completed ?? coinRecord.isCompleted
+    if (typeof coinInfoComplete === "boolean" && coinInfoComplete !== token.completed) {
+      updates.completed = coinInfoComplete
+    }
     if (metadata.description && !token.description) {
       updates.description = metadata.description
     }
@@ -754,13 +792,7 @@ async function refreshTokenMetadata(mint: string): Promise<boolean> {
       updates.website = metadata.website
     }
 
-    // Update completed status from coinInfo if available
-    // The API uses "complete" (boolean), not "completed"
-    const coinInfoComplete = coinRecord.complete ?? coinRecord.completed ?? coinRecord.isCompleted
-    if (typeof coinInfoComplete === "boolean") {
-      updates.completed = coinInfoComplete
-    }
-
+    // Completed status is already updated above from coinInfo
     if (token.completed || (typeof coinInfoComplete === "boolean" && coinInfoComplete)) {
       const dexCreatedAt = await getDexPairCreatedAt(mint)
       if (dexCreatedAt && (!token.createdTimestamp || dexCreatedAt < Number(token.createdTimestamp))) {
