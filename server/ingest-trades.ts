@@ -1143,9 +1143,23 @@ async function generateFeaturesForCandles(): Promise<number> {
   try {
     // Generate features for candles that don't have features yet
     // Features: return, range, body, dlog_volume, ret_mean_15, ret_std_15, ret_mean_60, ret_std_60
-    // Using a CTE to calculate returns first, then window functions for rolling stats
-    const featureResult = await prisma.$executeRawUnsafe(`
-      WITH candle_returns AS (
+    // Use full candle history per token for rolling windows, then upsert missing/bad rows.
+    const updateResult = await prisma.$executeRawUnsafe(`
+      WITH target_tokens AS (
+        SELECT DISTINCT c.token_id
+        FROM pump_candles_1m c
+        LEFT JOIN pump_features_1m f
+          ON f.token_id = c.token_id
+          AND f.timestamp = c.timestamp
+        WHERE f.token_id IS NULL
+          OR (
+            f.ret_mean_15 IS NULL
+            AND f.ret_std_15 IS NULL
+            AND f.ret_mean_60 IS NULL
+            AND f.ret_std_60 IS NULL
+          )
+      ),
+      candle_series AS (
         SELECT 
           c.token_id,
           c.timestamp,
@@ -1154,38 +1168,140 @@ async function generateFeaturesForCandles(): Promise<number> {
           c.low,
           c.close,
           c.volume_usd,
-          LAG(c.close, 1) OVER (PARTITION BY c.token_id ORDER BY c.timestamp) as prev_close,
+          LAG(c.close, 1) OVER (PARTITION BY c.token_id ORDER BY c.timestamp) as prev_close
+        FROM pump_candles_1m c
+        JOIN target_tokens t ON t.token_id = c.token_id
+      ),
+      candle_returns AS (
+        SELECT 
+          cs.token_id,
+          cs.timestamp,
+          cs.open,
+          cs.high,
+          cs.low,
+          cs.close,
+          cs.volume_usd,
           CASE 
-            WHEN LAG(c.close, 1) OVER (PARTITION BY c.token_id ORDER BY c.timestamp) > 0 
-            THEN (c.close - LAG(c.close, 1) OVER (PARTITION BY c.token_id ORDER BY c.timestamp)) / LAG(c.close, 1) OVER (PARTITION BY c.token_id ORDER BY c.timestamp)
+            WHEN cs.prev_close > 0 
+            THEN (cs.close - cs.prev_close) / cs.prev_close
             ELSE NULL
           END as return_val
+        FROM candle_series cs
+      ),
+      feature_rows AS (
+        SELECT 
+          cr.token_id,
+          cr.timestamp,
+          cr.return_val as "return",
+          (cr.high - cr.low) as range,
+          (cr.close - cr.open) as body,
+          CASE 
+            WHEN cr.volume_usd > 0 THEN LN(cr.volume_usd + 1)
+            ELSE NULL
+          END as dlog_volume,
+          AVG(cr.return_val) OVER (PARTITION BY cr.token_id ORDER BY cr.timestamp ROWS BETWEEN 14 PRECEDING AND CURRENT ROW) as ret_mean_15,
+          STDDEV(cr.return_val) OVER (PARTITION BY cr.token_id ORDER BY cr.timestamp ROWS BETWEEN 14 PRECEDING AND CURRENT ROW) as ret_std_15,
+          AVG(cr.return_val) OVER (PARTITION BY cr.token_id ORDER BY cr.timestamp ROWS BETWEEN 59 PRECEDING AND CURRENT ROW) as ret_mean_60,
+          STDDEV(cr.return_val) OVER (PARTITION BY cr.token_id ORDER BY cr.timestamp ROWS BETWEEN 59 PRECEDING AND CURRENT ROW) as ret_std_60
+        FROM candle_returns cr
+      )
+      UPDATE pump_features_1m f
+      SET
+        "return" = fr."return",
+        range = fr.range,
+        body = fr.body,
+        dlog_volume = fr.dlog_volume,
+        ret_mean_15 = fr.ret_mean_15,
+        ret_std_15 = fr.ret_std_15,
+        ret_mean_60 = fr.ret_mean_60,
+        ret_std_60 = fr.ret_std_60
+      FROM feature_rows fr
+      WHERE f.token_id = fr.token_id
+        AND f.timestamp = fr.timestamp
+        AND (
+          f.ret_mean_15 IS NULL
+          AND f.ret_std_15 IS NULL
+          AND f.ret_mean_60 IS NULL
+          AND f.ret_std_60 IS NULL
+        );
+    `)
+
+    const insertResult = await prisma.$executeRawUnsafe(`
+      WITH target_tokens AS (
+        SELECT DISTINCT c.token_id
         FROM pump_candles_1m c
-        WHERE NOT EXISTS (
-          SELECT 1 FROM pump_features_1m f
-          WHERE f.token_id = c.token_id
-            AND f.timestamp = c.timestamp
-        )
+        LEFT JOIN pump_features_1m f
+          ON f.token_id = c.token_id
+          AND f.timestamp = c.timestamp
+        WHERE f.token_id IS NULL
+      ),
+      candle_series AS (
+        SELECT 
+          c.token_id,
+          c.timestamp,
+          c.open,
+          c.high,
+          c.low,
+          c.close,
+          c.volume_usd,
+          LAG(c.close, 1) OVER (PARTITION BY c.token_id ORDER BY c.timestamp) as prev_close
+        FROM pump_candles_1m c
+        JOIN target_tokens t ON t.token_id = c.token_id
+      ),
+      candle_returns AS (
+        SELECT 
+          cs.token_id,
+          cs.timestamp,
+          cs.open,
+          cs.high,
+          cs.low,
+          cs.close,
+          cs.volume_usd,
+          CASE 
+            WHEN cs.prev_close > 0 
+            THEN (cs.close - cs.prev_close) / cs.prev_close
+            ELSE NULL
+          END as return_val
+        FROM candle_series cs
+      ),
+      feature_rows AS (
+        SELECT 
+          cr.token_id,
+          cr.timestamp,
+          cr.return_val as "return",
+          (cr.high - cr.low) as range,
+          (cr.close - cr.open) as body,
+          CASE 
+            WHEN cr.volume_usd > 0 THEN LN(cr.volume_usd + 1)
+            ELSE NULL
+          END as dlog_volume,
+          AVG(cr.return_val) OVER (PARTITION BY cr.token_id ORDER BY cr.timestamp ROWS BETWEEN 14 PRECEDING AND CURRENT ROW) as ret_mean_15,
+          STDDEV(cr.return_val) OVER (PARTITION BY cr.token_id ORDER BY cr.timestamp ROWS BETWEEN 14 PRECEDING AND CURRENT ROW) as ret_std_15,
+          AVG(cr.return_val) OVER (PARTITION BY cr.token_id ORDER BY cr.timestamp ROWS BETWEEN 59 PRECEDING AND CURRENT ROW) as ret_mean_60,
+          STDDEV(cr.return_val) OVER (PARTITION BY cr.token_id ORDER BY cr.timestamp ROWS BETWEEN 59 PRECEDING AND CURRENT ROW) as ret_std_60
+        FROM candle_returns cr
       )
       INSERT INTO pump_features_1m (token_id, timestamp, "return", range, body, dlog_volume, ret_mean_15, ret_std_15, ret_mean_60, ret_std_60)
       SELECT 
-        cr.token_id,
-        cr.timestamp,
-        cr.return_val as "return",
-        (cr.high - cr.low) as range,
-        (cr.close - cr.open) as body,
-        CASE 
-          WHEN cr.volume_usd > 0 THEN LN(cr.volume_usd + 1)
-          ELSE NULL
-        END as dlog_volume,
-        AVG(cr.return_val) OVER (PARTITION BY cr.token_id ORDER BY cr.timestamp ROWS BETWEEN 14 PRECEDING AND CURRENT ROW) as ret_mean_15,
-        STDDEV(cr.return_val) OVER (PARTITION BY cr.token_id ORDER BY cr.timestamp ROWS BETWEEN 14 PRECEDING AND CURRENT ROW) as ret_std_15,
-        AVG(cr.return_val) OVER (PARTITION BY cr.token_id ORDER BY cr.timestamp ROWS BETWEEN 59 PRECEDING AND CURRENT ROW) as ret_mean_60,
-        STDDEV(cr.return_val) OVER (PARTITION BY cr.token_id ORDER BY cr.timestamp ROWS BETWEEN 59 PRECEDING AND CURRENT ROW) as ret_std_60
-      FROM candle_returns cr
+        fr.token_id,
+        fr.timestamp,
+        fr."return",
+        fr.range,
+        fr.body,
+        fr.dlog_volume,
+        fr.ret_mean_15,
+        fr.ret_std_15,
+        fr.ret_mean_60,
+        fr.ret_std_60
+      FROM feature_rows fr
+      WHERE NOT EXISTS (
+        SELECT 1 FROM pump_features_1m f
+        WHERE f.token_id = fr.token_id
+          AND f.timestamp = fr.timestamp
+      )
     `)
 
-    return Number(featureResult)
+    return Number(updateResult) + Number(insertResult)
     } catch (error) {
     console.error("[features] Error generating features:", (error as Error).message)
     return 0
