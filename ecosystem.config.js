@@ -1,19 +1,24 @@
+const path = require("path")
+
+const appCwd = __dirname
+const logDir = path.join(appCwd, "logs")
+
 module.exports = {
   apps: [
     {
       name: 'pump-investments-web',
       script: 'npm',
       args: 'start',
-      cwd: '/home/hendo420/pumpInvestments/v0-pump-investments',
+      cwd: appCwd,
       instances: 1,
       exec_mode: 'fork',
       env: {
         NODE_ENV: 'production',
         PORT: 3000,
       },
-      error_file: './logs/web-error.log',
-      out_file: './logs/web-out.log',
-      log_file: './logs/web-combined.log',
+      error_file: path.join(logDir, 'web-error.log'),
+      out_file: path.join(logDir, 'web-out.log'),
+      log_file: path.join(logDir, 'web-combined.log'),
       time: true,
       autorestart: true,
       watch: false,
@@ -28,15 +33,15 @@ module.exports = {
       name: 'pump-investments-ingest',
       script: 'npm',
       args: 'run ingest',
-      cwd: '/home/hendo420/pumpInvestments/v0-pump-investments',
+      cwd: appCwd,
       instances: 1,
       exec_mode: 'fork',
       env: {
         NODE_ENV: 'production',
       },
-      error_file: './logs/ingest-error.log',
-      out_file: './logs/ingest-out.log',
-      log_file: './logs/ingest-combined.log',
+      error_file: path.join(logDir, 'ingest-error.log'),
+      out_file: path.join(logDir, 'ingest-out.log'),
+      log_file: path.join(logDir, 'ingest-combined.log'),
       time: true,
       autorestart: true,
       watch: false,
@@ -49,4 +54,3 @@ module.exports = {
     },
   ],
 };
-
