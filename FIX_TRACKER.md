@@ -63,7 +63,7 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - `app/api/tokens/route.ts` now imports and uses the shared token-query types directly, and favorite mint filtering is typed as `Set<string>`.
 
 #### T3. Fix onboarding typing drift
-- Status: `open`
+- Status: `done`
 - Files:
   - `components/onboarding/onboarding-guide.tsx`
 - Problem:
@@ -75,6 +75,9 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - Narrow `placement` to the actual supported string union, or broaden the type intentionally if the runtime allows it.
 - Verification:
   - `npx tsc --noEmit --project tsconfig.json`
+- Notes:
+  - `components/onboarding/onboarding-step.tsx` now exports the canonical onboarding step schema, including `OnboardingPlacement`, `OnboardingAction`, and `OnboardingGuideStep`.
+  - `components/onboarding/onboarding-guide.tsx` now types its `steps` array explicitly and keeps `action` support optional for dormant changelog/roadmap flows.
 
 #### T4. Fix missing UI module
 - Status: `open`

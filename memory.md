@@ -24,6 +24,9 @@ This file stores durable project memory for recovery after context compression o
 - The reconnect hardening commit was pushed to `main`.
 
 ## Important Recent Changes
+- T3 in `FIX_TRACKER.md` is now implemented:
+  - onboarding step typing is centralized in `components/onboarding/onboarding-step.tsx`
+  - `action` support remains optional and typed, even though current steps do not actively use it
 - T2 in `FIX_TRACKER.md` is now implemented:
   - `types/token-data.ts` is the canonical in-app source for token-query types
   - `contexts/token-context.tsx` now imports `TokenQueryOptions` from `@/types/token-data`

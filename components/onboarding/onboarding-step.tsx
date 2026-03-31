@@ -5,13 +5,20 @@ import type React from "react"
 import { useEffect, useState, useRef } from "react"
 import { motion } from "framer-motion"
 
+export type OnboardingPlacement = "top" | "right" | "bottom" | "left" | "middle" | "center"
+
+export type OnboardingAction = "open-changelog" | "view-changelog" | "open-roadmap" | "view-roadmap"
+
+export interface OnboardingGuideStep {
+  title: string
+  description: string
+  target: string | null
+  placement: OnboardingPlacement
+  action?: OnboardingAction
+}
+
 interface OnboardingStepProps {
-  step: {
-    title: string
-    description: string
-    target: string | null
-    placement: "top" | "right" | "bottom" | "left" | "middle" | "center"
-  }
+  step: OnboardingGuideStep
   currentStep: number
   totalSteps: number
   children: React.ReactNode

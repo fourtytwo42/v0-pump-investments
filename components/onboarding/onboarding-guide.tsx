@@ -6,11 +6,11 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { db } from "@/lib/db"
 import { X } from "lucide-react"
-import { OnboardingStep } from "./onboarding-step"
+import { OnboardingStep, type OnboardingAction, type OnboardingGuideStep } from "./onboarding-step"
 import { useOnboardingStore } from "./onboarding-store"
 
 // Updated steps with combined token status icons step
-const steps = [
+const steps: OnboardingGuideStep[] = [
   {
     title: "Welcome to Pump.Investments Lite!",
     description:
@@ -103,7 +103,7 @@ const steps = [
 ]
 
 // Add this function to handle special actions for certain steps
-const executeStepAction = (action: string | undefined) => {
+const executeStepAction = (action: OnboardingAction | undefined) => {
   // Function intentionally left empty to prevent automatic opening of panels
   // We'll just highlight the buttons without opening them
 }
