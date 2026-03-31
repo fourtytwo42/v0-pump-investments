@@ -66,6 +66,23 @@ const NATS_CONNECT_PAYLOAD = {
   headers: true,
 }
 
+function parseEnvNumber(name: string, fallback: number): number {
+  const raw = process.env[name]
+  if (!raw) return fallback
+  const parsed = Number.parseInt(raw, 10)
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback
+}
+
+const INGEST_RECONNECT_MIN_MS = parseEnvNumber("INGEST_RECONNECT_MIN_MS", 2_000)
+const INGEST_RECONNECT_MAX_MS = parseEnvNumber("INGEST_RECONNECT_MAX_MS", 60_000)
+const INGEST_CONNECT_TIMEOUT_MS = parseEnvNumber("INGEST_CONNECT_TIMEOUT_MS", 10_000)
+const INGEST_PING_INTERVAL_MS = parseEnvNumber("INGEST_PING_INTERVAL_MS", 15_000)
+const INGEST_STALE_AFTER_MS = parseEnvNumber("INGEST_STALE_AFTER_MS", 45_000)
+const INGEST_BACKOFF_RESET_AFTER_MS = parseEnvNumber("INGEST_BACKOFF_RESET_AFTER_MS", 30_000)
+const INGEST_PING_TIMEOUT_MS = 20_000
+const INGEST_HEALTH_CHECK_INTERVAL_MS = Math.min(5_000, INGEST_PING_INTERVAL_MS)
+const INGEST_HEALTH_LOG_INTERVAL_MS = 60_000
+
 // =============================================================================
 // Database Setup
 // =============================================================================
@@ -102,9 +119,24 @@ let activeProcessors = 0
 const MAX_PROCESSORS = 5 // Reduced from 10 to avoid connection pool exhaustion
 let lastQueueFlush = Date.now()
 
+type ConnectionState = "idle" | "connecting" | "connected" | "reconnect_wait" | "shutting_down"
+
 let ws: WebSocket | null = null
 let reconnectTimer: NodeJS.Timeout | null = null
+let connectTimeoutTimer: NodeJS.Timeout | null = null
+let heartbeatTimer: NodeJS.Timeout | null = null
+let backoffResetTimer: NodeJS.Timeout | null = null
 let messageBuffer = ""
+let connectionState: ConnectionState = "idle"
+let connectionAttempt = 0
+let activeConnectionId = 0
+let reconnectAttemptCount = 0
+let lastConnectStartedAt = 0
+let lastConnectedAt = 0
+let lastMessageAt = 0
+let lastPingSentAt = 0
+let lastPongAt = 0
+let lastDisconnectAt = 0
 
 // SOL price cache
 let solPriceCache = { value: 160, updatedAt: 0 }
@@ -127,6 +159,11 @@ let metadataDynamicDelayMs = 0
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+function clearTimer(timer: NodeJS.Timeout | null): null {
+  if (timer) clearTimeout(timer)
+  return null
 }
 
 function escapeSQL(value: string | null | undefined): string {
@@ -431,11 +468,14 @@ async function persistTradesBulk(trades: PreparedTrade[]): Promise<void> {
       }
     }
 
-    // Step 2: Run price, market cap history, and trade inserts in PARALLEL for speed
+    // Step 2: Run price and trade inserts in PARALLEL for speed
     const priceTokens = uniqueTokens.filter((t) => mintToId.has(t.mint))
     const validTrades = trades.filter((t) => mintToId.has(t.mint))
 
     const parallelOps: Promise<unknown>[] = []
+    const enableMarketCapHistory =
+      process.env.ENABLE_MARKET_CAP_HISTORY === "true" ||
+      process.env.ENABLE_MARKET_CAP_HISTORY === "1"
 
     // Price upsert
     if (priceTokens.length > 0) {
@@ -474,8 +514,8 @@ async function persistTradesBulk(trades: PreparedTrade[]): Promise<void> {
       }
     }
 
-    // Market cap history insert (store time series of market cap per trade)
-    if (validTrades.length > 0) {
+    // Optional market cap history insert (store time series of market cap per trade)
+    if (enableMarketCapHistory && validTrades.length > 0) {
       const marketCapValues = validTrades
         .map((t) => {
           const tokenId = mintToId.get(t.mint)
@@ -929,6 +969,7 @@ async function processMetadataRetryQueue(): Promise<void> {
         }
       } catch (error) {
         // Error occurred - re-queue if under max attempts
+        const tokenElapsed = Date.now() - tokenStartTime
         const attempts = metadataRetryAttempts.get(mint) ?? 0
         if (attempts < METADATA_RETRY_MAX_ATTEMPTS) {
           scheduleMetadataRetry(mint)
@@ -1387,18 +1428,157 @@ if (ENABLE_CANDLE_GENERATION) {
 // WebSocket / NATS Connection
 // =============================================================================
 
-function handleMessageChunk(chunk: string): void {
+function isActiveConnection(connectionId: number): boolean {
+  return activeConnectionId === connectionId
+}
+
+function clearReconnectTimer(log = false): void {
+  if (!reconnectTimer) return
+  reconnectTimer = clearTimer(reconnectTimer)
+  if (log) {
+    console.log("[ingest] event=reconnect_cancelled")
+  }
+}
+
+function clearConnectionTimers(): void {
+  connectTimeoutTimer = clearTimer(connectTimeoutTimer)
+  heartbeatTimer = clearTimer(heartbeatTimer)
+  backoffResetTimer = clearTimer(backoffResetTimer)
+}
+
+function disposeCurrentSocket(reason: string, connectionId?: number): void {
+  if (connectionId !== undefined && !isActiveConnection(connectionId)) return
+
+  clearConnectionTimers()
+
+  const socket = ws
+  if (socket) {
+    ws = null
+    socket.removeAllListeners()
+
+    if (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING) {
+      try {
+        socket.close()
+      } catch {
+        // Ignore close errors during forced teardown.
+      }
+    }
+  }
+
+  messageBuffer = ""
+  console.log(`[ingest] event=socket_disposed reason=${JSON.stringify(reason)}`)
+}
+
+function scheduleBackoffReset(connectionId: number): void {
+  backoffResetTimer = clearTimer(backoffResetTimer)
+  backoffResetTimer = setTimeout(() => {
+    if (!isActiveConnection(connectionId) || connectionState !== "connected") return
+    reconnectAttemptCount = 0
+    console.log("[ingest] event=backoff_reset")
+  }, INGEST_BACKOFF_RESET_AFTER_MS)
+}
+
+function getReconnectDelayMs(attemptNumber: number): number {
+  const baseDelay = Math.min(
+    INGEST_RECONNECT_MAX_MS,
+    INGEST_RECONNECT_MIN_MS * Math.pow(2, Math.max(0, attemptNumber - 1))
+  )
+  const jitterMultiplier = 1 + (Math.random() * 0.4 - 0.2)
+  return Math.max(INGEST_RECONNECT_MIN_MS, Math.round(baseDelay * jitterMultiplier))
+}
+
+function scheduleReconnect(reason: string): void {
+  if (connectionState === "shutting_down") return
+  if (reconnectTimer) return
+
+  disposeCurrentSocket(reason)
+  connectionState = "reconnect_wait"
+  reconnectAttemptCount += 1
+  const delayMs = getReconnectDelayMs(reconnectAttemptCount)
+
+  console.warn(
+    `[ingest] event=reconnect_scheduled reason=${JSON.stringify(reason)} attempt=${reconnectAttemptCount} delay_ms=${delayMs}`
+  )
+
+  reconnectTimer = setTimeout(() => {
+    reconnectTimer = null
+    startConnectionAttempt("reconnect", delayMs)
+  }, delayMs)
+}
+
+function handleStaleConnection(reason: string, connectionId: number): void {
+  if (!isActiveConnection(connectionId) || connectionState === "shutting_down") return
+  console.warn(`[ingest] event=heartbeat_stale reason=${JSON.stringify(reason)} connection_id=${connectionId}`)
+  scheduleReconnect(reason)
+}
+
+function checkConnectionHealth(connectionId: number): void {
+  if (!isActiveConnection(connectionId) || connectionState !== "connected") return
+
+  const socket = ws
+  if (!socket || socket.readyState !== WebSocket.OPEN) {
+    handleStaleConnection("socket_not_open", connectionId)
+    return
+  }
+
+  const now = Date.now()
+  if (lastMessageAt > 0 && now - lastMessageAt >= INGEST_STALE_AFTER_MS) {
+    handleStaleConnection("inbound_idle_timeout", connectionId)
+    return
+  }
+
+  if (lastPingSentAt > lastMessageAt && now - lastPingSentAt >= INGEST_PING_TIMEOUT_MS) {
+    handleStaleConnection("ping_timeout", connectionId)
+    return
+  }
+
+  const lastActivityAt = Math.max(lastConnectedAt, lastMessageAt, lastPingSentAt)
+  if (now - lastActivityAt >= INGEST_PING_INTERVAL_MS) {
+    try {
+      socket.send("PING\r\n")
+      lastPingSentAt = now
+      console.log(`[ingest] event=heartbeat_ping connection_id=${connectionId}`)
+    } catch (error) {
+      handleStaleConnection(`ping_send_failed:${(error as Error).message}`, connectionId)
+    }
+  }
+}
+
+function startHeartbeat(connectionId: number): void {
+  heartbeatTimer = clearTimer(heartbeatTimer)
+  heartbeatTimer = setInterval(() => {
+    checkConnectionHealth(connectionId)
+  }, INGEST_HEALTH_CHECK_INTERVAL_MS)
+}
+
+function handleMessageChunk(chunk: string, connectionId: number, socket: WebSocket): void {
+  if (!isActiveConnection(connectionId) || socket !== ws) return
+
   messageBuffer += chunk
+  lastMessageAt = Date.now()
 
   while (messageBuffer.length > 0) {
     if (messageBuffer.startsWith("PING")) {
-      ws?.send("PONG\r\n")
+      try {
+        socket.send("PONG\r\n")
+      } catch (error) {
+        handleStaleConnection(`pong_send_failed:${(error as Error).message}`, connectionId)
+        return
+      }
       const newline = messageBuffer.indexOf("\r\n")
       messageBuffer = newline === -1 ? "" : messageBuffer.slice(newline + 2)
       continue
     }
 
-    if (messageBuffer.startsWith("PONG") || messageBuffer.startsWith("+OK") || messageBuffer.startsWith("INFO")) {
+    if (messageBuffer.startsWith("PONG")) {
+      lastPongAt = Date.now()
+      const newline = messageBuffer.indexOf("\r\n")
+      if (newline === -1) return
+      messageBuffer = messageBuffer.slice(newline + 2)
+      continue
+    }
+
+    if (messageBuffer.startsWith("+OK") || messageBuffer.startsWith("INFO")) {
       const newline = messageBuffer.indexOf("\r\n")
       if (newline === -1) return
       messageBuffer = messageBuffer.slice(newline + 2)
@@ -1440,37 +1620,106 @@ function handleMessageChunk(chunk: string): void {
   }
 }
 
-function scheduleReconnect(): void {
-  if (reconnectTimer) return
-  reconnectTimer = setTimeout(() => {
-    reconnectTimer = null
-    console.log("[ingest] Reconnecting...")
-    connectToFeed()
-  }, 2000)
+function startConnectionAttempt(trigger: string, scheduledDelayMs = 0): void {
+  if (connectionState === "shutting_down") return
+
+  clearReconnectTimer(scheduledDelayMs > 0)
+  disposeCurrentSocket(`before_connect:${trigger}`)
+
+  connectionAttempt += 1
+  activeConnectionId += 1
+  connectionState = "connecting"
+  lastConnectStartedAt = Date.now()
+  messageBuffer = ""
+
+  const connectionId = activeConnectionId
+  const socket = new WebSocket(NATS_URL, { headers: NATS_HEADERS })
+  ws = socket
+
+  console.log(
+    `[ingest] event=connect_start trigger=${trigger} connection_id=${connectionId} attempt=${connectionAttempt} reconnect_attempt=${reconnectAttemptCount} delay_ms=${scheduledDelayMs}`
+  )
+
+  connectTimeoutTimer = clearTimer(connectTimeoutTimer)
+  connectTimeoutTimer = setTimeout(() => {
+    if (!isActiveConnection(connectionId) || connectionState !== "connecting") return
+    console.warn(
+      `[ingest] event=connect_timeout connection_id=${connectionId} timeout_ms=${INGEST_CONNECT_TIMEOUT_MS}`
+    )
+    scheduleReconnect("connect_timeout")
+  }, INGEST_CONNECT_TIMEOUT_MS)
+
+  socket.once("open", () => {
+    if (!isActiveConnection(connectionId) || socket !== ws) return
+
+    connectTimeoutTimer = clearTimer(connectTimeoutTimer)
+    connectionState = "connected"
+    lastConnectedAt = Date.now()
+    lastMessageAt = lastConnectedAt
+    lastPingSentAt = 0
+    lastPongAt = lastConnectedAt
+    messageBuffer = ""
+    clearReconnectTimer(true)
+    scheduleBackoffReset(connectionId)
+    startHeartbeat(connectionId)
+
+    console.log(`[ingest] event=connect_open connection_id=${connectionId}`)
+
+    try {
+      socket.send(`CONNECT ${JSON.stringify(NATS_CONNECT_PAYLOAD)}\r\n`)
+      socket.send("PING\r\n")
+      lastPingSentAt = Date.now()
+      socket.send("SUB unifiedTradeEvent.processed sub0\r\n")
+      console.log(`[ingest] event=subscription_sent connection_id=${connectionId} subject=unifiedTradeEvent.processed`)
+    } catch (error) {
+      console.error(
+        `[ingest] event=socket_error connection_id=${connectionId} stage=handshake message=${JSON.stringify((error as Error).message)}`
+      )
+      scheduleReconnect(`handshake_failed:${(error as Error).message}`)
+    }
+  })
+
+  socket.on("message", (data: WebSocket.Data) => {
+    if (!isActiveConnection(connectionId) || socket !== ws) return
+    handleMessageChunk(data.toString(), connectionId, socket)
+  })
+
+  socket.on("close", (code: number, reasonBuffer: Buffer) => {
+    if (!isActiveConnection(connectionId) || socket !== ws) return
+
+    const reason = reasonBuffer.toString() || "no_reason"
+    lastDisconnectAt = Date.now()
+    console.warn(
+      `[ingest] event=socket_close connection_id=${connectionId} code=${code} reason=${JSON.stringify(reason)}`
+    )
+    scheduleReconnect(`socket_close:${code}`)
+  })
+
+  socket.on("error", (error: Error) => {
+    if (!isActiveConnection(connectionId) || socket !== ws) return
+
+    console.error(
+      `[ingest] event=socket_error connection_id=${connectionId} message=${JSON.stringify(error.message)}`
+    )
+    scheduleReconnect(`socket_error:${error.message}`)
+  })
 }
 
-function connectToFeed(): void {
-  ws = new WebSocket(NATS_URL, { headers: NATS_HEADERS })
+function logConnectionHealth(): void {
+  const now = Date.now()
+  const secondsSinceLastMessage = lastMessageAt > 0 ? Math.floor((now - lastMessageAt) / 1000) : -1
+  console.log(
+    `[ingest] event=health state=${connectionState} connection_id=${activeConnectionId} reconnect_attempt=${reconnectAttemptCount} queue=${tradeQueue.length} processors=${activeProcessors} since_last_message_s=${secondsSinceLastMessage}`
+  )
+}
 
-  ws.once("open", () => {
-    console.log("✅ Connected to Pump.fun trade feed")
-    messageBuffer = ""
-    ws?.send(`CONNECT ${JSON.stringify(NATS_CONNECT_PAYLOAD)}\r\n`)
-    ws?.send("PING\r\n")
-    ws?.send("SUB unifiedTradeEvent.processed sub0\r\n")
-  })
+async function shutdown(reason: string): Promise<void> {
+  if (connectionState === "shutting_down") return
 
-  ws.on("message", (data: WebSocket.Data) => handleMessageChunk(data.toString()))
-
-  ws.on("close", (code: number) => {
-    console.warn(`[ingest] Closed (${code})`)
-    scheduleReconnect()
-  })
-
-  ws.on("error", (error: Error) => {
-    console.error("[ingest] WS error:", error.message)
-    ws?.close()
-  })
+  connectionState = "shutting_down"
+  clearReconnectTimer(true)
+  disposeCurrentSocket(`shutdown:${reason}`)
+  await prisma.$disconnect()
 }
 
 // =============================================================================
@@ -1480,26 +1729,27 @@ function connectToFeed(): void {
 console.log("🚀 Trade ingestion (optimized)")
 console.log(`   Batch: ${QUEUE_BATCH_SIZE} | Flush: ${QUEUE_FLUSH_INTERVAL_MS}ms | Pool: ${CONNECTION_LIMIT}`)
 
-connectToFeed()
+setInterval(() => {
+  logConnectionHealth()
+}, INGEST_HEALTH_LOG_INTERVAL_MS)
+
+startConnectionAttempt("startup")
 
 // Auto-restart every 24 hours
 setTimeout(async () => {
   console.log("🔄 24h restart...")
-    ws?.close()
-    await prisma.$disconnect()
-    process.exit(0)
+  await shutdown("24h_restart")
+  process.exit(0)
 }, 24 * 60 * 60 * 1000)
 
 process.on("SIGINT", async () => {
   console.log("\n🛑 Shutting down...")
-  ws?.close()
-  await prisma.$disconnect()
+  await shutdown("sigint")
   process.exit(0)
 })
 
 process.on("SIGTERM", async () => {
   console.log("\n🛑 Shutting down...")
-  ws?.close()
-  await prisma.$disconnect()
+  await shutdown("sigterm")
   process.exit(0)
 })

@@ -31,6 +31,20 @@ interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: "3.0.33",
+    date: "March 30, 2025",
+    changes: [
+      {
+        type: "improved",
+        description: "Hardened the trade ingester with reconnect backoff, connect timeouts, and heartbeat-based stale socket detection.",
+      },
+      {
+        type: "fixed",
+        description: "The ingestion service now tears down and rebuilds dead upstream WebSocket connections automatically after internet or DNS interruptions.",
+      },
+    ],
+  },
+  {
     version: "3.0.32",
     date: "January 15, 2025",
     changes: [
