@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       model: groq("openai/gpt-oss-20b"),
       prompt,
       system: systemPrompt,
-      maxTokens: 3000, // Increased from 1000 to 3000
+      maxOutputTokens: 3000, // Increased from 1000 to 3000
     })
 
     return NextResponse.json({ text })

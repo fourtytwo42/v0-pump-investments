@@ -24,6 +24,13 @@ This file stores durable project memory for recovery after context compression o
 - The reconnect hardening commit was pushed to `main`.
 
 ## Important Recent Changes
+- T2 in `FIX_TRACKER.md` is now implemented:
+  - `types/token-data.ts` is the canonical in-app source for token-query types
+  - `contexts/token-context.tsx` now imports `TokenQueryOptions` from `@/types/token-data`
+  - `app/api/tokens/route.ts` now uses shared token-query types and a typed `Set<string>` for favorites
+- T1 in `FIX_TRACKER.md` is now implemented:
+  - `app/api/chat/route.ts` uses `maxOutputTokens` instead of `maxTokens`
+  - `app/api/pump-ws/route.ts` uses local Edge socket typings for `accept()` and `ResponseInit & { webSocket }`
 - Ingester reconnect logic now includes:
   - connection state tracking
   - reconnect backoff with jitter

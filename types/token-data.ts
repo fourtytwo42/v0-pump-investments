@@ -1,3 +1,48 @@
+export type GraduatedFilterValue = "all" | "bonding" | "graduated"
+
+export type TokenSortBy =
+  | "marketCap"
+  | "totalVolume"
+  | "buyVolume"
+  | "sellVolume"
+  | "uniqueTraders"
+  | "tokenAge"
+  | "lastTrade"
+
+export interface TokenQueryFilters {
+  hideKOTH?: boolean
+  hideExternal?: boolean
+  graduationFilter?: GraduatedFilterValue
+  minMarketCap?: number
+  maxMarketCap?: number
+  minTotalVolume?: number
+  maxTotalVolume?: number
+  minBuyVolume?: number
+  maxBuyVolume?: number
+  minSellVolume?: number
+  maxSellVolume?: number
+  minUniqueTraders?: number
+  maxUniqueTraders?: number
+  minTradeAmount?: number
+  maxTradeAmount?: number
+  minTokenAgeMinutes?: number
+  maxTokenAgeMinutes?: number
+  favoritesOnly?: boolean
+}
+
+export interface TokenQueryOptions {
+  page: number
+  pageSize: number
+  sortBy: TokenSortBy
+  sortOrder: "asc" | "desc"
+  timeRangeMinutes: number
+  filters: TokenQueryFilters
+}
+
+export interface TokenQueryRequest extends TokenQueryOptions {
+  favoriteMints: string[]
+}
+
 export interface TokenData {
   mint: string
   name: string

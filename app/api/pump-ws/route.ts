@@ -6,7 +6,22 @@ type ProxyMessage =
   | { type: "status"; state: StatusState }
   | { type: "trade"; trade: Trade }
 
-type WebSocketPairConstructor = { new (): [WebSocket, WebSocket] }
+type ProxySocketEventMap = WebSocketEventMap & {
+  message: MessageEvent<string | ArrayBuffer | Blob>
+}
+
+type ProxyClientSocket = Omit<WebSocket, "addEventListener"> & {
+  accept(): void
+  addEventListener<K extends keyof ProxySocketEventMap>(
+    type: K,
+    listener: (event: ProxySocketEventMap[K]) => void,
+    options?: boolean | AddEventListenerOptions,
+  ): void
+}
+
+type EdgeWebSocketResponseInit = ResponseInit & { webSocket: ProxyClientSocket }
+
+type WebSocketPairConstructor = { new (): [ProxyClientSocket, ProxyClientSocket] }
 
 declare const WebSocketPair: WebSocketPairConstructor
 
@@ -42,19 +57,20 @@ export async function GET(request: Request) {
 
   handleProxy(proxy)
 
-  return new Response(null, { status: 101, webSocket: client })
+  return new Response(null, { status: 101, webSocket: client } as EdgeWebSocketResponseInit)
 }
 
-function handleProxy(clientSocket: WebSocket) {
+function handleProxy(clientSocket: ProxyClientSocket) {
   clientSocket.accept()
 
   let upstreamSocket: UpstreamSocket = null
   let buffer = ""
   const decoder = new TextDecoder()
   let closed = false
+  const SOCKET_OPEN = 1
 
   const sendJson = (payload: ProxyMessage) => {
-    if (closed || clientSocket.readyState !== WebSocket.OPEN) {
+    if (closed || clientSocket.readyState !== SOCKET_OPEN) {
       return
     }
 

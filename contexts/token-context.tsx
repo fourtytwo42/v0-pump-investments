@@ -4,8 +4,7 @@ import type React from "react"
 import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from "react"
 import { db } from "@/lib/db"
 import { toast } from "@/components/ui/use-toast"
-import type { TokenData } from "@/types/token-data"
-import type { TokenQueryOptions } from "@/lib/token-query"
+import type { TokenData, TokenQueryOptions } from "@/types/token-data"
 import { normalizeIpfsUri } from "@/lib/pump-trades"
 
 interface TokenContextType {

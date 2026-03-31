@@ -19,7 +19,7 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 ### P0: Restore TypeScript Baseline
 
 #### T1. Fix API type errors in chat and websocket routes
-- Status: `open`
+- Status: `done`
 - Files:
   - `app/api/chat/route.ts`
   - `app/api/pump-ws/route.ts`
@@ -34,9 +34,13 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - If it stays Edge-specific, add the correct route/runtime typing instead of relying on unsupported DOM assumptions.
 - Verification:
   - `npx tsc --noEmit --project tsconfig.json`
+- Notes:
+  - `app/api/chat/route.ts` was updated to use `maxOutputTokens`, which matches the installed AI SDK type surface.
+  - `app/api/pump-ws/route.ts` now uses local Edge-specific socket and response init types so `accept()` and `{ webSocket }` compile cleanly without changing route behavior.
+  - Route-specific verification should show no remaining errors for these two files even though broader repo TypeScript failures still exist.
 
 #### T2. Repair token query types and imports
-- Status: `open`
+- Status: `done`
 - Files:
   - `app/api/tokens/route.ts`
   - `types/token-data.ts`
@@ -53,6 +57,10 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - Update both API and context consumers to use the same imports.
 - Verification:
   - `npx tsc --noEmit --project tsconfig.json`
+- Notes:
+  - `types/token-data.ts` is now the canonical in-app home for `TokenQueryFilters`, `TokenQueryOptions`, `TokenQueryRequest`, `TokenSortBy`, and `GraduatedFilterValue`.
+  - `contexts/token-context.tsx` no longer imports from the nonexistent `@/lib/token-query`.
+  - `app/api/tokens/route.ts` now imports and uses the shared token-query types directly, and favorite mint filtering is typed as `Set<string>`.
 
 #### T3. Fix onboarding typing drift
 - Status: `open`

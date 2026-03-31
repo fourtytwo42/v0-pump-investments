@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { type TokenData, type TokenQueryOptions } from "@/types/token-data"
+import { type TokenQueryFilters, type TokenQueryRequest, type TokenSortBy } from "@/types/token-data"
 import { Decimal } from "@prisma/client/runtime/library"
 import { fetchPumpCoin, PUMP_HEADERS } from "@/lib/pump-coin"
 import { normalizeTokenMetadata } from "@/lib/token-metadata"
@@ -99,6 +99,10 @@ function normalizeNumber(value: Decimal | number | bigint | null | undefined): n
   } catch {
     return 0
   }
+}
+
+function isString(value: unknown): value is string {
+  return typeof value === "string"
 }
 
 function passesFilters(
@@ -244,7 +248,7 @@ interface AggregatedToken {
   trades: []
 }
 
-function sortTokens(tokens: AggregatedToken[], sortBy: string, sortOrder: "asc" | "desc") {
+function sortTokens(tokens: AggregatedToken[], sortBy: TokenSortBy, sortOrder: "asc" | "desc") {
   const direction = sortOrder === "asc" ? 1 : -1
 
   const getSortableValue = (token: AggregatedToken) => {
@@ -314,7 +318,7 @@ export async function POST(request: Request) {
 
     const page = Number(body.page ?? 1)
     const pageSize = Number(body.pageSize ?? 12)
-    const sortBy = body.sortBy ?? "marketCap"
+    const sortBy: TokenSortBy = body.sortBy ?? "marketCap"
     const sortOrder = (body.sortOrder ?? "desc") as "asc" | "desc"
     const requestedTimeRangeMinutes = Number(body.timeRangeMinutes ?? 10)
     let effectiveTimeRangeMinutes = Number.isFinite(requestedTimeRangeMinutes)
@@ -340,7 +344,7 @@ export async function POST(request: Request) {
       maxTokenAgeMinutes: body.filters?.maxTokenAgeMinutes,
       favoritesOnly: body.filters?.favoritesOnly ?? false,
     }
-    const favoriteMints = new Set((body.favoriteMints ?? []).filter(Boolean))
+    const favoriteMints = new Set((body.favoriteMints ?? []).filter(isString))
 
     let { trades, cutoffBigInt } = await fetchTradesSince(effectiveTimeRangeMinutes)
 
