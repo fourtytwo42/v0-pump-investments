@@ -24,6 +24,10 @@ This file stores durable project memory for recovery after context compression o
 - The reconnect hardening commit was pushed to `main`.
 
 ## Important Recent Changes
+- T7 in `FIX_TRACKER.md` is now implemented:
+  - PM2 runtime logs live in the repo-local `logs/` directory configured by `ecosystem.config.js`
+  - `.gitignore` already ignores `/logs`, and `git check-ignore -v` confirms the active PM2 log files are covered
+  - no log-ignore change was needed; the earlier concern was a verification issue, not a real mismatch
 - T6 in `FIX_TRACKER.md` is now implemented:
   - `package.json` now includes PM2 restart scripts for normal restarts and `--update-env` restarts
   - `README.md` now includes a PM2 runbook section documenting the app names and env refresh workflow

@@ -136,7 +136,7 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - Added a short reminder comment to `ecosystem.config.js` so the env reload behavior is visible near the PM2 app definitions.
 
 #### T7. Confirm runtime log handling
-- Status: `monitor`
+- Status: `done`
 - Files:
   - `.gitignore`
   - `logs/`
@@ -149,6 +149,12 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - If nested logs exist outside the ignored path, update ignore rules intentionally.
 - Verification:
   - `git status --short`
+  - `git check-ignore -v logs logs/web-out.log logs/ingest-out.log`
+- Notes:
+  - Confirmed `v0-pump-investments/.gitignore` already ignores `/logs`.
+  - Confirmed PM2 log files configured in `ecosystem.config.js` write into the repo-local `logs/` directory.
+  - Confirmed `git status --short` is clean from the app repo root and `git check-ignore -v` reports `.gitignore:12:/logs` for the active PM2 log files.
+  - No `.gitignore` change was needed; the earlier concern appears to have come from checking outside the repo root or before verification.
 
 ### P2: Cleanup and Hardening
 
