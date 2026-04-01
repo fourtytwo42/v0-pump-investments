@@ -2,6 +2,8 @@ const path = require("path")
 
 const appCwd = __dirname
 const logDir = path.join(appCwd, "logs")
+// PM2 keeps the previous process environment on a plain restart.
+// If .env-backed values change, restart with --update-env.
 
 module.exports = {
   apps: [

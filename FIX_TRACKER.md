@@ -117,7 +117,7 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 ### P1: Operational Consistency
 
 #### T6. Make PM2 env reload behavior explicit
-- Status: `open`
+- Status: `done`
 - Files:
   - `ecosystem.config.js`
   - deployment/runbook docs
@@ -130,6 +130,10 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - Optionally add a package script or deploy note for `pm2 restart <app> --update-env`.
 - Verification:
   - Manual PM2 restart after an env change.
+- Notes:
+  - Added PM2 restart scripts to `package.json` for both normal restarts and env-refresh restarts.
+  - Added a PM2 runbook section to `README.md` documenting the two app names and when `--update-env` is required.
+  - Added a short reminder comment to `ecosystem.config.js` so the env reload behavior is visible near the PM2 app definitions.
 
 #### T7. Confirm runtime log handling
 - Status: `monitor`

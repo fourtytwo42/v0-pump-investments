@@ -9,7 +9,12 @@
     "start": "next start",
     "prisma:generate": "prisma generate",
     "db:push": "prisma db push",
-    "ingest": "tsx --tsconfig tsconfig.json server/ingest-trades.ts"
+    "ingest": "tsx --tsconfig tsconfig.json server/ingest-trades.ts",
+    "pm2:web:restart": "pm2 restart pump-investments-web",
+    "pm2:ingest:restart": "pm2 restart pump-investments-ingest",
+    "pm2:web:restart-env": "pm2 restart pump-investments-web --update-env",
+    "pm2:ingest:restart-env": "pm2 restart pump-investments-ingest --update-env",
+    "pm2:restart-env": "pm2 restart pump-investments-web --update-env && pm2 restart pump-investments-ingest --update-env"
   },
   "dependencies": {
     "@ai-sdk/groq": "latest",

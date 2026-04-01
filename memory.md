@@ -24,6 +24,10 @@ This file stores durable project memory for recovery after context compression o
 - The reconnect hardening commit was pushed to `main`.
 
 ## Important Recent Changes
+- T6 in `FIX_TRACKER.md` is now implemented:
+  - `package.json` now includes PM2 restart scripts for normal restarts and `--update-env` restarts
+  - `README.md` now includes a PM2 runbook section documenting the app names and env refresh workflow
+  - `ecosystem.config.js` now includes a reminder comment that plain PM2 restarts do not reload env changes
 - T5 in `FIX_TRACKER.md` is now implemented:
   - `@types/ws` was added as a dev dependency
   - the ingester `ws` declaration error was resolved without a custom `declare module "ws"` fallback
@@ -57,7 +61,6 @@ This file stores durable project memory for recovery after context compression o
 
 ## Known Problems
 - Full TypeScript validation is still broken across several API and UI files.
-- `ws` types are missing for TypeScript.
 - PM2 env changes require `--update-env` on restart if `.env` has changed.
 
 ## Commands / Checks
@@ -65,7 +68,13 @@ This file stores durable project memory for recovery after context compression o
   - `npm run build`
 - Full typecheck:
   - `npx tsc --noEmit --project tsconfig.json`
+- PM2 normal restart:
+  - `npm run pm2:web:restart`
+  - `npm run pm2:ingest:restart`
 - Restart with env reload:
+  - `npm run pm2:web:restart-env`
+  - `npm run pm2:ingest:restart-env`
+  - `npm run pm2:restart-env`
   - `pm2 restart pump-investments-ingest --update-env`
   - `pm2 restart pump-investments-web --update-env`
 
