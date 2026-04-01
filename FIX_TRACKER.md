@@ -176,6 +176,24 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - Fixed the remaining TypeScript errors in `components/dashboard.tsx` and `components/alert-settings-dialog.tsx`.
   - Removed `typescript.ignoreBuildErrors` from `next.config.mjs`, so `npm run build` now fails on TypeScript errors again.
 
+#### T9. Fix metadata backlog staleness
+- Status: `done`
+- Files:
+  - `server/ingest-trades.ts`
+  - `lib/pump-coin.ts`
+  - `app/api/tokens/route.ts`
+- Problem:
+  - Long-running freshness could degrade because metadata retries were low-throughput, permanent failures could get pinned, and API fallback hydration was doing too much work per request.
+- Goal:
+  - Keep active tokens eligible for metadata recovery over long uptime and reduce backlog pressure from both the ingester and API route.
+- Verification:
+  - `npm run typecheck`
+  - `npm run build`
+- Notes:
+  - Replaced permanent pump-coin failure caching with expiring cooldowns and clear-on-settle inflight promise handling.
+  - Reworked the ingester metadata queue to prioritize active tokens, keep retry state over time, and emit explicit metadata backlog health logs.
+  - Limited `/api/tokens` metadata fallback hydration to returned page items with bounded concurrency instead of the full aggregated token list.
+
 ## Known Good Changes
 - Ingester reconnect hardening is live and pushed.
 - GitHub CLI auth is valid for account `fourtytwo42`.

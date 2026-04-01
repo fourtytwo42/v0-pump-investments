@@ -12,12 +12,43 @@ const FRONTEND_ENDPOINTS = [
 
 const COIN_CACHE = new Map<string, any | null>()
 const COIN_FETCH_PROMISES = new Map<string, Promise<any | null>>()
-// Cache failed requests (404, 530) to avoid retrying
-const FAILED_CACHE = new Set<string>()
+const FAILURE_COOLDOWNS = new Map<string, { until: number; type: "not_found" | "transient" }>()
+
+const NOT_FOUND_COOLDOWN_MS = parseEnvNumber("INGEST_METADATA_NOT_FOUND_COOLDOWN_MS", 30 * 60 * 1000)
+const TRANSIENT_COOLDOWN_MS = parseEnvNumber("INGEST_METADATA_TRANSIENT_COOLDOWN_MS", 2 * 60 * 1000)
+
+function parseEnvNumber(name: string, fallback: number): number {
+  const raw = process.env[name]
+  if (!raw) return fallback
+  const parsed = Number.parseInt(raw, 10)
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback
+}
+
+function getActiveCooldown(mint: string): { until: number; type: "not_found" | "transient" } | null {
+  const cooldown = FAILURE_COOLDOWNS.get(mint)
+  if (!cooldown) return null
+  if (cooldown.until <= Date.now()) {
+    FAILURE_COOLDOWNS.delete(mint)
+    return null
+  }
+  return cooldown
+}
+
+function setCooldown(mint: string, type: "not_found" | "transient"): void {
+  const duration = type === "not_found" ? NOT_FOUND_COOLDOWN_MS : TRANSIENT_COOLDOWN_MS
+  FAILURE_COOLDOWNS.set(mint, { until: Date.now() + duration, type })
+}
+
+function clearCooldown(mint: string): void {
+  FAILURE_COOLDOWNS.delete(mint)
+}
+
+export function shouldSkipPumpCoinFetch(mint: string): boolean {
+  return getActiveCooldown(mint) !== null
+}
 
 async function requestPumpCoin(mint: string): Promise<any | null> {
-  // Check if we've already failed for this mint
-  if (FAILED_CACHE.has(mint)) {
+  if (getActiveCooldown(mint)) {
     return null
   }
 
@@ -33,17 +64,17 @@ async function requestPumpCoin(mint: string): Promise<any | null> {
       })
 
       if (!response.ok) {
-        // Treat 404 and 530 as "token not found" - cache to avoid retrying
-        if (response.status === 404 || response.status === 530) {
-          FAILED_CACHE.add(mint)
+        if (response.status === 404) {
+          setCooldown(mint, "not_found")
           return null
         }
-        // For other errors, log but don't cache (might be temporary)
-        lastError = new Error(`pump.fun coin request failed with status ${response.status}`)
-        // Only log non-530 errors to reduce noise
-        if (response.status !== 530) {
-          console.warn(`[pump-coin] ${url} responded with ${response.status}`)
+        if (response.status === 530 || response.status >= 500 || response.status === 429) {
+          setCooldown(mint, "transient")
+          lastError = new Error(`pump.fun coin request failed with status ${response.status}`)
+          continue
         }
+        lastError = new Error(`pump.fun coin request failed with status ${response.status}`)
+        console.warn(`[pump-coin] ${url} responded with ${response.status}`)
         continue
       }
 
@@ -58,30 +89,28 @@ async function requestPumpCoin(mint: string): Promise<any | null> {
 
       try {
         const text = await response.text()
-        // If response is empty, treat as not found
         if (!text || text.trim().length === 0) {
-          FAILED_CACHE.add(mint)
+          setCooldown(mint, "transient")
           return null
         }
         
         const json = JSON.parse(text)
         COIN_CACHE.set(mint, json)
+        clearCooldown(mint)
         return json
       } catch (parseError) {
-        // If response is not valid JSON (e.g., empty response from 530), treat as not found
-        FAILED_CACHE.add(mint)
-        return null
+        lastError = parseError as Error
+        setCooldown(mint, "transient")
+        continue
       }
     } catch (error) {
       lastError = error as Error
-      // Don't log errors - they're usually network issues or tokens not on pump.fun
-      // Silently continue to next endpoint
+      setCooldown(mint, "transient")
     }
   }
 
-  // Cache failures silently - don't retry tokens that don't exist on pump.fun
   if (lastError) {
-    FAILED_CACHE.add(mint)
+    setCooldown(mint, "transient")
   }
 
   return null
@@ -104,8 +133,9 @@ export async function fetchPumpCoin(mint: string | null | undefined): Promise<an
     return COIN_FETCH_PROMISES.get(mint)!
   }
 
-  const promise = requestPumpCoin(mint)
+  const promise = requestPumpCoin(mint).finally(() => {
+    COIN_FETCH_PROMISES.delete(mint)
+  })
   COIN_FETCH_PROMISES.set(mint, promise)
   return promise
 }
-

@@ -8,7 +8,7 @@ import {
   normalizeIpfsUri,
 } from "@/lib/pump-trades"
 import { normalizeTokenMetadata } from "@/lib/token-metadata"
-import { fetchPumpCoin, PUMP_HEADERS } from "@/lib/pump-coin"
+import { fetchPumpCoin, PUMP_HEADERS, shouldSkipPumpCoinFetch } from "@/lib/pump-coin"
 import { getDexPairCreatedAt } from "@/lib/dexscreener"
 
 // =============================================================================
@@ -23,7 +23,6 @@ const CONNECTION_LIMIT = 15 // Increased for 10 parallel processors
 const METADATA_RETRY_INTERVAL_MS = 1_000 // Check queue every second
 const METADATA_RETRY_TIMEOUT_MS = 6_000 // 6 second timeout per token
 const METADATA_RETRY_BATCH_SIZE = 25 // Process 25 tokens in parallel per batch
-const METADATA_RETRY_MAX_ATTEMPTS = 5
 const METADATA_FETCH_MAX_ATTEMPTS = 3
 const METADATA_MIN_INTERVAL_MS = 150
 
@@ -82,6 +81,26 @@ const INGEST_BACKOFF_RESET_AFTER_MS = parseEnvNumber("INGEST_BACKOFF_RESET_AFTER
 const INGEST_PING_TIMEOUT_MS = 20_000
 const INGEST_HEALTH_CHECK_INTERVAL_MS = Math.min(5_000, INGEST_PING_INTERVAL_MS)
 const INGEST_HEALTH_LOG_INTERVAL_MS = 60_000
+const INGEST_METADATA_BATCH_SIZE_NORMAL = parseEnvNumber("INGEST_METADATA_BATCH_SIZE_NORMAL", METADATA_RETRY_BATCH_SIZE)
+const INGEST_METADATA_BATCH_SIZE_ELEVATED = parseEnvNumber(
+  "INGEST_METADATA_BATCH_SIZE_ELEVATED",
+  INGEST_METADATA_BATCH_SIZE_NORMAL * 2,
+)
+const INGEST_METADATA_ACTIVE_WINDOW_MS = parseEnvNumber("INGEST_METADATA_ACTIVE_WINDOW_MS", 30 * 60 * 1000)
+const INGEST_METADATA_NOT_FOUND_COOLDOWN_MS = parseEnvNumber(
+  "INGEST_METADATA_NOT_FOUND_COOLDOWN_MS",
+  30 * 60 * 1000,
+)
+const INGEST_METADATA_TRANSIENT_COOLDOWN_MS = parseEnvNumber(
+  "INGEST_METADATA_TRANSIENT_COOLDOWN_MS",
+  2 * 60 * 1000,
+)
+const INGEST_METADATA_OVERLOAD_QUEUE_THRESHOLD = parseEnvNumber("INGEST_METADATA_OVERLOAD_QUEUE_THRESHOLD", 1000)
+const INGEST_METADATA_ELEVATED_QUEUE_THRESHOLD = Math.max(
+  INGEST_METADATA_BATCH_SIZE_NORMAL * 4,
+  Math.floor(INGEST_METADATA_OVERLOAD_QUEUE_THRESHOLD / 2),
+)
+const INGEST_METADATA_INACTIVE_EXPIRY_MS = Math.max(INGEST_METADATA_ACTIVE_WINDOW_MS * 12, 6 * 60 * 60 * 1000)
 
 // =============================================================================
 // Database Setup
@@ -146,12 +165,18 @@ const tokenIdCache = new Map<string, string>()
 
 // Metadata caches
 const metadataCache = new Map<string, unknown>()
-const metadataRetryQueue = new Set<string>()
-const metadataRetryAttempts = new Map<string, number>()
-const metadataFirstSeenTime = new Map<string, number>()
+const metadataRetryQueue = new Map<string, MetadataRetryState>()
 let isProcessingMetadataQueue = false
 let lastMetadataRequestAt = 0
 let metadataDynamicDelayMs = 0
+let latestTradeSeenTimestampMs = 0
+let latestTradePersistedTimestampMs = 0
+const metadataStats = {
+  success: 0,
+  timeout: 0,
+  failed: 0,
+  cooldownSkips: 0,
+}
 
 // =============================================================================
 // Utilities
@@ -261,6 +286,27 @@ interface PreparedTrade {
   raw: PumpUnifiedTrade | null // Store full raw payload including marketCap
 }
 
+interface MetadataRetryState {
+  mint: string
+  attempts: number
+  firstSeenAt: number
+  lastAttemptAt: number
+  lastSuccessAt: number
+  lastTradeAt: number
+  nextEligibleAt: number
+  missingCritical: boolean
+}
+
+type MetadataRefreshResult = "success" | "retry" | "cooldown"
+
+interface MetadataProcessingResult {
+  mint: string
+  result: MetadataRefreshResult
+  timeout: boolean
+  elapsed: number
+  error?: string
+}
+
 // =============================================================================
 // Trade Preparation
 // =============================================================================
@@ -278,6 +324,7 @@ function prepareTrade(trade: PumpUnifiedTrade, solPriceUsd: number): PreparedTra
   const timestampMs = Number.isFinite(Date.parse(trade.timestamp))
     ? Date.parse(trade.timestamp)
     : Date.now()
+  latestTradeSeenTimestampMs = Math.max(latestTradeSeenTimestampMs, timestampMs)
 
   let priceSol = trade.priceSol
     ? toDecimal(trade.priceSol)
@@ -341,10 +388,6 @@ function prepareTrade(trade: PumpUnifiedTrade, solPriceUsd: number): PreparedTra
   // We'll determine KOTH separately - for now, we don't set it from trade data
   // KOTH timestamp should come from metadata or be calculated separately
   const kingOfTheHillTimestamp: number | null = null
-
-  if (!metadataFirstSeenTime.has(trade.mintAddress)) {
-    metadataFirstSeenTime.set(trade.mintAddress, Date.now())
-  }
 
   return {
     mint: trade.mintAddress,
@@ -447,24 +490,39 @@ async function persistTradesBulk(trades: PreparedTrade[]): Promise<void> {
         }
       }
 
-      // Get IDs for uncached tokens only
-      const mints = uncachedTokens.map((t) => t.mint)
-      const tokenIds = await prisma.token.findMany({
-        where: { mintAddress: { in: mints } },
-        select: { id: true, mintAddress: true, metadataUri: true, imageUri: true, completed: true },
+      // Warm the ID cache for newly inserted tokens.
+      const insertedMints = uncachedTokens.map((t) => t.mint)
+      const insertedRows = await prisma.token.findMany({
+        where: { mintAddress: { in: insertedMints } },
+        select: { id: true, mintAddress: true },
       })
-      for (const row of tokenIds) {
+      for (const row of insertedRows) {
         mintToId.set(row.mintAddress, row.id)
-        tokenIdCache.set(row.mintAddress, row.id) // Cache for future
+        tokenIdCache.set(row.mintAddress, row.id)
       }
+    }
 
-      // Schedule metadata retries for tokens missing metadata only
-      for (const t of uncachedTokens) {
-        const token = tokenIds.find((token) => token.mintAddress === t.mint)
-        // Only schedule if token doesn't have both metadataUri and imageUri
-        if (!token || !token.metadataUri || !token.imageUri) {
-          scheduleMetadataRetry(t.mint)
-        }
+    // Query token metadata state for all unique mints in this batch so active
+    // tokens that are still missing metadata keep getting re-prioritized.
+    const batchMints = uniqueTokens.map((t) => t.mint)
+    const tokenRows = await prisma.token.findMany({
+      where: { mintAddress: { in: batchMints } },
+      select: { id: true, mintAddress: true, metadataUri: true, imageUri: true },
+    })
+
+    const tokenRowsByMint = new Map(tokenRows.map((row) => [row.mintAddress, row]))
+    for (const row of tokenRows) {
+      mintToId.set(row.mintAddress, row.id)
+      tokenIdCache.set(row.mintAddress, row.id)
+    }
+
+    for (const t of uniqueTokens) {
+      const token = tokenRowsByMint.get(t.mint)
+      if (!token || !token.metadataUri || !token.imageUri) {
+        scheduleMetadataRetry(t.mint, {
+          lastTradeAt: t.timestampMs,
+          missingCritical: !token || (!token.metadataUri && !token.imageUri),
+        })
       }
     }
 
@@ -633,6 +691,10 @@ async function persistTradesBulk(trades: PreparedTrade[]): Promise<void> {
 
     const duration = Date.now() - startTime
     const rate = trades.length / (duration / 1000)
+    latestTradePersistedTimestampMs = Math.max(
+      latestTradePersistedTimestampMs,
+      ...trades.map((trade) => trade.timestampMs),
+    )
     logBatchCount++
     const now = Date.now()
     
@@ -725,12 +787,102 @@ function isValidSolanaAddress(address: string): boolean {
   return base58Regex.test(address)
 }
 
-function scheduleMetadataRetry(mint: string): void {
-  if (!mint || !isValidSolanaAddress(mint) || metadataRetryQueue.has(mint)) return
-  const attempts = metadataRetryAttempts.get(mint) ?? 0
-  if (attempts >= METADATA_RETRY_MAX_ATTEMPTS) return
-  metadataRetryAttempts.set(mint, attempts + 1)
-  metadataRetryQueue.add(mint)
+function getMetadataQueueMode(): "normal" | "elevated" | "overload" {
+  const size = metadataRetryQueue.size
+  if (size >= INGEST_METADATA_OVERLOAD_QUEUE_THRESHOLD) return "overload"
+  if (size >= INGEST_METADATA_ELEVATED_QUEUE_THRESHOLD) return "elevated"
+  return "normal"
+}
+
+function getMetadataBatchSize(): number {
+  const mode = getMetadataQueueMode()
+  if (mode === "normal") return INGEST_METADATA_BATCH_SIZE_NORMAL
+  return INGEST_METADATA_BATCH_SIZE_ELEVATED
+}
+
+function isMetadataEntryActive(entry: MetadataRetryState, now = Date.now()): boolean {
+  return now - entry.lastTradeAt <= INGEST_METADATA_ACTIVE_WINDOW_MS
+}
+
+function computeMetadataRetryDelayMs(attempts: number, isActive: boolean): number {
+  const base = isActive ? 5_000 : 30_000
+  const cap = isActive ? 5 * 60 * 1000 : 15 * 60 * 1000
+  return Math.min(cap, base * Math.pow(2, Math.max(0, attempts - 1)))
+}
+
+function scheduleMetadataRetry(
+  mint: string,
+  options: { lastTradeAt?: number; missingCritical?: boolean; forceAt?: number } = {},
+): void {
+  if (!mint || !isValidSolanaAddress(mint)) return
+
+  const now = Date.now()
+  const existing = metadataRetryQueue.get(mint)
+  const hadNewTrade =
+    options.lastTradeAt !== undefined && options.lastTradeAt > (existing?.lastTradeAt ?? 0)
+  const nextEligibleAt =
+    options.forceAt ??
+    (existing
+      ? hadNewTrade
+        ? Math.min(existing.nextEligibleAt, now + 1_000)
+        : existing.nextEligibleAt
+      : now)
+
+  metadataRetryQueue.set(mint, {
+    mint,
+    attempts: existing?.attempts ?? 0,
+    firstSeenAt: existing?.firstSeenAt ?? now,
+    lastAttemptAt: existing?.lastAttemptAt ?? 0,
+    lastSuccessAt: existing?.lastSuccessAt ?? 0,
+    lastTradeAt: Math.max(existing?.lastTradeAt ?? 0, options.lastTradeAt ?? now),
+    nextEligibleAt,
+    missingCritical: existing?.missingCritical || options.missingCritical || false,
+  })
+}
+
+function getMetadataQueueSnapshot(): MetadataRetryState[] {
+  const now = Date.now()
+  const mode = getMetadataQueueMode()
+  const eligible = Array.from(metadataRetryQueue.values()).filter((entry) => entry.nextEligibleAt <= now)
+  const activeOnly = eligible.filter((entry) => isMetadataEntryActive(entry, now))
+  const candidates = mode === "overload" && activeOnly.length > 0 ? activeOnly : eligible
+
+  candidates.sort((a, b) => {
+    if (a.missingCritical !== b.missingCritical) return a.missingCritical ? -1 : 1
+    const aActive = isMetadataEntryActive(a, now)
+    const bActive = isMetadataEntryActive(b, now)
+    if (aActive !== bActive) return aActive ? -1 : 1
+    if (a.lastTradeAt !== b.lastTradeAt) return b.lastTradeAt - a.lastTradeAt
+    if (a.attempts !== b.attempts) return a.attempts - b.attempts
+    return a.firstSeenAt - b.firstSeenAt
+  })
+
+  return candidates.slice(0, getMetadataBatchSize())
+}
+
+function getMetadataQueueMetrics() {
+  const now = Date.now()
+  const entries = Array.from(metadataRetryQueue.values())
+  const activeEntries = entries.filter((entry) => isMetadataEntryActive(entry, now))
+  const oldestWaitMs =
+    entries.length > 0 ? now - Math.min(...entries.map((entry) => entry.firstSeenAt)) : 0
+
+  return {
+    queueSize: entries.length,
+    oldestWaitMs,
+    activeRecentMissingCount: activeEntries.length,
+    successRate:
+      metadataStats.success + metadataStats.failed + metadataStats.timeout > 0
+        ? metadataStats.success /
+          (metadataStats.success + metadataStats.failed + metadataStats.timeout)
+        : 1,
+    timeoutRate:
+      metadataStats.success + metadataStats.failed + metadataStats.timeout > 0
+        ? metadataStats.timeout /
+          (metadataStats.success + metadataStats.failed + metadataStats.timeout)
+        : 0,
+    cooldownSkips: metadataStats.cooldownSkips,
+  }
 }
 
 async function fetchMetadataFromUri(uri: string): Promise<unknown | null> {
@@ -779,7 +931,7 @@ async function fetchMetadataFromUri(uri: string): Promise<unknown | null> {
   return null
 }
 
-async function refreshTokenMetadata(mint: string): Promise<boolean> {
+async function refreshTokenMetadata(mint: string): Promise<MetadataRefreshResult> {
   try {
     const token = await prisma.token.findUnique({
       where: { mintAddress: mint },
@@ -798,24 +950,21 @@ async function refreshTokenMetadata(mint: string): Promise<boolean> {
       },
     })
 
-    if (!token) return true
+    if (!token) return "success"
 
-    // Only fetch metadata if token is missing it
-    // We'll update completed status when we fetch metadata, but we can't fetch for every token on every trade
     const shouldFetchMetadata = !token.metadataUri || !token.imageUri
-    
-    // If token already has metadata, skip to avoid rate limits
-    // Completion status will be updated when metadata is fetched for tokens that need it
+
     if (!shouldFetchMetadata) {
-      return true
+      return "success"
+    }
+
+    if (shouldSkipPumpCoinFetch(mint)) {
+      return "cooldown"
     }
 
     const coinInfo = await fetchPumpCoin(mint)
     if (!coinInfo) {
-      // If fetchPumpCoin returns null, the token doesn't exist on pump.fun
-      // Don't retry - mark as max attempts to prevent re-queuing
-      metadataRetryAttempts.set(mint, METADATA_RETRY_MAX_ATTEMPTS)
-      return false
+      return "retry"
     }
 
     const coinRecord = coinInfo as Record<string, unknown>
@@ -892,15 +1041,13 @@ async function refreshTokenMetadata(mint: string): Promise<boolean> {
       select: { metadataUri: true, imageUri: true },
     })
     if (updatedToken && updatedToken.metadataUri && updatedToken.imageUri) {
-      return true
+      return "success"
     }
 
-    // Return false if we still don't have both metadataUri and imageUri
-    // This will cause the token to be retried (up to METADATA_RETRY_MAX_ATTEMPTS)
-    return false
+    return "retry"
   } catch (error) {
     console.warn(`[metadata] Failed ${mint}:`, (error as Error).message)
-    return false
+    return "retry"
   }
 }
 
@@ -916,111 +1063,128 @@ async function processMetadataRetryQueue(): Promise<void> {
   const batchStartTime = Date.now()
 
   try {
-    // Get batch of 25 tokens
-    const batch = Array.from(metadataRetryQueue).slice(0, METADATA_RETRY_BATCH_SIZE)
+    const batch = getMetadataQueueSnapshot()
     if (batch.length === 0) {
       return
     }
 
-    // Remove all from queue immediately
-    for (const mint of batch) {
-      metadataRetryQueue.delete(mint)
-    }
-
-    // Processing batch - no log needed, batch summary will show
-
-    // Process all tokens in parallel with timeout
-    const promises = batch.map(async (mint) => {
+    const promises = batch.map(async (entry): Promise<MetadataProcessingResult> => {
       const tokenStartTime = Date.now()
+      entry.lastAttemptAt = tokenStartTime
+      entry.attempts += 1
       
       try {
-        // Use Promise.race with timeout to prevent hanging
-        const timeoutPromise = new Promise<boolean>((resolve) => {
+        const timeoutPromise = new Promise<MetadataRefreshResult>((resolve) => {
           setTimeout(() => {
-            resolve(false)
+            resolve("retry")
           }, METADATA_RETRY_TIMEOUT_MS)
         })
 
-        const metadataPromise = refreshTokenMetadata(mint).catch(() => false)
-        const success = await Promise.race([metadataPromise, timeoutPromise])
+        const metadataPromise = refreshTokenMetadata(entry.mint).catch(() => "retry" as const)
+        const result = await Promise.race([metadataPromise, timeoutPromise])
 
         const tokenElapsed = Date.now() - tokenStartTime
 
         if (tokenElapsed >= METADATA_RETRY_TIMEOUT_MS) {
-          // Timeout occurred - re-queue the mint
-          const attempts = metadataRetryAttempts.get(mint) ?? 0
-          if (attempts < METADATA_RETRY_MAX_ATTEMPTS) {
-            scheduleMetadataRetry(mint)
-          }
-          return { mint, success: false, timeout: true, elapsed: tokenElapsed }
-        } else if (success) {
-          // Success
-          metadataRetryAttempts.delete(mint)
-          const firstSeen = metadataFirstSeenTime.get(mint)
-          metadataFirstSeenTime.delete(mint)
-          return { mint, success: true, timeout: false, elapsed: tokenElapsed, firstSeen }
-        } else {
-          // Failed but didn't timeout - re-queue if under max attempts
-          const attempts = metadataRetryAttempts.get(mint) ?? 0
-          if (attempts < METADATA_RETRY_MAX_ATTEMPTS) {
-            scheduleMetadataRetry(mint)
-          }
-          return { mint, success: false, timeout: false, elapsed: tokenElapsed }
+          return { mint: entry.mint, result: "retry", timeout: true, elapsed: tokenElapsed }
         }
+
+        return { mint: entry.mint, result, timeout: false, elapsed: tokenElapsed }
       } catch (error) {
-        // Error occurred - re-queue if under max attempts
         const tokenElapsed = Date.now() - tokenStartTime
-        const attempts = metadataRetryAttempts.get(mint) ?? 0
-        if (attempts < METADATA_RETRY_MAX_ATTEMPTS) {
-          scheduleMetadataRetry(mint)
-        }
-        return { mint, success: false, timeout: false, elapsed: tokenElapsed, error: (error as Error).message }
+        return { mint: entry.mint, result: "retry", timeout: false, elapsed: tokenElapsed, error: (error as Error).message }
       }
     })
 
-    // Wait for all promises to complete
     const results = await Promise.all(promises)
 
-    // Count results (no individual logging - batch summary is enough)
     let successCount = 0
     let timeoutCount = 0
     let failedCount = 0
+    let cooldownCount = 0
+    const now = Date.now()
 
     for (const result of results) {
-      if (result.success) {
+      const entry = metadataRetryQueue.get(result.mint)
+      if (!entry) {
+        continue
+      }
+
+      if (result.result === "success") {
         successCount++
+        metadataStats.success++
+        entry.lastSuccessAt = now
+        metadataRetryQueue.delete(result.mint)
       } else if (result.timeout) {
         timeoutCount++
+        metadataStats.timeout++
+        const active = isMetadataEntryActive(entry, now)
+        entry.nextEligibleAt = now + computeMetadataRetryDelayMs(entry.attempts, active)
+      } else if (result.result === "cooldown") {
+        cooldownCount++
+        metadataStats.cooldownSkips++
+        entry.nextEligibleAt = now + Math.min(INGEST_METADATA_TRANSIENT_COOLDOWN_MS, 60_000)
       } else {
         failedCount++
-        // Only log actual errors (not normal failures)
+        metadataStats.failed++
         if (result.error) {
           console.warn(`[metadata] ❌ Error processing ${result.mint.slice(0, 8)}...:`, result.error)
+        }
+        const active = isMetadataEntryActive(entry, now)
+        const isExpired =
+          !active &&
+          now - entry.firstSeenAt >= INGEST_METADATA_INACTIVE_EXPIRY_MS &&
+          now - entry.lastTradeAt >= INGEST_METADATA_ACTIVE_WINDOW_MS
+
+        if (isExpired) {
+          metadataRetryQueue.delete(result.mint)
+        } else {
+          entry.nextEligibleAt = now + computeMetadataRetryDelayMs(entry.attempts, active)
         }
       }
     }
 
     const batchElapsed = Date.now() - batchStartTime
-    console.log(`[metadata] Batch complete: ${batch.length} processed (${successCount} ok, ${timeoutCount} timeout, ${failedCount} failed) | Queue: ${metadataRetryQueue.size} | Time: ${batchElapsed}ms`)
+    console.log(
+      `[metadata] Batch complete: ${batch.length} processed (${successCount} ok, ${timeoutCount} timeout, ${failedCount} failed, ${cooldownCount} cooldown) | Queue: ${metadataRetryQueue.size} | Time: ${batchElapsed}ms | Mode: ${getMetadataQueueMode()}`
+    )
 
   } catch (error) {
     console.error(`[metadata] ❌ Error in processMetadataRetryQueue:`, (error as Error).message)
   } finally {
     isProcessingMetadataQueue = false
+    if (metadataRetryQueue.size >= INGEST_METADATA_ELEVATED_QUEUE_THRESHOLD) {
+      setTimeout(() => void processMetadataRetryQueue(), 250)
+    }
   }
 }
 
-// Start metadata processing interval - process one token at a time
+function logMetadataQueueHealth(): void {
+  const metrics = getMetadataQueueMetrics()
+  console.log(
+    `[metadata] event=health queue_size=${metrics.queueSize} oldest_wait_ms=${metrics.oldestWaitMs} active_recent_missing=${metrics.activeRecentMissingCount} success_rate=${metrics.successRate.toFixed(2)} timeout_rate=${metrics.timeoutRate.toFixed(2)} cooldown_skips=${metrics.cooldownSkips} newest_trade_seen_ms=${latestTradeSeenTimestampMs} newest_trade_persisted_ms=${latestTradePersistedTimestampMs}`
+  )
+
+  if (
+    metrics.queueSize >= INGEST_METADATA_OVERLOAD_QUEUE_THRESHOLD ||
+    metrics.oldestWaitMs >= INGEST_METADATA_ACTIVE_WINDOW_MS ||
+    metrics.successRate < 0.5
+  ) {
+    console.warn(
+      `[metadata] event=overload_warning queue_size=${metrics.queueSize} oldest_wait_ms=${metrics.oldestWaitMs} success_rate=${metrics.successRate.toFixed(2)}`
+    )
+  }
+}
+
 setInterval(() => {
   if (metadataRetryQueue.size > 0 && !isProcessingMetadataQueue) {
     void processMetadataRetryQueue()
   }
 }, METADATA_RETRY_INTERVAL_MS)
 
-// Log queue size periodically (every 30 seconds) for monitoring
 setInterval(() => {
   if (metadataRetryQueue.size > 0) {
-    console.log(`[metadata] Queue size: ${metadataRetryQueue.size} tokens waiting for metadata`)
+    logMetadataQueueHealth()
   }
 }, 30_000)
 
@@ -1080,10 +1244,6 @@ if (TRADE_RETENTION_HOURS > 0) {
 
 async function seedMetadataRetryQueue(): Promise<void> {
   try {
-    // Only seed tokens that have recent trades (from service start time forward)
-    // This avoids backfilling old data and focuses on active tokens
-    const nowTimestamp = BigInt(Date.now())
-    
     // Count total tokens missing metadata (for logging only)
     const totalMissing = await prisma.token.count({
       where: {
@@ -1119,7 +1279,7 @@ async function seedMetadataRetryQueue(): Promise<void> {
     let offset = 0
     let hasMore = true
 
-    while (hasMore && metadataRetryQueue.size < 10000) {
+    while (hasMore && metadataRetryQueue.size < INGEST_METADATA_OVERLOAD_QUEUE_THRESHOLD * 2) {
       const candidates = await prisma.token.findMany({
         where: {
           OR: [
@@ -1133,7 +1293,12 @@ async function seedMetadataRetryQueue(): Promise<void> {
             },
           },
         },
-        select: { mintAddress: true },
+        select: { mintAddress: true, price: { select: { lastTradeTimestamp: true } } },
+        orderBy: {
+          price: {
+            lastTradeTimestamp: "desc",
+          },
+        },
         skip: offset,
         take: batchSize,
       })
@@ -1147,7 +1312,10 @@ async function seedMetadataRetryQueue(): Promise<void> {
       let invalidCount = 0
       for (const token of candidates) {
         if (token.mintAddress && isValidSolanaAddress(token.mintAddress)) {
-          scheduleMetadataRetry(token.mintAddress)
+          scheduleMetadataRetry(token.mintAddress, {
+            lastTradeAt: Number(token.price?.lastTradeTimestamp ?? Date.now()),
+            missingCritical: true,
+          })
           validCount++
         } else {
           invalidCount++

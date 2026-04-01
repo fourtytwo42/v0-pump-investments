@@ -2,23 +2,29 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { type TokenQueryFilters, type TokenQueryRequest, type TokenSortBy } from "@/types/token-data"
 import { Decimal } from "@prisma/client/runtime/library"
-import { fetchPumpCoin, PUMP_HEADERS } from "@/lib/pump-coin"
+import { fetchPumpCoin, PUMP_HEADERS, shouldSkipPumpCoinFetch } from "@/lib/pump-coin"
 import { normalizeTokenMetadata } from "@/lib/token-metadata"
 import { normalizeIpfsUri } from "@/lib/pump-trades"
 
 const metadataCache = new Map<
   string,
   {
-    image?: string | null
-    description?: string | null
-    twitter?: string | null
-    telegram?: string | null
-    website?: string | null
-    name?: string | null
-    symbol?: string | null
+    expiresAt: number
+    value: {
+      image?: string | null
+      description?: string | null
+      twitter?: string | null
+      telegram?: string | null
+      website?: string | null
+      name?: string | null
+      symbol?: string | null
+    }
   }
 >()
 
+const API_METADATA_SUCCESS_TTL_MS = 10 * 60 * 1000
+const API_METADATA_FAILURE_TTL_MS = 60 * 1000
+const API_METADATA_HYDRATE_CONCURRENCY = 8
 
 function looksLikeMintPrefix(value: string | null | undefined, mint: string): boolean {
   if (!value) return true
@@ -41,8 +47,9 @@ async function fetchMetadata(uri: string): Promise<{
     return {}
   }
 
-  if (metadataCache.has(uri)) {
-    return metadataCache.get(uri) ?? {}
+  const cached = metadataCache.get(uri)
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.value
   }
 
   const normalizedUri = normalizeIpfsUri(uri) ?? uri
@@ -70,13 +77,121 @@ async function fetchMetadata(uri: string): Promise<{
       const symbol = typeof json?.symbol === "string" ? json.symbol : null
 
       const normalized = { image, description, twitter, telegram, website, name, symbol }
-    metadataCache.set(uri, normalized)
+    metadataCache.set(uri, {
+      expiresAt: Date.now() + API_METADATA_SUCCESS_TTL_MS,
+      value: normalized,
+    })
     return normalized
   } catch (error) {
     console.warn("[api/tokens] metadata fetch failed", normalizedUri, (error as Error).message)
-    metadataCache.set(uri, {})
+    metadataCache.set(uri, {
+      expiresAt: Date.now() + API_METADATA_FAILURE_TTL_MS,
+      value: {},
+    })
     return {}
   }
+}
+
+async function runWithConcurrency<T>(
+  items: T[],
+  limit: number,
+  worker: (item: T) => Promise<void>,
+): Promise<void> {
+  if (items.length === 0) return
+  let currentIndex = 0
+
+  const runners = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (currentIndex < items.length) {
+      const index = currentIndex
+      currentIndex += 1
+      await worker(items[index])
+    }
+  })
+
+  await Promise.all(runners)
+}
+
+async function hydrateTokenMetadata(token: AggregatedToken): Promise<void> {
+  let metadataWasHydrated = false
+
+  if (token.metadata_uri) {
+    const remoteMetadata = await fetchMetadata(token.metadata_uri)
+    if (remoteMetadata) {
+      if (remoteMetadata.image && (!token.image_uri || token.image_uri === token.metadata_uri)) {
+        token.image_uri = normalizeIpfsUri(remoteMetadata.image) ?? token.image_uri
+      }
+      if (remoteMetadata.name && looksLikeMintPrefix(token.name, token.mint)) {
+        token.name = remoteMetadata.name
+      }
+      if (remoteMetadata.symbol && looksLikeMintPrefix(token.symbol, token.mint)) {
+        token.symbol = remoteMetadata.symbol
+      }
+      token.description = token.description ?? remoteMetadata.description ?? null
+      token.twitter = token.twitter ?? remoteMetadata.twitter ?? null
+      token.telegram = token.telegram ?? remoteMetadata.telegram ?? null
+      token.website = token.website ?? remoteMetadata.website ?? null
+      metadataWasHydrated = true
+    }
+  }
+
+  if (
+    (!metadataWasHydrated ||
+      !token.metadata_uri ||
+      !token.image_uri ||
+      token.image_uri === token.metadata_uri ||
+      (!token.description && !token.twitter && !token.telegram)) &&
+    !shouldSkipPumpCoinFetch(token.mint)
+  ) {
+    const coinInfo = await fetchPumpCoin(token.mint)
+    if (coinInfo && typeof coinInfo === "object") {
+      const coinMetadataUri =
+        coinInfo.metadataUri ?? coinInfo.metadata_uri ?? coinInfo.uri ?? token.metadata_uri ?? null
+
+      if (!token.metadata_uri && typeof coinMetadataUri === "string") {
+        const normalizedUri = normalizeIpfsUri(coinMetadataUri)
+        if (normalizedUri) {
+          token.metadata_uri = normalizedUri
+          token.image_metadata_uri = normalizedUri
+
+          const remoteMetadata = await fetchMetadata(normalizedUri)
+          if (remoteMetadata) {
+            if (remoteMetadata.image && (!token.image_uri || token.image_uri === normalizedUri)) {
+              token.image_uri = normalizeIpfsUri(remoteMetadata.image) ?? token.image_uri
+            }
+            if (remoteMetadata.name && looksLikeMintPrefix(token.name, token.mint)) {
+              token.name = remoteMetadata.name
+            }
+            if (remoteMetadata.symbol && looksLikeMintPrefix(token.symbol, token.mint)) {
+              token.symbol = remoteMetadata.symbol
+            }
+            token.description = token.description ?? remoteMetadata.description ?? null
+            token.twitter = token.twitter ?? remoteMetadata.twitter ?? null
+            token.telegram = token.telegram ?? remoteMetadata.telegram ?? null
+            token.website = token.website ?? remoteMetadata.website ?? null
+          }
+        }
+      }
+
+      const normalizedCoinMetadata = normalizeTokenMetadata(
+        (coinInfo as Record<string, unknown>).metadata ?? (coinInfo as Record<string, unknown>),
+      )
+      if (normalizedCoinMetadata.image && !token.image_uri) {
+        token.image_uri = normalizeIpfsUri(normalizedCoinMetadata.image) ?? token.image_uri
+      }
+      if (normalizedCoinMetadata.name && looksLikeMintPrefix(token.name, token.mint)) {
+        token.name = normalizedCoinMetadata.name
+      }
+      if (normalizedCoinMetadata.symbol && looksLikeMintPrefix(token.symbol, token.mint)) {
+        token.symbol = normalizedCoinMetadata.symbol
+      }
+      token.description = token.description ?? normalizedCoinMetadata.description ?? null
+      token.twitter = token.twitter ?? normalizedCoinMetadata.twitter ?? null
+      token.telegram = token.telegram ?? normalizedCoinMetadata.telegram ?? null
+      token.website = token.website ?? normalizedCoinMetadata.website ?? null
+    }
+  }
+
+  token.image_uri = token.image_uri ?? ""
 }
 
 export const dynamic = "force-dynamic"
@@ -537,91 +652,6 @@ export async function POST(request: Request) {
       })
     }
 
-    await Promise.all(
-      aggregatedTokens.map(async (token) => {
-        let metadataWasHydrated = false
-
-        if (token.metadata_uri) {
-          const remoteMetadata = await fetchMetadata(token.metadata_uri)
-          if (remoteMetadata) {
-            if (remoteMetadata.image && (!token.image_uri || token.image_uri === token.metadata_uri)) {
-              token.image_uri = normalizeIpfsUri(remoteMetadata.image) ?? token.image_uri
-            }
-            if (remoteMetadata.name && looksLikeMintPrefix(token.name, token.mint)) {
-              token.name = remoteMetadata.name
-            }
-            if (remoteMetadata.symbol && looksLikeMintPrefix(token.symbol, token.mint)) {
-              token.symbol = remoteMetadata.symbol
-            }
-            token.description = token.description ?? remoteMetadata.description ?? null
-            token.twitter = token.twitter ?? remoteMetadata.twitter ?? null
-            token.telegram = token.telegram ?? remoteMetadata.telegram ?? null
-            token.website = token.website ?? remoteMetadata.website ?? null
-            metadataWasHydrated = true
-          }
-        }
-
-        if (
-          !metadataWasHydrated ||
-          !token.metadata_uri ||
-          !token.image_uri ||
-          token.image_uri === token.metadata_uri ||
-          (!token.description && !token.twitter && !token.telegram)
-        ) {
-          const coinInfo = await fetchPumpCoin(token.mint)
-          if (coinInfo && typeof coinInfo === "object") {
-            const coinMetadataUri =
-              coinInfo.metadataUri ?? coinInfo.metadata_uri ?? coinInfo.uri ?? token.metadata_uri ?? null
-
-            if (!token.metadata_uri && typeof coinMetadataUri === "string") {
-              const normalizedUri = normalizeIpfsUri(coinMetadataUri)
-              if (normalizedUri) {
-                token.metadata_uri = normalizedUri
-                token.image_metadata_uri = normalizedUri
-
-                const remoteMetadata = await fetchMetadata(normalizedUri)
-                if (remoteMetadata) {
-                  if (remoteMetadata.image && (!token.image_uri || token.image_uri === normalizedUri)) {
-                    token.image_uri = normalizeIpfsUri(remoteMetadata.image) ?? token.image_uri
-                  }
-                  if (remoteMetadata.name && looksLikeMintPrefix(token.name, token.mint)) {
-                    token.name = remoteMetadata.name
-                  }
-                  if (remoteMetadata.symbol && looksLikeMintPrefix(token.symbol, token.mint)) {
-                    token.symbol = remoteMetadata.symbol
-                  }
-                  token.description = token.description ?? remoteMetadata.description ?? null
-                  token.twitter = token.twitter ?? remoteMetadata.twitter ?? null
-                  token.telegram = token.telegram ?? remoteMetadata.telegram ?? null
-                  token.website = token.website ?? remoteMetadata.website ?? null
-                  metadataWasHydrated = true
-                }
-              }
-            }
-
-            const normalizedCoinMetadata = normalizeTokenMetadata(
-              (coinInfo as Record<string, unknown>).metadata ?? (coinInfo as Record<string, unknown>),
-            )
-            if (normalizedCoinMetadata.image && !token.image_uri) {
-              token.image_uri = normalizeIpfsUri(normalizedCoinMetadata.image) ?? token.image_uri
-            }
-            if (normalizedCoinMetadata.name && looksLikeMintPrefix(token.name, token.mint)) {
-              token.name = normalizedCoinMetadata.name
-            }
-            if (normalizedCoinMetadata.symbol && looksLikeMintPrefix(token.symbol, token.mint)) {
-              token.symbol = normalizedCoinMetadata.symbol
-            }
-            token.description = token.description ?? normalizedCoinMetadata.description ?? null
-            token.twitter = token.twitter ?? normalizedCoinMetadata.twitter ?? null
-            token.telegram = token.telegram ?? normalizedCoinMetadata.telegram ?? null
-            token.website = token.website ?? normalizedCoinMetadata.website ?? null
-          }
-        }
-
-        token.image_uri = token.image_uri ?? ""
-      }),
-    )
-
     const filteredTokens = aggregatedTokens.filter((token) => passesFilters(token, filters, favoriteMints))
     const sortedTokens = sortTokens(filteredTokens, sortBy, sortOrder)
 
@@ -629,6 +659,8 @@ export async function POST(request: Request) {
     const totalPages = Math.max(1, Math.ceil(total / pageSize))
     const startIndex = (page - 1) * pageSize
     const pageItems = sortedTokens.slice(startIndex, startIndex + pageSize)
+
+    await runWithConcurrency(pageItems, API_METADATA_HYDRATE_CONCURRENCY, hydrateTokenMetadata)
 
     return NextResponse.json({
       page,

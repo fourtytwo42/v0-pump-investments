@@ -31,6 +31,24 @@ interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: "3.0.34",
+    date: "April 01, 2026",
+    changes: [
+      {
+        type: "fixed",
+        description: "Reworked metadata retries so temporary pump.fun failures and stale inflight requests no longer freeze token enrichment indefinitely.",
+      },
+      {
+        type: "improved",
+        description: "Prioritized active tokens in the ingester metadata queue and added backlog health logging so fresh trading activity stays ahead of older missing metadata work.",
+      },
+      {
+        type: "improved",
+        description: "Reduced /api/tokens metadata hydration pressure by limiting fallback enrichment to returned page items instead of every aggregated token.",
+      },
+    ],
+  },
+  {
     version: "3.0.33",
     date: "March 30, 2025",
     changes: [

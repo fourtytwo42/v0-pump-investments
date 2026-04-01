@@ -24,6 +24,10 @@ This file stores durable project memory for recovery after context compression o
 - The reconnect hardening commit was pushed to `main`.
 
 ## Important Recent Changes
+- T9 in `FIX_TRACKER.md` is now implemented:
+  - `lib/pump-coin.ts` now clears settled inflight requests and uses expiring cooldowns instead of permanent failure pinning
+  - `server/ingest-trades.ts` now prioritizes active metadata backlog items, keeps retry state over time, and logs metadata queue/freshness health
+  - `app/api/tokens/route.ts` now hydrates metadata only for paginated response items with bounded concurrency instead of the whole aggregated token set
 - T8 in `FIX_TRACKER.md` is now implemented:
   - `package.json` now includes `npm run typecheck` for explicit TypeScript validation
   - `components/dashboard.tsx` and `components/alert-settings-dialog.tsx` were fixed so the repo reaches a clean TypeScript baseline
@@ -66,6 +70,12 @@ This file stores durable project memory for recovery after context compression o
   - `INGEST_PING_INTERVAL_MS`
   - `INGEST_STALE_AFTER_MS`
   - `INGEST_BACKOFF_RESET_AFTER_MS`
+  - `INGEST_METADATA_BATCH_SIZE_NORMAL`
+  - `INGEST_METADATA_BATCH_SIZE_ELEVATED`
+  - `INGEST_METADATA_ACTIVE_WINDOW_MS`
+  - `INGEST_METADATA_NOT_FOUND_COOLDOWN_MS`
+  - `INGEST_METADATA_TRANSIENT_COOLDOWN_MS`
+  - `INGEST_METADATA_OVERLOAD_QUEUE_THRESHOLD`
 
 ## Known Problems
 - PM2 env changes require `--update-env` on restart if `.env` has changed.
