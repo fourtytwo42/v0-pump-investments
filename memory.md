@@ -24,6 +24,10 @@ This file stores durable project memory for recovery after context compression o
 - The reconnect hardening commit was pushed to `main`.
 
 ## Important Recent Changes
+- T8 in `FIX_TRACKER.md` is now implemented:
+  - `package.json` now includes `npm run typecheck` for explicit TypeScript validation
+  - `components/dashboard.tsx` and `components/alert-settings-dialog.tsx` were fixed so the repo reaches a clean TypeScript baseline
+  - `next.config.mjs` no longer bypasses TypeScript build errors, so `npm run build` fails on TS errors again
 - T7 in `FIX_TRACKER.md` is now implemented:
   - PM2 runtime logs live in the repo-local `logs/` directory configured by `ecosystem.config.js`
   - `.gitignore` already ignores `/logs`, and `git check-ignore -v` confirms the active PM2 log files are covered
@@ -64,13 +68,13 @@ This file stores durable project memory for recovery after context compression o
   - `INGEST_BACKOFF_RESET_AFTER_MS`
 
 ## Known Problems
-- Full TypeScript validation is still broken across several API and UI files.
 - PM2 env changes require `--update-env` on restart if `.env` has changed.
 
 ## Commands / Checks
 - Build:
   - `npm run build`
 - Full typecheck:
+  - `npm run typecheck`
   - `npx tsc --noEmit --project tsconfig.json`
 - PM2 normal restart:
   - `npm run pm2:web:restart`

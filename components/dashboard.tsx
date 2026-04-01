@@ -48,6 +48,7 @@ import {
 import { useSettings } from "@/hooks/use-settings"
 import { usePiBotData } from "@/hooks/use-pi-bot-data"
 import { useAlertChecker } from "@/hooks/use-alert-checker"
+import type { TokenSortBy } from "@/types/token-data"
 
 export default function Dashboard() {
   // Get values from context
@@ -68,7 +69,7 @@ export default function Dashboard() {
 
   // Use localStorage for timeRange and sortBy to persist user preferences
   const [timeRange, setTimeRange] = useLocalStorage<string>("pump-investments-time-range", "10")
-  const [sortBy, setSortBy] = useLocalStorage<string>("pump-investments-sort-by", "marketCap")
+  const [sortBy, setSortBy] = useLocalStorage<TokenSortBy>("pump-investments-sort-by", "marketCap")
   const [currentPage, setCurrentPage] = useState<number>(queryOptions.page ?? 1)
 
   // Onboarding state
@@ -397,7 +398,7 @@ export default function Dashboard() {
               </SelectContent>
             </Select>
 
-            <Select value={sortBy} onValueChange={setSortBy}>
+            <Select value={sortBy} onValueChange={(value) => setSortBy(value as TokenSortBy)}>
               <SelectTrigger className="w-[150px]" data-onboarding="sort-by">
                 <SelectValue placeholder="Sort By" />
               </SelectTrigger>

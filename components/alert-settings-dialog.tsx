@@ -505,7 +505,7 @@ export function AlertSettingsDialog({ open, onOpenChange, token }: AlertSettings
                                   <div>{entry.percentChange.toFixed(2)}%</div>
 
                                   <div className="text-muted-foreground">Reference Value:</div>
-                                  <div>{formatUSD(entry.referenceMarketCap)}</div>
+                                  <div>{formatUSD(entry.referenceMarketCap ?? null)}</div>
                                 </>
                               )}
                             </div>

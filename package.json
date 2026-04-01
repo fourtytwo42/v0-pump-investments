@@ -6,6 +6,7 @@
     "build": "rm -rf .next && next build",
     "dev": "next dev",
     "lint": "next lint",
+    "typecheck": "tsc --noEmit --project tsconfig.json",
     "start": "next start",
     "prisma:generate": "prisma generate",
     "db:push": "prisma db push",

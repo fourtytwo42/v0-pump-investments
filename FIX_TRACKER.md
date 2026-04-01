@@ -159,7 +159,7 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 ### P2: Cleanup and Hardening
 
 #### T8. Re-enable meaningful type validation in regular workflow
-- Status: `open`
+- Status: `done`
 - Files:
   - project scripts / CI config
 - Problem:
@@ -171,6 +171,10 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - Decide whether CI or release steps should enforce it.
 - Verification:
   - `npm run typecheck`
+- Notes:
+  - Added `npm run typecheck` as the canonical explicit TypeScript validation command.
+  - Fixed the remaining TypeScript errors in `components/dashboard.tsx` and `components/alert-settings-dialog.tsx`.
+  - Removed `typescript.ignoreBuildErrors` from `next.config.mjs`, so `npm run build` now fails on TypeScript errors again.
 
 ## Known Good Changes
 - Ingester reconnect hardening is live and pushed.
