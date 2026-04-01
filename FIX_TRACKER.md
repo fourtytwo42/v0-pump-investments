@@ -80,7 +80,7 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - `components/onboarding/onboarding-guide.tsx` now types its `steps` array explicitly and keeps `action` support optional for dormant changelog/roadmap flows.
 
 #### T4. Fix missing UI module
-- Status: `open`
+- Status: `done`
 - Files:
   - `components/alert-management.tsx`
   - `components/ui/`
@@ -92,9 +92,12 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - Search for intended shadcn/Radix tabs usage and add the missing file if the feature depends on it.
 - Verification:
   - `npx tsc --noEmit --project tsconfig.json`
+- Notes:
+  - Added `@radix-ui/react-tabs` and a standard shadcn-style `components/ui/tabs.tsx` wrapper.
+  - `components/alert-management.tsx` can now keep its existing tabbed UI without refactor.
 
 #### T5. Add `ws` TypeScript declarations
-- Status: `open`
+- Status: `done`
 - Files:
   - `package.json`
   - `server/ingest-trades.ts`
@@ -107,6 +110,9 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - Fallback: add a local declaration file only if needed.
 - Verification:
   - `npx tsc --noEmit --project tsconfig.json`
+- Notes:
+  - Installed `@types/ws` as a dev dependency.
+  - The `TS7016` declaration error for `server/ingest-trades.ts` was resolved without needing a local fallback declaration file or source edits.
 
 ### P1: Operational Consistency
 

@@ -24,6 +24,12 @@ This file stores durable project memory for recovery after context compression o
 - The reconnect hardening commit was pushed to `main`.
 
 ## Important Recent Changes
+- T5 in `FIX_TRACKER.md` is now implemented:
+  - `@types/ws` was added as a dev dependency
+  - the ingester `ws` declaration error was resolved without a custom `declare module "ws"` fallback
+- T4 in `FIX_TRACKER.md` is now implemented:
+  - `components/ui/tabs.tsx` now exists as the app-local tabs primitive
+  - `@radix-ui/react-tabs` was added to support the alert-management tabs UI
 - T3 in `FIX_TRACKER.md` is now implemented:
   - onboarding step typing is centralized in `components/onboarding/onboarding-step.tsx`
   - `action` support remains optional and typed, even though current steps do not actively use it
