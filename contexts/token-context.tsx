@@ -5,7 +5,6 @@ import { createContext, useContext, useState, useEffect, useCallback, useMemo, u
 import { db } from "@/lib/db"
 import { toast } from "@/components/ui/use-toast"
 import type { TokenData, TokenQueryOptions } from "@/types/token-data"
-import { normalizeIpfsUri } from "@/lib/pump-trades"
 
 interface TokenContextType {
   tokens: Map<string, TokenData>
@@ -43,35 +42,6 @@ const DEFAULT_QUERY_OPTIONS: TokenQueryOptions = {
   },
 }
 
-const METADATA_ENDPOINT = "/api/tokens"
-
-interface RemoteMetadataResponse {
-  mintAddress: string
-  name: string | null
-  symbol: string | null
-  imageUri: string | null
-  twitter: string | null
-  telegram: string | null
-  website: string | null
-}
-
-function looksLikeMintPrefix(value: string | null | undefined, mint: string): boolean {
-  if (!value) return true
-  const cleaned = value.replace(/[^A-Za-z0-9]/g, "").toUpperCase()
-  if (!cleaned) return true
-  if (cleaned.length < 3) return false
-  return mint.toUpperCase().startsWith(cleaned)
-}
-
-function shouldHydrateOnClient(token: TokenData): boolean {
-  if (!token) return false
-  if (!token.image_uri) return true
-  if (looksLikeMintPrefix(token.name, token.mint)) return true
-  if (looksLikeMintPrefix(token.symbol, token.mint)) return true
-  if (!token.description && !token.twitter && !token.telegram) return true
-  return false
-}
-
 export function TokenProvider({ children }: { children: React.ReactNode }) {
   const [tokens, setTokens] = useState<Map<string, TokenData>>(new Map())
   const [visibleTokens, setVisibleTokens] = useState<TokenData[]>([])
@@ -84,8 +54,6 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
   const [totalPages, setTotalPages] = useState<number>(1)
   const [totalCount, setTotalCount] = useState<number>(0)
   const [isConnected, setIsConnected] = useState<boolean>(false)
-  const metadataPendingRef = useRef<Set<string>>(new Set())
-  const metadataRetryRef = useRef<Map<string, number>>(new Map())
   const tokenMapRef = useRef<Map<string, TokenData>>(new Map())
 
   const loadFavorites = useCallback(async () => {
@@ -308,113 +276,6 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
       stopFallback()
     }
   }, [queryOptions, favorites])
-
-  const fetchRemoteMetadata = useCallback(async (mint: string): Promise<RemoteMetadataResponse | null> => {
-    const url = `${METADATA_ENDPOINT}/${encodeURIComponent(mint)}/metadata`
-    try {
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          accept: "application/json",
-        },
-        cache: "no-store",
-      })
-      if (!response.ok) {
-        return null
-      }
-      return (await response.json()) as RemoteMetadataResponse
-    } catch (error) {
-      console.warn("[TokenProvider] metadata fetch failed", mint, (error as Error).message)
-      return null
-    }
-  }, [])
-
-  const hydrateFromClient = useCallback(
-    async (mint: string) => {
-      const pending = metadataPendingRef.current
-      const retries = metadataRetryRef.current
-      const attempt = (retries.get(mint) ?? 0) + 1
-      retries.set(mint, attempt)
-
-      try {
-        const metadata = await fetchRemoteMetadata(mint)
-        if (!metadata) {
-          return
-        }
-
-        const normalizedImage = normalizeIpfsUri(metadata.imageUri)
-
-        let appliedUpdates: Partial<TokenData> | null = null
-
-        setTokens((prev) => {
-          const existing = prev.get(mint)
-          if (!existing) return prev
-
-          const updates: Partial<TokenData> = {}
-
-          if (
-            normalizedImage &&
-            (!existing.image_uri || existing.image_uri === existing.metadata_uri || existing.image_uri === "")
-          ) {
-            updates.image_uri = normalizedImage
-          }
-
-          if (metadata.name && looksLikeMintPrefix(existing.name, mint)) {
-            updates.name = metadata.name
-          }
-
-          if (metadata.symbol && looksLikeMintPrefix(existing.symbol, mint)) {
-            updates.symbol = metadata.symbol
-          }
-
-          if (metadata.twitter && !existing.twitter) {
-            updates.twitter = metadata.twitter
-          }
-
-          if (metadata.telegram && !existing.telegram) {
-            updates.telegram = metadata.telegram
-          }
-
-          if (metadata.website && !existing.website) {
-            updates.website = metadata.website
-          }
-
-          if (Object.keys(updates).length === 0) {
-            return prev
-          }
-
-          appliedUpdates = updates
-          const next = new Map(prev)
-          next.set(mint, { ...existing, ...updates })
-          return next
-        })
-
-        if (appliedUpdates) {
-          setVisibleTokens((prev) =>
-            prev.map((token) => (token.mint === mint ? { ...token, ...appliedUpdates } : token)),
-          )
-        }
-      } finally {
-        metadataPendingRef.current.delete(mint)
-      }
-    },
-    [fetchRemoteMetadata, setTokens, setVisibleTokens],
-  )
-
-  useEffect(() => {
-    if (typeof window === "undefined") return
-    const pending = metadataPendingRef.current
-    const retries = metadataRetryRef.current
-
-    const candidates = visibleTokens.filter(shouldHydrateOnClient).slice(0, 5)
-    for (const token of candidates) {
-      if (pending.has(token.mint)) continue
-      const attempts = retries.get(token.mint) ?? 0
-      if (attempts >= 3) continue
-      pending.add(token.mint)
-      void hydrateFromClient(token.mint)
-    }
-  }, [visibleTokens, hydrateFromClient])
 
   const value = useMemo(
     () => ({

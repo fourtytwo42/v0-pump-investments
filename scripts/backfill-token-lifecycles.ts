@@ -80,6 +80,14 @@ async function main(): Promise<void> {
     create: { key: "tokens", revision: BigInt(1) },
     update: { revision: { increment: BigInt(1) } },
   })
+  await prisma.token.updateMany({
+    where: { lifecycleStatus: { notIn: ["CURVE_COMPLETE", "PUMPSWAP"] } },
+    data: { completed: false },
+  })
+  await prisma.token.updateMany({
+    where: { lifecycleStatus: { in: ["CURVE_COMPLETE", "PUMPSWAP"] } },
+    data: { completed: true },
+  })
 
   console.log(
     JSON.stringify(
