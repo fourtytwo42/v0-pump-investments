@@ -37,6 +37,26 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - Returning-user initial JavaScript is 252.2 kB versus the 267 kB baseline. Production dependency audit reports zero findings.
   - Upstream Pump subscriber credentials are no longer in source and live only in the mode-600 VM environment. Provider-side credential rotation still requires a replacement credential from Pump.
 
+#### T29. Publish production through Cloudflare Tunnel
+- Status: `done`
+- Goal:
+  - Serve `https://pump.investments` through an outbound-only Cloudflare Tunnel while preserving the LAN endpoint.
+- Configuration:
+  - Publish one unrestricted HTTP route from `pump.investments` to `http://127.0.0.1:3000`.
+  - Do not publish ports 3001, 4000, PostgreSQL, or SSH.
+  - Browser realtime uses same-origin fetch-based SSE; no separate WebSocket service or hostname is required.
+- Verification:
+  - VM confirmed Ubuntu 24.04 x86-64, Nginx active on 3000, Next.js on 3001, PostgreSQL loopback-only, and no listener on 4000.
+  - Installed `cloudflared` 2026.7.3 from Cloudflare's official APT repository.
+  - VM-local `/api/health` returned `status=ok`.
+  - Both `/api/tokens/stream` and `/api/alerts/stream` returned 200 `text/event-stream` through Nginx with `Cache-Control: no-cache, no-transform` and `X-Accel-Buffering: no`.
+  - Installed the remotely managed tunnel token as an enabled systemd service; Cloudflare reports tunnel `Pump.Investments-4` and its Linux connector Healthy/Connected.
+  - Published unrestricted hostname `pump.investments` to `http://127.0.0.1:3000`.
+  - Public `/` and `/api/health` returned HTTP 200 through Cloudflare; browser verification loaded the expected Pump.Investments v4 page at `https://pump.investments/`.
+  - Added the v4.0.1 in-app changelog entry and aligned package, badge, health, and browser-test versions.
+- Runbook:
+  - `deploy/cloudflare/README.md`
+
 ### P1: Whole-app efficiency and reliability audit
 
 #### T21. Identify no-visual-change improvements
