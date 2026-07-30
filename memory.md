@@ -39,7 +39,7 @@ This file stores durable project memory for recovery after context compression o
 
 ## Important Recent Changes
 - The in-app v3.1.0 changelog now documents the lifecycle, filtering, SQL/SSE, metadata, cache, and price-ordering changes.
-- Lifecycle presentation is intentionally binary: `BONDING` displays as Bonding; `CURVE_COMPLETE`, `PUMPSWAP`, and `NON_LAUNCHPAD` display as Graduated. `UNKNOWN` remains Verifying, and the existing provenance icon distinguishes external tokens.
+- Token cards intentionally show no Bonding, Graduated, or Verifying chip. Verified bonding tokens use the progress bar; graduated and unknown tokens have no lifecycle label, and the existing provenance icon still distinguishes external tokens.
 - T12 in `FIX_TRACKER.md` is implemented and live:
   - lifecycle states are `UNKNOWN`, `BONDING`, `CURVE_COMPLETE`, `PUMPSWAP`, and `NON_LAUNCHPAD`
   - `$60k` market-cap graduation inference was removed
@@ -124,6 +124,10 @@ This file stores durable project memory for recovery after context compression o
 - Pump vanity mints ending in `pump` are valid Solana addresses and must never be filtered from ingestion or recovery queues.
 - Startup recovery uses `INGEST_METADATA_ACTIVE_WINDOW_MS`, not the process start timestamp, so active pre-existing tokens are seeded.
 - Live v3.1.2 verification reached zero missing stored images among tokens active in the previous 30 minutes; the visible 12-card page used 12 same-origin image endpoints and no default images.
+
+## 2026-07-29 Lifecycle chip removal
+- Release v3.1.3 removes all lifecycle chips from token cards.
+- The bonding progress bar remains the only card-level lifecycle treatment; graduated and unknown tokens show no replacement chip.
 
 ## Commands / Checks
 - VM app path:

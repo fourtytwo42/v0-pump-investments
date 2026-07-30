@@ -20,11 +20,14 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 ### P1: Simplify lifecycle presentation
 
 #### T17. Remove redundant lifecycle chips
-- Status: `in_progress`
+- Status: `done`
 - Goal:
   - Remove Bonding, Graduated, and Verifying chips from token cards; retain the bonding progress bar as the only lifecycle treatment on cards.
 - Verification:
   - Tests, typecheck/build, deployment, and live LAN card inspection.
+- Notes:
+  - Removed Bonding, Graduated, and Verifying badges from all token cards.
+  - Verified v3.1.3 live with no lifecycle-chip text in the card DOM; bonding progress-bar logic remains intact.
 
 ### P0: Reliable token images
 
