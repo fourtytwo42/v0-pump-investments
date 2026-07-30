@@ -20,11 +20,15 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 ### P1: User-facing release notes
 
 #### T18. Expand recent v3.1.x changelog entries
-- Status: `in_progress`
+- Status: `done`
 - Goal:
   - Fully document the slider, image-recovery, and lifecycle-card cleanup work in the live changelog.
 - Verification:
   - Typecheck/build, deployment, and live changelog inspection.
+- Notes:
+  - Expanded v3.1.2 with Pump vanity-mint recovery and active image-backfill details.
+  - Expanded v3.1.3 with the final clean graduated-card treatment and retained external provenance icon.
+  - Verified all new text plus the v3.1.1 slider notes in the live changelog panel.
 
 ### P1: Simplify lifecycle presentation
 

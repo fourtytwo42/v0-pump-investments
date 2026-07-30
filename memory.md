@@ -128,6 +128,7 @@ This file stores durable project memory for recovery after context compression o
 ## 2026-07-29 Lifecycle chip removal
 - Release v3.1.3 removes all lifecycle chips from token cards.
 - The bonding progress bar remains the only card-level lifecycle treatment; graduated and unknown tokens show no replacement chip.
+- The live changelog now fully records v3.1.1 slider hardening, v3.1.2 image proxy/backfill and Pump mint recovery, and v3.1.3 lifecycle-chip removal.
 
 ## Commands / Checks
 - VM app path:
