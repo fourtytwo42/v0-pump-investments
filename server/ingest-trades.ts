@@ -11,6 +11,7 @@ import { normalizeTokenMetadata, type TokenMetadata } from "@/lib/token-metadata
 import { fetchPumpCoin, PUMP_HEADERS, shouldSkipPumpCoinFetch } from "@/lib/pump-coin"
 import { getDexPairCreatedAt } from "@/lib/dexscreener"
 import { BoundedCache } from "@/lib/bounded-cache"
+import { isValidSolanaAddress } from "@/lib/solana-address"
 import {
   DEFAULT_LIFECYCLE_BATCH_SIZE,
   fetchPumpLifecycleBatch,
@@ -1000,16 +1001,6 @@ setInterval(() => {
 // =============================================================================
 // Metadata Retry System
 // =============================================================================
-
-function isValidSolanaAddress(address: string): boolean {
-  // Solana addresses are base58 encoded and typically 32-44 characters
-  // Filter out obvious fake addresses (ending in "pump", too short, etc.)
-  if (!address || address.length < 32 || address.length > 44) return false
-  if (address.toLowerCase().endsWith("pump")) return false
-  // Base58 characters: 1-9, A-H, J-N, P-Z, a-k, m-z (no 0, O, I, l)
-  const base58Regex = /^[1-9A-HJ-NP-Za-km-z]+$/
-  return base58Regex.test(address)
-}
 
 function getMetadataQueueMode(): "normal" | "elevated" | "overload" {
   const size = metadataRetryQueue.size
