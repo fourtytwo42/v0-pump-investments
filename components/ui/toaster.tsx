@@ -19,7 +19,7 @@ export function Toaster() {
           {props.duration !== 0 && <ToastClose />}
         </Toast>
       ))}
-      <ToastViewport />
+      <ToastViewport aria-label="Notifications" data-notification-region />
     </ToastProvider>
   )
 }
