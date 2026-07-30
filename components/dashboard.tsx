@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from "react"
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { Pause, Play, Settings, Star } from "lucide-react"
@@ -8,7 +8,6 @@ import TokenCard from "./token-card"
 import Header from "./header"
 import { useLocalStorage } from "@/hooks/use-local-storage"
 import NextImage from "next/image"
-import dynamic from "next/dynamic"
 import {
   Pagination,
   PaginationContent,
@@ -29,22 +28,19 @@ import { useSettings } from "@/hooks/use-settings"
 import { usePiBotData } from "@/hooks/use-pi-bot-data"
 import { useAlertChecker } from "@/hooks/use-alert-checker"
 import type { TokenSortBy } from "@/types/token-data"
+import { useAlertModalStore } from "@/stores/alert-modal-store"
 
-const OnboardingGuide = dynamic(
-  () => import("./onboarding/onboarding-guide").then((module) => module.OnboardingGuide),
-  { ssr: false },
+const OnboardingGuide = lazy(() =>
+  import("./onboarding/onboarding-guide").then((module) => ({ default: module.OnboardingGuide })),
 )
-const ChatBubble = dynamic(
-  () => import("./pi-bot/chat-bubble").then((module) => module.ChatBubble),
-  { ssr: false },
+const ChatBubble = lazy(() =>
+  import("./pi-bot/chat-bubble").then((module) => ({ default: module.ChatBubble })),
 )
-const AlertSettingsModal = dynamic(
-  () => import("./alert-settings-modal").then((module) => module.AlertSettingsModal),
-  { ssr: false },
+const AlertSettingsModal = lazy(() =>
+  import("./alert-settings-modal").then((module) => ({ default: module.AlertSettingsModal })),
 )
-const SettingsSheet = dynamic(
-  () => import("./settings-sheet").then((module) => module.SettingsSheet),
-  { ssr: false },
+const SettingsSheet = lazy(() =>
+  import("./settings-sheet").then((module) => ({ default: module.SettingsSheet })),
 )
 
 export default function Dashboard() {
@@ -71,6 +67,7 @@ export default function Dashboard() {
   const [chatOpen, setChatOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const settingsButtonRef = useRef<HTMLButtonElement>(null)
+  const isAlertModalOpen = useAlertModalStore((state) => state.isOpen)
 
   // Onboarding state
   const { isOnboardingActive, setOnboardingActive } = useOnboardingStore()
@@ -341,17 +338,19 @@ export default function Dashboard() {
               <Settings className="h-4 w-4" />
             </Button>
             {settingsOpen && (
-              <SettingsSheet
-                open={settingsOpen}
-                settings={settings}
-                updateSettings={updateSettings}
-                updateSettingsBatch={updateSettingsBatch}
-                restartOnboarding={restartOnboarding}
-                onOpenChange={(open) => {
-                  setSettingsOpen(open)
-                  if (!open) requestAnimationFrame(() => settingsButtonRef.current?.focus())
-                }}
-              />
+              <Suspense fallback={null}>
+                <SettingsSheet
+                  open={settingsOpen}
+                  settings={settings}
+                  updateSettings={updateSettings}
+                  updateSettingsBatch={updateSettingsBatch}
+                  restartOnboarding={restartOnboarding}
+                  onOpenChange={(open) => {
+                    setSettingsOpen(open)
+                    if (!open) requestAnimationFrame(() => settingsButtonRef.current?.focus())
+                  }}
+                />
+              </Suspense>
             )}
           </div>
         </div>
@@ -454,7 +453,11 @@ export default function Dashboard() {
       </div>
 
       {/* Onboarding Guide */}
-      {isOnboardingActive && <OnboardingGuide />}
+      {isOnboardingActive && (
+        <Suspense fallback={null}>
+          <OnboardingGuide />
+        </Suspense>
+      )}
 
       {/* Add Toaster for notifications */}
       {!chatOpen && (
@@ -469,10 +472,18 @@ export default function Dashboard() {
           </Button>
         </div>
       )}
-      {chatOpen && <ChatBubble open={chatOpen} onOpenChange={setChatOpen} />}
+      {chatOpen && (
+        <Suspense fallback={null}>
+          <ChatBubble open={chatOpen} onOpenChange={setChatOpen} />
+        </Suspense>
+      )}
 
       {/* Add the Alert Settings Modal */}
-      <AlertSettingsModal />
+      {isAlertModalOpen && (
+        <Suspense fallback={null}>
+          <AlertSettingsModal />
+        </Suspense>
+      )}
     </div>
   )
 }

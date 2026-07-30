@@ -7,7 +7,7 @@ import NextImage from "next/image"
 import { formatDistanceToNow } from "date-fns"
 import { Globe, Twitter, MessageCircle, Star, Bell, ChevronDown, ChevronUp } from "lucide-react"
 import Link from "next/link"
-import { openAlertSettingsModal } from "./alert-settings-modal"
+import { useAlertModalStore } from "@/stores/alert-modal-store"
 import { db } from "@/lib/db"
 import { alertStatusCache } from "@/lib/alert-status-cache"
 import type { TokenData } from "@/types/token-data"
@@ -206,10 +206,7 @@ function TokenCard({ mint, size = "medium", showAlertSettings = false, showBonkB
       e.stopPropagation() // Prevent card click
       e.preventDefault() // Prevent any default behavior
 
-      console.log("Alert settings button clicked for token:", token.name)
-
-      // Use the global function to open the modal
-      openAlertSettingsModal({
+      useAlertModalStore.getState().open({
         mint: token.mint,
         name: token.name,
         symbol: token.symbol,

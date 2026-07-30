@@ -19,65 +19,13 @@ import { db } from "@/lib/db"
 import { Volume2, VolumeX, ArrowUp, ArrowDown } from "lucide-react"
 import { soundService } from "@/lib/sound-service"
 import { alertStatusCache } from "@/lib/alert-status-cache"
-
-// Global state for the alert modal
-type ModalState = {
-  isOpen: boolean
-  token: {
-    mint: string
-    name: string
-    symbol: string
-    usd_market_cap: number
-  } | null
-}
-
-// Global variable to store modal state
-let modalState: ModalState = {
-  isOpen: false,
-  token: null,
-}
-
-// Global callbacks
-let openCallback: ((state: ModalState) => void) | null = null
-let closeCallback: (() => void) | null = null
-
-// Function to open the modal from anywhere
-export function openAlertSettingsModal(token: {
-  mint: string
-  name: string
-  symbol: string
-  usd_market_cap: number
-}) {
-  console.log("Opening alert settings modal for token:", token.name)
-
-  modalState = {
-    isOpen: true,
-    token,
-  }
-
-  if (openCallback) {
-    openCallback(modalState)
-  } else {
-    console.warn("Alert settings modal callback not registered yet")
-  }
-}
-
-// Function to close the modal from anywhere
-export function closeAlertSettingsModal() {
-  modalState = {
-    isOpen: false,
-    token: null,
-  }
-
-  if (closeCallback) {
-    closeCallback()
-  }
-}
+import { useAlertModalStore } from "@/stores/alert-modal-store"
 
 // The actual modal component
 export function AlertSettingsModal() {
-  const [isOpen, setIsOpen] = useState(false)
-  const [token, setToken] = useState<ModalState["token"]>(null)
+  const isOpen = useAlertModalStore((state) => state.isOpen)
+  const token = useAlertModalStore((state) => state.token)
+  const close = useAlertModalStore((state) => state.close)
   // Update the state to include percentage thresholds and threshold type
   const [alertSettings, setAlertSettings] = useState({
     enabled: false,
@@ -92,30 +40,10 @@ export function AlertSettingsModal() {
   const initialized = useRef(false)
   const stopSoundRef = useRef<(() => void) | null>(null)
 
-  // Register callbacks when component mounts
   useEffect(() => {
     setIsClient(true)
 
-    openCallback = (state: ModalState) => {
-      setIsOpen(state.isOpen)
-      setToken(state.token)
-    }
-
-    closeCallback = () => {
-      setIsOpen(false)
-    }
-
-    // Initialize from current state
-    if (modalState.isOpen) {
-      setIsOpen(true)
-      setToken(modalState.token)
-    }
-
     return () => {
-      openCallback = null
-      closeCallback = null
-
-      // Clean up any playing test sounds
       if (stopSoundRef.current) {
         stopSoundRef.current()
         stopSoundRef.current = null
@@ -203,7 +131,7 @@ export function AlertSettingsModal() {
       })
 
       // Close the dialog
-      closeAlertSettingsModal()
+      close()
     } catch (error) {
       console.error("Error saving alert settings:", error)
       toast({
@@ -299,7 +227,7 @@ export function AlertSettingsModal() {
     <Dialog
       open={isOpen}
       onOpenChange={(open) => {
-        if (!open) closeAlertSettingsModal()
+        if (!open) close()
       }}
     >
       <DialogContent className="sm:max-w-[425px]">
@@ -481,7 +409,7 @@ export function AlertSettingsModal() {
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => closeAlertSettingsModal()}>
+              <Button variant="outline" onClick={close}>
                 Cancel
               </Button>
               <Button onClick={handleSave}>Save Settings</Button>
