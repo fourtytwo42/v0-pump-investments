@@ -1237,6 +1237,7 @@ async function processQueue(): Promise<void> {
       await persistTradesBulk(prepared)
     }
     await rm(durableBatchPath, { force: true })
+    activeSpoolFiles.delete(durableBatchPath)
     durableBatchPath = null
 
     // Only log queue size every 30 seconds
@@ -1259,6 +1260,7 @@ async function processQueue(): Promise<void> {
       tradeQueue.unshift(...batch)
     }
   } finally {
+    if (durableBatchPath) activeSpoolFiles.delete(durableBatchPath)
     activeProcessors--
     // Process next batch immediately
     if (tradeQueue.length >= QUEUE_BATCH_SIZE) {
@@ -1444,6 +1446,8 @@ interface SpoolEnvelope {
   trades: PumpUnifiedTrade[]
 }
 
+const activeSpoolFiles = new Set<string>()
+
 async function ensureSpoolDirectories(): Promise<void> {
   await Promise.all([
     mkdir(SPOOL_PENDING_DIR, { recursive: true }),
@@ -1462,7 +1466,13 @@ async function spoolBatch(trades: PumpUnifiedTrade[], attempts = 0): Promise<str
     trades,
   }
   await writeFile(temporary, JSON.stringify(envelope), { encoding: "utf8", flag: "wx" })
-  await rename(temporary, destination)
+  activeSpoolFiles.add(destination)
+  try {
+    await rename(temporary, destination)
+  } catch (error) {
+    activeSpoolFiles.delete(destination)
+    throw error
+  }
   return destination
 }
 
@@ -1502,6 +1512,7 @@ async function replayPendingSpool(): Promise<void> {
     await ensureSpoolDirectories()
     const files = (await readdir(SPOOL_PENDING_DIR))
       .filter((name) => name.endsWith(".json"))
+      .filter((name) => !activeSpoolFiles.has(path.join(SPOOL_PENDING_DIR, name)))
       .sort()
     for (const name of files.slice(0, 10)) {
       await replaySpoolFile(path.join(SPOOL_PENDING_DIR, name))
