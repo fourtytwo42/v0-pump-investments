@@ -1,6 +1,5 @@
 import { PrismaPg } from "@prisma/adapter-pg"
 import { PrismaClient } from "@/generated/prisma/client"
-import { Pool } from "pg"
 
 type ClientProfile = "web" | "ingester" | "utility"
 
@@ -27,15 +26,18 @@ export function createPrismaClient(profile: ClientProfile = "web"): PrismaClient
   )
   const idleTimeoutMillis = Number.parseInt(process.env.DATABASE_IDLE_TIMEOUT_MS ?? "30000", 10)
 
-  const pool = new Pool({
-    connectionString,
+  const parsed = new URL(connectionString)
+  const adapter = new PrismaPg({
+    host: parsed.hostname,
+    port: parsed.port ? Number(parsed.port) : 5432,
+    database: decodeURIComponent(parsed.pathname.replace(/^\//, "")),
+    user: decodeURIComponent(parsed.username),
+    password: decodeURIComponent(parsed.password),
     max: Number.isFinite(max) ? max : PROFILE_LIMITS[profile],
     connectionTimeoutMillis,
     idleTimeoutMillis,
     allowExitOnIdle: profile !== "web",
-  })
-  const adapter = new PrismaPg(pool, {
-    disposeExternalPool: true,
+  }, {
     onPoolError: (error) => console.error(`[database:${profile}] idle pool error`, error),
   })
 
