@@ -7,6 +7,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum TokenLifecycleStatus {
+  UNKNOWN
+  BONDING
+  CURVE_COMPLETE
+  PUMPSWAP
+  NON_LAUNCHPAD
+}
+
 model Token {
   id                     String   @id @default(cuid())
   mintAddress            String   @unique @map("mint_address")
@@ -22,6 +30,10 @@ model Token {
   createdTimestamp       BigInt   @map("created_timestamp")
   kingOfTheHillTimestamp BigInt?  @map("king_of_the_hill_timestamp")
   completed              Boolean  @default(false) @map("completed")
+  lifecycleStatus        TokenLifecycleStatus @default(UNKNOWN) @map("lifecycle_status")
+  lifecycleVerifiedAt    DateTime? @map("lifecycle_verified_at")
+  pumpSwapPool           String?  @map("pump_swap_pool")
+  graduatedAt            DateTime? @map("graduated_at")
   bondingCurve           String?  @map("bonding_curve")
   associatedBondingCurve String?  @map("associated_bonding_curve")
   updatedAt              DateTime @default(now()) @updatedAt @map("updated_at")
@@ -31,10 +43,35 @@ model Token {
   candles1m  PumpCandle1m[]
   features1m PumpFeature1m[]
   marketCaps TokenMarketCap[]
+  lifecycleCheck TokenLifecycleCheck?
 
   @@index([completed, kingOfTheHillTimestamp])
+  @@index([lifecycleStatus, lifecycleVerifiedAt])
   @@index([createdTimestamp])
   @@map("tokens")
+}
+
+model TokenLifecycleCheck {
+  tokenId       String   @id @map("token_id")
+  requestedAt   DateTime @default(now()) @map("requested_at")
+  nextAttemptAt DateTime @default(now()) @map("next_attempt_at")
+  attempts      Int      @default(0)
+  priority      Int      @default(0)
+  reason        String
+  lastError     String?  @map("last_error")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+  token         Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@index([nextAttemptAt, priority])
+  @@map("token_lifecycle_checks")
+}
+
+model TokenDataRevision {
+  key       String   @id
+  revision  BigInt   @default(0)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("token_data_revisions")
 }
 
 model TokenPrice {

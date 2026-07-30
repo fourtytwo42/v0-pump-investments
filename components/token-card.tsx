@@ -56,15 +56,26 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
   const { solPrice, favorites, toggleFavorite } = useTokenContext()
   const BONDING_TARGET_SOL = 415
   const solPriceUsd = solPrice ?? 0
-  const isGraduated = token.is_completed === true || token.is_bonding_curve === false
+  const lifecycleStatus = token.lifecycle_status ?? "unknown"
+  const isGraduated = lifecycleStatus === "curve_complete" || lifecycleStatus === "pumpswap"
   const rawProgress = solPriceUsd > 0 ? (token.usd_market_cap / (solPriceUsd * BONDING_TARGET_SOL)) * 100 : 0
   const cappedProgress = Math.min(Math.max(rawProgress, 0), isGraduated ? 100 : 99)
   const progressPercent = isGraduated ? 100 : cappedProgress
   const showBondingProgress =
-    token.is_completed !== true &&
+    lifecycleStatus === "bonding" &&
     Number.isFinite(progressPercent) &&
     progressPercent >= 0 &&
-    token.is_bonding_curve !== false
+    token.is_bonding_curve === true
+  const lifecycleLabel =
+    lifecycleStatus === "pumpswap"
+      ? "PumpSwap"
+      : lifecycleStatus === "curve_complete"
+        ? "Graduated"
+        : lifecycleStatus === "bonding"
+          ? "Bonding"
+          : lifecycleStatus === "non_launchpad"
+            ? "External"
+            : "Verifying"
 
   const isFavorite = favorites.includes(token.mint)
 
@@ -181,8 +192,8 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
 
   // Check if token is from pump.fun - memoize
   const isFromPumpFun = useMemo(() => {
-    return token.mint.endsWith("pump")
-  }, [token.mint])
+    return lifecycleStatus !== "non_launchpad"
+  }, [lifecycleStatus])
 
   // Handle click on the card
   const handleCardClick = useCallback(() => {
@@ -556,6 +567,9 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
                 <p className="text-xs text-muted-foreground">Token Age</p>
                 <p className="font-medium">{timeInfo.tokenAge}</p>
               </div>
+              <Badge variant="outline" className="text-[10px]">
+                {lifecycleLabel}
+              </Badge>
               {statusIcons}
             </div>
           </div>
@@ -575,7 +589,15 @@ export default React.memo(TokenCard, (prevProps, nextProps) => {
 
   // For market cap, only re-render if it changes significantly (more than 1%)
   const marketCapSame =
-    Math.abs(prevProps.token.usd_market_cap - nextProps.token.usd_market_cap) / prevProps.token.usd_market_cap < 0.01
+    prevProps.token.usd_market_cap === 0
+      ? nextProps.token.usd_market_cap === 0
+      : Math.abs(prevProps.token.usd_market_cap - nextProps.token.usd_market_cap) /
+          prevProps.token.usd_market_cap <
+        0.01
+  const lifecycleSame =
+    prevProps.token.lifecycle_status === nextProps.token.lifecycle_status &&
+    prevProps.token.lifecycle_verified_at === nextProps.token.lifecycle_verified_at &&
+    prevProps.token.pump_swap_pool === nextProps.token.pump_swap_pool
 
-  return mintSame && sizeSame && showAlertSettingsSame && showBonkBotLogoSame && marketCapSame
+  return mintSame && sizeSame && showAlertSettingsSame && showBonkBotLogoSame && marketCapSame && lifecycleSame
 })

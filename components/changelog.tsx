@@ -31,6 +31,24 @@ interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: "3.1.0",
+    date: "July 29, 2026",
+    changes: [
+      {
+        type: "fixed",
+        description: "Replaced market-cap graduation guesses with verified pump.fun lifecycle states, including bonding, curve completion, and PumpSwap migration.",
+      },
+      {
+        type: "improved",
+        description: "Moved token aggregation into PostgreSQL and removed third-party metadata requests from the token-list request path.",
+      },
+      {
+        type: "new",
+        description: "Added realtime token updates over a shared server-sent event stream with snapshot recovery.",
+      },
+    ],
+  },
+  {
     version: "3.0.34",
     date: "April 01, 2026",
     changes: [

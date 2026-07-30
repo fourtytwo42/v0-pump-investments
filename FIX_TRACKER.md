@@ -10,11 +10,34 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 
 ## Current State
 - Production build currently succeeds with `npm run build`.
-- Full TypeScript validation does not pass with `npx tsc --noEmit --project tsconfig.json`.
+- Full TypeScript validation passes with `npm run typecheck`.
 - GitHub auth on this machine is fixed.
 - The ingester reconnect hardening was implemented, built, restarted under PM2, and pushed to `main`.
+- The LAN VM deployment is live at `http://192.168.50.237:3000`.
 
 ## Priorities
+
+### P0: Reliable lifecycle and realtime token delivery
+
+#### T12. Replace market-cap graduation inference and 500 ms polling
+- Status: `in_progress`
+- Files:
+  - `prisma/schema.prisma`
+  - `server/ingest-trades.ts`
+  - `app/api/tokens/`
+  - `contexts/token-context.tsx`
+  - `components/token-card.tsx`
+- Goal:
+  - Verify lifecycle from Pump frontend endpoints without RPC, move token aggregation into PostgreSQL, and deliver realtime updates through SSE.
+- Constraints:
+  - Pump websocket/NATS fields are hints only.
+  - Unknown lifecycle must remain explicit rather than inferred from market cap.
+  - Existing API compatibility fields remain during rollout.
+- Verification:
+  - `npm test`
+  - `npm run typecheck`
+  - `npm run build`
+  - Live VM backfill, PM2 health, API latency, SSE reconnect, and LAN browser checks.
 
 ### P0: Restore TypeScript Baseline
 
@@ -115,6 +138,30 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - The `TS7016` declaration error for `server/ingest-trades.ts` was resolved without needing a local fallback declaration file or source edits.
 
 ### P1: Operational Consistency
+
+#### T10. Provision LAN production VM
+- Status: `done`
+- Target:
+  - `192.168.50.237` (`pumpinvestments-4`)
+- Goal:
+  - Run the web tracker and live trade ingester persistently on the new Ubuntu VM.
+- Notes:
+  - Installed Node.js 22, PostgreSQL 16, build tools, and PM2.
+  - Cloned the app to `/home/hendo420/pumpInvestments/v0-pump-investments`.
+  - Created the PostgreSQL database and app role, wrote a mode-600 production `.env`, pushed the Prisma schema, and built the production app.
+  - Registered and started `pm2-hendo420.service`; `pump-investments-web` and `pump-investments-ingest` are online.
+  - Verified the homepage and POST `/api/tokens` from another LAN machine; the ingester also populated PostgreSQL with live tokens and trades.
+  - Pi Bot chat remains unconfigured because no `GROQ_API_KEY` was supplied.
+  - `npm ci` reported 25 audit findings; dependency remediation is follow-up work and was not mixed into deployment.
+
+#### T11. Monitor third-party metadata failures
+- Status: `monitor`
+- Problem:
+  - Some token metadata URLs return upstream 403 or 404 responses.
+- Notes:
+  - Observed in `logs/web-error.log` during final LAN verification.
+  - Homepage and POST `/api/tokens` still return 200, and live ingestion continues.
+  - Existing metadata fallback and cooldown behavior remains active; investigate only if missing token artwork becomes materially disruptive.
 
 #### T6. Make PM2 env reload behavior explicit
 - Status: `done`

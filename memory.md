@@ -13,11 +13,21 @@ This file stores durable project memory for recovery after context compression o
 - Primary branch: `main`
 - Git remote: `origin https://github.com/fourtytwo42/v0-pump-investments.git`
 - Process manager: PM2
+- LAN deployment:
+  - VM: `192.168.50.237` (`pumpinvestments-4`, Ubuntu 24.04)
+  - Web URL: `http://192.168.50.237:3000`
+  - Runtime: Node.js 22
+  - Database: PostgreSQL 16 on localhost
+  - Boot service: `pm2-hendo420.service`
 - Main PM2 app names:
   - `pump-investments-web`
   - `pump-investments-ingest`
 
 ## Current Operational State
+- The LAN deployment at `192.168.50.237:3000` was provisioned and verified on 2026-07-29.
+- `pm2-hendo420.service` is enabled and active; both PM2 processes are online.
+- The homepage and POST `/api/tokens` respond successfully over the LAN, and the ingester is writing live token/trade data.
+- The production `.env` exists only on the VM with mode `600`; do not commit it.
 - GitHub auth is working for `fourtytwo42` through `gh` and HTTPS Git.
 - Production build succeeded after the ingester reconnect changes.
 - PM2 web and ingest processes were restarted successfully after that build.
@@ -79,8 +89,16 @@ This file stores durable project memory for recovery after context compression o
 
 ## Known Problems
 - PM2 env changes require `--update-env` on restart if `.env` has changed.
+- Pi Bot chat requires `GROQ_API_KEY`; no key was available during the 2026-07-29 VM deployment.
+- `npm ci` reported 25 dependency audit findings (5 low, 2 moderate, 17 high, 1 critical); no force-upgrade was applied during deployment.
+- Some third-party token metadata URLs return 403 or 404; the API continues serving token data and uses its existing fallback/cooldown behavior.
 
 ## Commands / Checks
+- VM app path:
+  - `cd /home/hendo420/pumpInvestments/v0-pump-investments`
+- Service status:
+  - `systemctl status pm2-hendo420`
+  - `pm2 status`
 - Build:
   - `npm run build`
 - Full typecheck:

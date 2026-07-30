@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client"
+import { PrismaClient, type TokenLifecycleStatus } from "@prisma/client"
 import { Decimal } from "@prisma/client/runtime/library"
 import WebSocket from "ws"
 import {
@@ -10,6 +10,19 @@ import {
 import { normalizeTokenMetadata } from "@/lib/token-metadata"
 import { fetchPumpCoin, PUMP_HEADERS, shouldSkipPumpCoinFetch } from "@/lib/pump-coin"
 import { getDexPairCreatedAt } from "@/lib/dexscreener"
+import { BoundedCache } from "@/lib/bounded-cache"
+import {
+  DEFAULT_LIFECYCLE_BATCH_SIZE,
+  fetchPumpLifecycleBatch,
+  fetchPumpLifecycleSingle,
+  PumpLifecycleRequestError,
+} from "@/lib/pump-lifecycle"
+import {
+  classifyPumpLifecycle,
+  isCompletedLifecycle,
+  lifecycleRetryDelayMs,
+  reduceLifecycle,
+} from "@/lib/token-lifecycle"
 
 // =============================================================================
 // Configuration
@@ -101,6 +114,10 @@ const INGEST_METADATA_ELEVATED_QUEUE_THRESHOLD = Math.max(
   Math.floor(INGEST_METADATA_OVERLOAD_QUEUE_THRESHOLD / 2),
 )
 const INGEST_METADATA_INACTIVE_EXPIRY_MS = Math.max(INGEST_METADATA_ACTIVE_WINDOW_MS * 12, 6 * 60 * 60 * 1000)
+const LIFECYCLE_VERIFIER_ENABLED = process.env.LIFECYCLE_VERIFIER_ENABLED !== "false"
+const LIFECYCLE_BATCH_SIZE = parseEnvNumber("LIFECYCLE_BATCH_SIZE", DEFAULT_LIFECYCLE_BATCH_SIZE)
+const LIFECYCLE_ACTIVE_RECHECK_MS = parseEnvNumber("LIFECYCLE_ACTIVE_RECHECK_MS", 60_000)
+const LIFECYCLE_FULL_RECHECK_MS = parseEnvNumber("LIFECYCLE_FULL_RECHECK_MS", 15 * 60_000)
 
 // =============================================================================
 // Database Setup
@@ -161,16 +178,18 @@ let lastDisconnectAt = 0
 let solPriceCache = { value: 160, updatedAt: 0 }
 
 // Token ID cache (mint -> id) - avoids repeated SELECT queries
-const tokenIdCache = new Map<string, string>()
+const tokenIdCache = new BoundedCache<string, string>(100_000, 24 * 60 * 60 * 1000)
 
 // Metadata caches
-const metadataCache = new Map<string, unknown>()
+const metadataCache = new BoundedCache<string, unknown>(5_000, 10 * 60 * 1000)
 const metadataRetryQueue = new Map<string, MetadataRetryState>()
 let isProcessingMetadataQueue = false
 let lastMetadataRequestAt = 0
 let metadataDynamicDelayMs = 0
 let latestTradeSeenTimestampMs = 0
 let latestTradePersistedTimestampMs = 0
+let tokenRevisionDirty = false
+let lifecycleWorkerRunning = false
 const metadataStats = {
   success: 0,
   timeout: 0,
@@ -220,6 +239,221 @@ function generateCuid(): string {
   const timestamp = Date.now().toString(36)
   const random = Math.random().toString(36).substring(2, 10)
   return `c${timestamp}${random}`
+}
+
+// =============================================================================
+// Pump lifecycle verification
+// =============================================================================
+
+interface LifecycleCheckRequest {
+  tokenId: string
+  reason: string
+  priority: number
+}
+
+async function enqueueLifecycleChecks(requests: LifecycleCheckRequest[]): Promise<void> {
+  if (!LIFECYCLE_VERIFIER_ENABLED || requests.length === 0) return
+  const deduplicated = new Map<string, LifecycleCheckRequest>()
+  for (const request of requests) {
+    const current = deduplicated.get(request.tokenId)
+    if (!current || request.priority > current.priority) deduplicated.set(request.tokenId, request)
+  }
+  const values = Array.from(deduplicated.values())
+    .map(
+      (request) =>
+        `(${escapeSQL(request.tokenId)},NOW(),NOW(),0,${request.priority},${escapeSQL(request.reason)},NOW())`,
+    )
+    .join(",")
+  await prisma.$executeRawUnsafe(`
+    INSERT INTO token_lifecycle_checks
+      (token_id,requested_at,next_attempt_at,attempts,priority,reason,updated_at)
+    VALUES ${values}
+    ON CONFLICT (token_id) DO UPDATE SET
+      requested_at = NOW(),
+      next_attempt_at = LEAST(token_lifecycle_checks.next_attempt_at, NOW()),
+      priority = GREATEST(token_lifecycle_checks.priority, EXCLUDED.priority),
+      reason = EXCLUDED.reason,
+      updated_at = NOW()
+  `)
+}
+
+async function enqueueLifecycleChecksByQuery(mode: "all" | "active"): Promise<void> {
+  if (!LIFECYCLE_VERIFIER_ENABLED) return
+  const activeCutoff = BigInt(Date.now() - 60 * 60 * 1000)
+  if (mode === "active") {
+    await prisma.$executeRawUnsafe(`
+      INSERT INTO token_lifecycle_checks
+        (token_id,requested_at,next_attempt_at,attempts,priority,reason,updated_at)
+      SELECT DISTINCT t.id,NOW(),NOW(),0,40,'active_recheck',NOW()
+      FROM tokens t
+      JOIN trades tr ON tr.token_id=t.id AND tr.timestamp >= ${activeCutoff}
+      WHERE t.lifecycle_status IN ('UNKNOWN','BONDING')
+      ON CONFLICT (token_id) DO UPDATE SET
+        requested_at=NOW(),
+        next_attempt_at=LEAST(token_lifecycle_checks.next_attempt_at,NOW()),
+        priority=GREATEST(token_lifecycle_checks.priority,40),
+        reason='active_recheck',
+        updated_at=NOW()
+    `)
+    return
+  }
+
+  await prisma.$executeRawUnsafe(`
+    INSERT INTO token_lifecycle_checks
+      (token_id,requested_at,next_attempt_at,attempts,priority,reason,updated_at)
+    SELECT t.id,NOW(),NOW(),0,10,'full_recheck',NOW()
+    FROM tokens t
+    WHERE t.lifecycle_status IN ('UNKNOWN','BONDING','CURVE_COMPLETE')
+    ON CONFLICT (token_id) DO UPDATE SET
+      requested_at=NOW(),
+      next_attempt_at=LEAST(token_lifecycle_checks.next_attempt_at,NOW()),
+      priority=GREATEST(token_lifecycle_checks.priority,10),
+      reason='full_recheck',
+      updated_at=NOW()
+  `)
+}
+
+async function rescheduleLifecycleCheck(
+  tokenId: string,
+  attempts: number,
+  error: string,
+  explicitDelayMs?: number | null,
+): Promise<void> {
+  const delayMs = explicitDelayMs ?? lifecycleRetryDelayMs(attempts)
+  await prisma.tokenLifecycleCheck.update({
+    where: { tokenId },
+    data: {
+      attempts,
+      lastError: error.slice(0, 500),
+      nextAttemptAt: new Date(Date.now() + delayMs),
+      priority: Math.max(0, 100 - attempts),
+    },
+  })
+}
+
+async function applyVerifiedLifecycle(
+  check: Awaited<ReturnType<typeof getLifecycleChecks>>[number],
+  payload: Record<string, unknown>,
+): Promise<boolean> {
+  const verified = classifyPumpLifecycle(payload)
+  if (!verified) {
+    await rescheduleLifecycleCheck(check.tokenId, check.attempts + 1, "unclassifiable Pump response")
+    return false
+  }
+
+  const transition = reduceLifecycle(check.token.lifecycleStatus, verified)
+  const now = new Date()
+  if (transition.conflict) {
+    console.warn(
+      `[lifecycle] event=conflict mint=${check.token.mintAddress} current=${check.token.lifecycleStatus} observed=${verified.status}`,
+    )
+  }
+
+  await prisma.$transaction([
+    prisma.token.update({
+      where: { id: check.tokenId },
+      data: {
+        lifecycleStatus: transition.next,
+        lifecycleVerifiedAt: now,
+        completed: isCompletedLifecycle(transition.next),
+        pumpSwapPool: verified.pumpSwapPool ?? check.token.pumpSwapPool,
+        graduatedAt:
+          isCompletedLifecycle(transition.next) && !check.token.graduatedAt
+            ? now
+            : check.token.graduatedAt,
+        bondingCurve: verified.bondingCurve ?? check.token.bondingCurve,
+        associatedBondingCurve:
+          verified.associatedBondingCurve ?? check.token.associatedBondingCurve,
+      },
+    }),
+    prisma.tokenLifecycleCheck.delete({ where: { tokenId: check.tokenId } }),
+  ])
+  tokenRevisionDirty = true
+  return true
+}
+
+async function getLifecycleChecks() {
+  return prisma.tokenLifecycleCheck.findMany({
+    where: { nextAttemptAt: { lte: new Date() } },
+    orderBy: [{ priority: "desc" }, { requestedAt: "asc" }],
+    take: LIFECYCLE_BATCH_SIZE,
+    include: {
+      token: {
+        select: {
+          mintAddress: true,
+          lifecycleStatus: true,
+          pumpSwapPool: true,
+          graduatedAt: true,
+          bondingCurve: true,
+          associatedBondingCurve: true,
+        },
+      },
+    },
+  })
+}
+
+async function processLifecycleChecks(): Promise<void> {
+  if (!LIFECYCLE_VERIFIER_ENABLED || lifecycleWorkerRunning) return
+  lifecycleWorkerRunning = true
+  let checks: Awaited<ReturnType<typeof getLifecycleChecks>> = []
+  try {
+    checks = await getLifecycleChecks()
+    if (checks.length === 0) return
+    const payloads = await fetchPumpLifecycleBatch(checks.map((check) => check.token.mintAddress))
+    const byMint = new Map<string, Record<string, unknown>>()
+    for (const payload of payloads) {
+      if (typeof payload.mint === "string") byMint.set(payload.mint, payload as Record<string, unknown>)
+    }
+
+    let singleFallbackUsed = false
+    let verifiedCount = 0
+    for (const check of checks) {
+      let payload = byMint.get(check.token.mintAddress)
+      if (!payload && check.attempts >= 2 && !singleFallbackUsed) {
+        singleFallbackUsed = true
+        const single = await fetchPumpLifecycleSingle(check.token.mintAddress)
+        if (single) payload = single as Record<string, unknown>
+      }
+      if (!payload) {
+        await rescheduleLifecycleCheck(
+          check.tokenId,
+          check.attempts + 1,
+          "mint missing from Pump lifecycle response",
+        )
+        continue
+      }
+      if (await applyVerifiedLifecycle(check, payload)) verifiedCount += 1
+    }
+    console.log(
+      `[lifecycle] event=batch checked=${checks.length} verified=${verifiedCount} missing=${checks.length - verifiedCount}`,
+    )
+  } catch (error) {
+    const message = (error as Error).message
+    const retryAfterMs = error instanceof PumpLifecycleRequestError ? error.retryAfterMs : null
+    console.warn(`[lifecycle] event=batch_failed checked=${checks.length} message=${JSON.stringify(message)}`)
+    await Promise.all(
+      checks.map((check) =>
+        rescheduleLifecycleCheck(check.tokenId, check.attempts + 1, message, retryAfterMs).catch(() => undefined),
+      ),
+    )
+  } finally {
+    lifecycleWorkerRunning = false
+  }
+}
+
+async function flushTokenRevision(): Promise<void> {
+  if (!tokenRevisionDirty) return
+  tokenRevisionDirty = false
+  try {
+    await prisma.tokenDataRevision.upsert({
+      where: { key: "tokens" },
+      create: { key: "tokens", revision: BigInt(1) },
+      update: { revision: { increment: BigInt(1) } },
+    })
+  } catch (error) {
+    tokenRevisionDirty = true
+    console.warn("[revision] Failed to advance token revision:", (error as Error).message)
+  }
 }
 
 // =============================================================================
@@ -281,7 +515,9 @@ interface PreparedTrade {
   description: string | null
   bondingCurve: string | null
   associatedBondingCurve: string | null
-  isCompleted: boolean
+  program: string
+  isBondingCurve: boolean | null
+  poolAddress: string | null
   kingOfTheHillTimestamp: number | null
   raw: PumpUnifiedTrade | null // Store full raw payload including marketCap
 }
@@ -375,14 +611,6 @@ function prepareTrade(trade: PumpUnifiedTrade, solPriceUsd: number): PreparedTra
   ) ?? null
 
   const program = typeof trade.program === "string" ? trade.program.toLowerCase() : ""
-  // completed = true when token has graduated
-  // The API uses "complete" (boolean), not "completed"
-  // Note: bonding curve address persists even after graduation, so we can't rely on it
-  // The websocket isBondingCurve flag is also unreliable - use API "complete" field when available
-  const coinInfoComplete = coinMeta.complete ?? coinMeta.completed ?? coinMeta.isCompleted
-  const isCompleted = typeof coinInfoComplete === "boolean" 
-    ? coinInfoComplete 
-    : (trade.isBondingCurve === false) // Fallback to websocket flag if coinMeta doesn't have complete status
   
   // KOTH is a milestone during bonding (about halfway), not graduation
   // We'll determine KOTH separately - for now, we don't set it from trade data
@@ -413,7 +641,9 @@ function prepareTrade(trade: PumpUnifiedTrade, solPriceUsd: number): PreparedTra
     description: metadata.description ?? null,
     bondingCurve,
     associatedBondingCurve,
-    isCompleted,
+    program,
+    isBondingCurve: typeof trade.isBondingCurve === "boolean" ? trade.isBondingCurve : null,
+    poolAddress: firstString(trade.poolAddress) ?? null,
     kingOfTheHillTimestamp,
     raw: trade, // Store full raw payload including marketCap, supply, etc.
   }
@@ -457,7 +687,7 @@ async function persistTradesBulk(trades: PreparedTrade[]): Promise<void> {
       const tokenValues = uncachedTokens
         .map((t) => {
           const id = generateCuid()
-          return `(${escapeSQL(id)},${escapeSQL(t.mint)},${escapeSQL(t.symbol.slice(0, 50))},${escapeSQL(t.name.slice(0, 200))},${escapeSQL(t.imageUri)},${escapeSQL(t.metadataUri)},${escapeSQL(t.twitter)},${escapeSQL(t.telegram)},${escapeSQL(t.website)},${escapeSQL(t.description?.slice(0, 1000) ?? null)},${escapeSQL(t.creatorAddress)},${t.createdTs},${t.kingOfTheHillTimestamp ? t.kingOfTheHillTimestamp : "NULL"},${t.isCompleted},${escapeSQL(t.bondingCurve)},${escapeSQL(t.associatedBondingCurve)},NOW())`
+          return `(${escapeSQL(id)},${escapeSQL(t.mint)},${escapeSQL(t.symbol.slice(0, 50))},${escapeSQL(t.name.slice(0, 200))},${escapeSQL(t.imageUri)},${escapeSQL(t.metadataUri)},${escapeSQL(t.twitter)},${escapeSQL(t.telegram)},${escapeSQL(t.website)},${escapeSQL(t.description?.slice(0, 1000) ?? null)},${escapeSQL(t.creatorAddress)},${t.createdTs},${t.kingOfTheHillTimestamp ? t.kingOfTheHillTimestamp : "NULL"},false,'UNKNOWN',${escapeSQL(t.bondingCurve)},${escapeSQL(t.associatedBondingCurve)},NOW())`
         })
         .join(",")
 
@@ -465,12 +695,11 @@ async function persistTradesBulk(trades: PreparedTrade[]): Promise<void> {
       if (tokenValues.length > 0) {
         try {
           await prisma.$executeRawUnsafe(`
-            INSERT INTO tokens (id,mint_address,symbol,name,image_uri,metadata_uri,twitter,telegram,website,description,creator_address,created_timestamp,king_of_the_hill_timestamp,completed,bonding_curve,associated_bonding_curve,updated_at)
+            INSERT INTO tokens (id,mint_address,symbol,name,image_uri,metadata_uri,twitter,telegram,website,description,creator_address,created_timestamp,king_of_the_hill_timestamp,completed,lifecycle_status,bonding_curve,associated_bonding_curve,updated_at)
             VALUES ${tokenValues}
             ON CONFLICT (mint_address) DO UPDATE SET
               bonding_curve = EXCLUDED.bonding_curve,
               associated_bonding_curve = EXCLUDED.associated_bonding_curve,
-              completed = EXCLUDED.completed,
               king_of_the_hill_timestamp = EXCLUDED.king_of_the_hill_timestamp,
               updated_at = NOW()
           `)
@@ -558,6 +787,7 @@ async function persistTradesBulk(trades: PreparedTrade[]): Promise<void> {
             ON CONFLICT (token_id) DO UPDATE SET
               price_sol=EXCLUDED.price_sol,price_usd=EXCLUDED.price_usd,
               market_cap_usd=EXCLUDED.market_cap_usd,last_trade_timestamp=EXCLUDED.last_trade_timestamp,updated_at=NOW()
+            WHERE token_prices.last_trade_timestamp <= EXCLUDED.last_trade_timestamp
           `).catch((error) => {
             const errMsg = (error as Error).message
             console.error(`[ingest] Price upsert failed for ${priceTokens.length} tokens:`, errMsg)
@@ -663,31 +893,26 @@ async function persistTradesBulk(trades: PreparedTrade[]): Promise<void> {
       }
     }
 
-    // Step 3: Update completion status for tokens with market cap > $60k
-    // Assume tokens over $60k have graduated from bonding curve
-    if (priceTokens.length > 0) {
-      const graduatedTokens = priceTokens.filter((t) => {
-        const marketCap = t.marketCapUsd.toNumber()
-        return marketCap > 60000
-      })
-
-      if (graduatedTokens.length > 0) {
-        const graduatedMints = graduatedTokens.map((t) => t.mint)
-        // Update tokens to completed = true if market cap > $60k
-        await prisma.token.updateMany({
-          where: {
-            mintAddress: { in: graduatedMints },
-            completed: false, // Only update if not already completed
-          },
-          data: {
-            completed: true,
-          },
-        }).catch((error) => {
-          // Don't fail the whole batch if this update fails
-          console.warn(`[ingest] Failed to update completion status for ${graduatedTokens.length} tokens:`, (error as Error).message)
+    if (LIFECYCLE_VERIFIER_ENABLED) {
+      const newMintSet = new Set(uncachedTokens.map((token) => token.mint))
+      const lifecycleRequests = uniqueTokens
+        .map((token) => {
+          const tokenId = mintToId.get(token.mint)
+          if (!tokenId) return null
+          const highPriority =
+            token.program === "pump_amm" || token.isBondingCurve === false || Boolean(token.poolAddress)
+          if (!newMintSet.has(token.mint) && !highPriority) return null
+          return {
+            tokenId,
+            reason: highPriority ? "trade_graduation_hint" : "new_token",
+            priority: highPriority ? 100 : 20,
+          }
         })
-      }
+        .filter((request): request is { tokenId: string; reason: string; priority: number } => request !== null)
+      await enqueueLifecycleChecks(lifecycleRequests)
     }
+
+    tokenRevisionDirty = true
 
     const duration = Date.now() - startTime
     const rate = trades.length / (duration / 1000)
@@ -945,7 +1170,7 @@ async function refreshTokenMetadata(mint: string): Promise<MetadataRefreshResult
         twitter: true,
         telegram: true,
         website: true,
-        completed: true,
+        lifecycleStatus: true,
         createdTimestamp: true,
       },
     })
@@ -1000,12 +1225,6 @@ async function refreshTokenMetadata(mint: string): Promise<MetadataRefreshResult
       updates.imageUri = imageUri
     }
 
-    // Update completed status from API when we fetch metadata (authoritative source)
-    // This is the only time we check completion status to avoid rate limits
-    const coinInfoComplete = coinRecord.complete ?? coinRecord.completed ?? coinRecord.isCompleted
-    if (typeof coinInfoComplete === "boolean" && coinInfoComplete !== token.completed) {
-      updates.completed = coinInfoComplete
-    }
     if (metadata.description && !token.description) {
       updates.description = metadata.description
     }
@@ -1019,8 +1238,7 @@ async function refreshTokenMetadata(mint: string): Promise<MetadataRefreshResult
       updates.website = metadata.website
     }
 
-    // Completed status is already updated above from coinInfo
-    if (token.completed || (typeof coinInfoComplete === "boolean" && coinInfoComplete)) {
+    if (isCompletedLifecycle(token.lifecycleStatus)) {
       const dexCreatedAt = await getDexPairCreatedAt(mint)
       if (dexCreatedAt && (!token.createdTimestamp || dexCreatedAt < Number(token.createdTimestamp))) {
         updates.createdTimestamp = BigInt(dexCreatedAt)
@@ -1032,6 +1250,7 @@ async function refreshTokenMetadata(mint: string): Promise<MetadataRefreshResult
         where: { id: token.id },
         data: updates,
       })
+      tokenRevisionDirty = true
     }
 
     // Only return true if we now have both metadataUri and imageUri (or already had both)
@@ -1236,6 +1455,31 @@ if (TRADE_RETENTION_HOURS > 0) {
   console.log(`[cleanup] Retention: ${TRADE_RETENTION_HOURS}h`)
   setTimeout(() => void cleanupOldTrades(), 5 * 60 * 1000)
   setInterval(() => void cleanupOldTrades(), CLEANUP_INTERVAL_MS)
+}
+
+setInterval(() => void flushTokenRevision(), 1_000)
+
+if (LIFECYCLE_VERIFIER_ENABLED) {
+  setTimeout(() => {
+    void enqueueLifecycleChecksByQuery("all")
+      .then(() => processLifecycleChecks())
+      .catch((error) => console.warn("[lifecycle] Initial backfill enqueue failed:", (error as Error).message))
+  }, 2_000)
+  setInterval(() => void processLifecycleChecks(), 2_200)
+  setInterval(
+    () =>
+      void enqueueLifecycleChecksByQuery("active").catch((error) =>
+        console.warn("[lifecycle] Active reconciliation enqueue failed:", (error as Error).message),
+      ),
+    LIFECYCLE_ACTIVE_RECHECK_MS,
+  )
+  setInterval(
+    () =>
+      void enqueueLifecycleChecksByQuery("all").catch((error) =>
+        console.warn("[lifecycle] Full reconciliation enqueue failed:", (error as Error).message),
+      ),
+    LIFECYCLE_FULL_RECHECK_MS,
+  )
 }
 
 // =============================================================================

@@ -1,4 +1,5 @@
 export type GraduatedFilterValue = "all" | "bonding" | "graduated"
+export type TokenLifecycleStatus = "unknown" | "bonding" | "curve_complete" | "pumpswap" | "non_launchpad"
 
 export type TokenSortBy =
   | "marketCap"
@@ -52,6 +53,8 @@ export interface TokenData {
   metadata_uri?: string | null
   usd_market_cap: number
   market_cap: number
+  price_sol?: number
+  price_usd?: number
   total_volume: number
   total_volume_usd: number
   buy_volume: number
@@ -75,6 +78,9 @@ export interface TokenData {
   king_of_the_hill_timestamp?: number | null
   description?: string | null
   is_completed?: boolean
+  lifecycle_status: TokenLifecycleStatus
+  lifecycle_verified_at?: string | null
+  pump_swap_pool?: string | null
   bonding_curve?: string | null
   associated_bonding_curve?: string | null
   is_bonding_curve?: boolean | null

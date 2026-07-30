@@ -10,7 +10,7 @@ const FRONTEND_ENDPOINTS = [
   "https://frontend-api.pump.fun",
 ]
 
-const COIN_CACHE = new Map<string, any | null>()
+const COIN_CACHE = new BoundedCache<string, any>(5_000, 10 * 60 * 1000)
 const COIN_FETCH_PROMISES = new Map<string, Promise<any | null>>()
 const FAILURE_COOLDOWNS = new Map<string, { until: number; type: "not_found" | "transient" }>()
 
@@ -121,13 +121,8 @@ export async function fetchPumpCoin(mint: string | null | undefined): Promise<an
     return null
   }
 
-  if (COIN_CACHE.has(mint)) {
-    const cached = COIN_CACHE.get(mint)
-    if (cached != null) {
-      return cached
-    }
-    COIN_CACHE.delete(mint)
-  }
+  const cached = COIN_CACHE.get(mint)
+  if (cached != null) return cached
 
   if (COIN_FETCH_PROMISES.has(mint)) {
     return COIN_FETCH_PROMISES.get(mint)!
@@ -139,3 +134,4 @@ export async function fetchPumpCoin(mint: string | null | undefined): Promise<an
   COIN_FETCH_PROMISES.set(mint, promise)
   return promise
 }
+import { BoundedCache } from "@/lib/bounded-cache"
