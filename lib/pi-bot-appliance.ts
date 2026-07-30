@@ -96,6 +96,7 @@ export async function generatePiBotText(options: {
           { role: "user", content: options.prompt },
         ],
         max_tokens: options.maxOutputTokens ?? DEFAULT_PI_BOT_OUTPUT_TOKENS,
+        reasoning_format: "none",
         stream: false,
       }),
       signal: controller.signal,
