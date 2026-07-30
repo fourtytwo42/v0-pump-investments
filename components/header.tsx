@@ -5,8 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import NextImage from "next/image"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { Changelog } from "./changelog"
-import { Roadmap } from "./roadmap"
+import dynamic from "next/dynamic"
 import { History, Map, MessageCircle } from "lucide-react"
 import { Quicksand } from "next/font/google"
 import { useTokenContext } from "@/contexts/token-context"
@@ -14,6 +13,15 @@ import { useState, useEffect } from "react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { changelogData } from "./changelog"
 import { useLocalStorage } from "@/hooks/use-local-storage"
+
+const Changelog = dynamic(
+  () => import("./changelog").then((module) => module.Changelog),
+  { ssr: false },
+)
+const Roadmap = dynamic(
+  () => import("./roadmap").then((module) => module.Roadmap),
+  { ssr: false },
+)
 
 // Initialize the Quicksand font
 const quicksand = Quicksand({ subsets: ["latin"], weight: ["300"] })
@@ -80,7 +88,7 @@ export default function Header() {
             </span>
           </div>
           <Badge variant="outline" className="ml-1 hidden md:flex">
-            v3.1.3
+            v4.0.0
           </Badge>
         </div>
         <div className="flex items-center gap-2 md:gap-4">

@@ -31,6 +31,36 @@ interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: "4.0.0",
+    date: "July 29, 2026",
+    changes: [
+      {
+        type: "new",
+        description: "Added durable trade spooling, atomic database writes, rolling activity aggregates, independent alert streaming, and public service health checks.",
+      },
+      {
+        type: "improved",
+        description: "Upgraded the application to Next.js 16, React 19, Prisma 7, and pinned production dependencies with explicit PostgreSQL connection pools.",
+      },
+      {
+        type: "improved",
+        description: "Centralized SOL pricing, hardened and cached token images, reduced initial loading, and made Pause preserve card order while values keep updating.",
+      },
+      {
+        type: "fixed",
+        description: "Made lifecycle updates no-op when Pump reports no change, corrected individual Trade Amount filtering, and preserved exact requested time ranges.",
+      },
+      {
+        type: "improved",
+        description: "Removed obsolete King of the Hill controls and artwork while preserving the existing card design and external-token provenance icon.",
+      },
+      {
+        type: "improved",
+        description: "Improved request validation, accessibility, reverse-proxy readiness, alert sounds, observability, and failure recovery without adding new card chips.",
+      },
+    ],
+  },
+  {
     version: "3.1.3",
     date: "July 29, 2026",
     changes: [

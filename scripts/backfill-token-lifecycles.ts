@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client"
+import { createPrismaClient } from "@/lib/prisma-client"
 
 import { fetchPumpLifecycleBatch } from "@/lib/pump-lifecycle"
 import {
@@ -7,7 +7,7 @@ import {
   reduceLifecycle,
 } from "@/lib/token-lifecycle"
 
-const prisma = new PrismaClient()
+const prisma = createPrismaClient("utility")
 const batchSize = Math.min(50, Math.max(1, Number(process.env.LIFECYCLE_BATCH_SIZE ?? 50)))
 const requestSpacingMs = 2_200
 

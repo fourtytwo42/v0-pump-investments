@@ -7,7 +7,6 @@ import { db } from "@/lib/db"
 
 export interface DashboardSettings {
   tokensPerPage: number
-  hideKOTH: boolean
   hideExternal: boolean
   minMarketCap: number
   maxMarketCap: number
@@ -36,7 +35,6 @@ export function useSettings(setOnboardingActive: (active: boolean) => void) {
   // Settings with localStorage persistence
   const [settings, setSettings] = useLocalStorage<DashboardSettings>("pump-investments-settings", {
     tokensPerPage: 12,
-    hideKOTH: false,
     hideExternal: false,
     minMarketCap: 0,
     maxMarketCap: 100000000,

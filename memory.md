@@ -110,6 +110,19 @@ This file stores durable project memory for recovery after context compression o
 - `npm ci` reported 25 dependency audit findings (5 low, 2 moderate, 17 high, 1 critical); no force-upgrade was applied during deployment.
 - Some third-party token metadata URLs return 403 or 404; the API continues serving token data and uses its existing fallback/cooldown behavior.
 
+## 2026-07-29 No-visual-change whole-app audit
+- The prioritized report is `APP_IMPROVEMENT_AUDIT.md`; no product behavior or visuals were changed during the audit.
+- Live snapshot baseline was 7.2 ms p50, 10.3 ms p95, and 11.5 ms max over 25 VM-local samples; newest persisted trade lag was 1.823 seconds.
+- P0 persistence risk: price/trade insert connection errors can be swallowed inside `persistTradesBulk`, after which revision and in-memory persisted timestamps still advance. Make the batch atomic, retry the original data, and derive health from confirmed writes.
+- Unchanged lifecycle verifications currently rewrite token rows and dirty the global token revision, causing unnecessary SQL/SSE churn.
+- `lib/token-stream.ts` has a process-global revision race when a new query group overwrites `lastObservedRevision`; use per-group applied revisions and an atomic snapshot/revision handshake.
+- Alerts only check tokens in the current result page and require the browser to remain open; the sound service eagerly probes missing and malformed sound URLs.
+- `npm audit --omit=dev` reported 17 production-tree findings: 1 critical, 11 high, 1 moderate, and 4 low. Next.js 14.1.0 and `ws` 8.18.3 require staged patching.
+- `npm run lint` is not a release gate because it opens the interactive first-time ESLint setup; the production build reports that linting is skipped.
+- Browser bundle baseline is about 267 kB first-load JS. Closed panels are eagerly included, all cards consume the broad token context, and two Toasters are mounted.
+- The Settings trade-amount description says individual trades, while SQL applies thresholds to each buyer's cumulative window total.
+- The API silently expands empty short time ranges to 30 minutes while the client continues displaying the requested range.
+
 ## 2026-07-29 Settings slider hardening
 - Release v3.1.1 makes all Settings sliders keep local preview state while dragging and commit filter changes only when the interaction ends.
 - Slider values are clamped and snapped centrally before rendering or committing, preventing stale or invalid persisted values from producing unstable thumb positions.

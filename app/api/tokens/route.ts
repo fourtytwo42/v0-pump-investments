@@ -2,16 +2,23 @@ import { NextResponse } from "next/server"
 
 import { getTokenDataRevision, queryTokenSnapshot } from "@/lib/token-query"
 import type { TokenQueryRequest } from "@/types/token-data"
+import { apiErrorResponse, readJsonBody, tokenQuerySchema } from "@/lib/api-request"
 
 export const dynamic = "force-dynamic"
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as Partial<TokenQueryRequest>
-    const [snapshot, revision] = await Promise.all([queryTokenSnapshot(body), getTokenDataRevision()])
-    return NextResponse.json({ ...snapshot, revision: revision.toString() })
+    const body = await readJsonBody(request, tokenQuerySchema, 64 * 1024) as Partial<TokenQueryRequest>
+    let snapshot
+    let revisionBefore
+    let revisionAfter
+    do {
+      revisionBefore = await getTokenDataRevision()
+      snapshot = await queryTokenSnapshot(body)
+      revisionAfter = await getTokenDataRevision()
+    } while (revisionBefore !== revisionAfter)
+    return NextResponse.json({ ...snapshot, revision: revisionAfter.toString() })
   } catch (error) {
-    console.error("[api/tokens] Failed to fetch tokens:", error)
-    return NextResponse.json({ error: "Failed to fetch tokens" }, { status: 500 })
+    return apiErrorResponse(error)
   }
 }

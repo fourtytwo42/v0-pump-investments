@@ -1,10 +1,25 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+}
+
+enum TokenLaunchSource {
+  UNKNOWN
+  PUMP
+  MOONSHOT
+  EXTERNAL
+}
+
+enum TokenTradeVenue {
+  UNKNOWN
+  PUMP_BONDING
+  PUMPSWAP
+  RAYDIUM_V4
+  METEORA_DBC
 }
 
 enum TokenLifecycleStatus {
@@ -16,39 +31,130 @@ enum TokenLifecycleStatus {
 }
 
 model Token {
-  id                     String   @id @default(cuid())
-  mintAddress            String   @unique @map("mint_address")
-  symbol                 String
-  name                   String
-  imageUri               String?  @map("image_uri")
-  metadataUri            String?  @map("metadata_uri")
-  twitter                String?
-  telegram               String?
-  website                String?
-  description            String?
-  creatorAddress         String   @map("creator_address")
-  createdTimestamp       BigInt   @map("created_timestamp")
-  kingOfTheHillTimestamp BigInt?  @map("king_of_the_hill_timestamp")
-  completed              Boolean  @default(false) @map("completed")
-  lifecycleStatus        TokenLifecycleStatus @default(UNKNOWN) @map("lifecycle_status")
-  lifecycleVerifiedAt    DateTime? @map("lifecycle_verified_at")
-  pumpSwapPool           String?  @map("pump_swap_pool")
-  graduatedAt            DateTime? @map("graduated_at")
-  bondingCurve           String?  @map("bonding_curve")
-  associatedBondingCurve String?  @map("associated_bonding_curve")
-  updatedAt              DateTime @default(now()) @updatedAt @map("updated_at")
+  id                         String               @id @default(cuid())
+  mintAddress                String               @unique @map("mint_address")
+  symbol                     String
+  name                       String
+  imageUri                   String?              @map("image_uri")
+  metadataUri                String?              @map("metadata_uri")
+  twitter                    String?
+  telegram                   String?
+  website                    String?
+  description                String?
+  creatorAddress             String               @map("creator_address")
+  createdTimestamp           BigInt               @map("created_timestamp")
+  kingOfTheHillTimestamp     BigInt?              @map("king_of_the_hill_timestamp")
+  completed                  Boolean              @default(false) @map("completed")
+  lifecycleStatus            TokenLifecycleStatus @default(UNKNOWN) @map("lifecycle_status")
+  lifecycleVerifiedAt        DateTime?            @map("lifecycle_verified_at")
+  pumpSwapPool               String?              @map("pump_swap_pool")
+  graduatedAt                DateTime?            @map("graduated_at")
+  launchSource               TokenLaunchSource    @default(UNKNOWN) @map("launch_source")
+  tradeVenue                 TokenTradeVenue      @default(UNKNOWN) @map("trade_venue")
+  sourceVerifiedAt           DateTime?            @map("source_verified_at")
+  tradeVenueUpdatedAt        DateTime?            @map("trade_venue_updated_at")
+  createdTimestampSource     String               @default("first_observed") @map("created_timestamp_source")
+  createdTimestampVerifiedAt DateTime?            @map("created_timestamp_verified_at")
+  bondingCurve               String?              @map("bonding_curve")
+  associatedBondingCurve     String?              @map("associated_bonding_curve")
+  updatedAt                  DateTime             @default(now()) @updatedAt @map("updated_at")
 
-  price      TokenPrice?
-  trades     Trade[]
-  candles1m  PumpCandle1m[]
-  features1m PumpFeature1m[]
-  marketCaps TokenMarketCap[]
-  lifecycleCheck TokenLifecycleCheck?
+  price                 TokenPrice?
+  trades                Trade[]
+  candles1m             PumpCandle1m[]
+  features1m            PumpFeature1m[]
+  marketCaps            TokenMarketCap[]
+  lifecycleCheck        TokenLifecycleCheck?
+  minuteAggregates      TokenMinuteAggregate[]
+  buyerMinuteAggregates TokenBuyerMinuteAggregate[]
+  imageStatus           TokenImageStatus?
 
   @@index([completed, kingOfTheHillTimestamp])
   @@index([lifecycleStatus, lifecycleVerifiedAt])
   @@index([createdTimestamp])
+  @@index([launchSource, tradeVenue])
   @@map("tokens")
+}
+
+model TokenMinuteAggregate {
+  tokenId            String   @map("token_id")
+  minute             DateTime
+  volumeUsd          Decimal  @default(0) @map("volume_usd") @db.Decimal(24, 8)
+  volumeSol          Decimal  @default(0) @map("volume_sol") @db.Decimal(24, 9)
+  buyVolumeUsd       Decimal  @default(0) @map("buy_volume_usd") @db.Decimal(24, 8)
+  buyVolumeSol       Decimal  @default(0) @map("buy_volume_sol") @db.Decimal(24, 9)
+  sellVolumeUsd      Decimal  @default(0) @map("sell_volume_usd") @db.Decimal(24, 8)
+  sellVolumeSol      Decimal  @default(0) @map("sell_volume_sol") @db.Decimal(24, 9)
+  buyCount           Int      @default(0) @map("buy_count")
+  sellCount          Int      @default(0) @map("sell_count")
+  lastTradeTimestamp BigInt   @map("last_trade_timestamp")
+  updatedAt          DateTime @default(now()) @updatedAt @map("updated_at")
+  token              Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@id([tokenId, minute])
+  @@index([minute])
+  @@map("token_minute_aggregates")
+}
+
+model TokenBuyerMinuteAggregate {
+  tokenId      String   @map("token_id")
+  minute       DateTime
+  buyerAddress String   @map("buyer_address")
+  buyTotalUsd  Decimal  @default(0) @map("buy_total_usd") @db.Decimal(24, 8)
+  buyCount     Int      @default(0) @map("buy_count")
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+  token        Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@id([tokenId, minute, buyerAddress])
+  @@index([minute])
+  @@map("token_buyer_minute_aggregates")
+}
+
+model TokenDirtyMint {
+  mintAddress String   @id @map("mint_address")
+  changeKinds String[] @default([]) @map("change_kinds")
+  revision    BigInt
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@index([revision])
+  @@map("token_dirty_mints")
+}
+
+model TokenRevisionJournal {
+  id          BigInt   @id @default(autoincrement())
+  revision    BigInt
+  mintAddress String   @map("mint_address")
+  changeKind  String   @map("change_kind")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([revision])
+  @@index([mintAddress, revision])
+  @@map("token_revision_journal")
+}
+
+model TokenImageStatus {
+  tokenId       String    @id @map("token_id")
+  resolvedUrl   String?   @map("resolved_url")
+  contentType   String?   @map("content_type")
+  byteSize      Int?      @map("byte_size")
+  cachePath     String?   @map("cache_path")
+  status        String    @default("unknown")
+  checkedAt     DateTime? @map("checked_at")
+  nextAttemptAt DateTime? @map("next_attempt_at")
+  lastError     String?   @map("last_error")
+  token         Token     @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@index([status, nextAttemptAt])
+  @@map("token_image_status")
+}
+
+model SolPriceState {
+  key       String   @id
+  priceUsd  Decimal  @map("price_usd") @db.Decimal(20, 8)
+  source    String
+  updatedAt DateTime @map("updated_at")
+
+  @@map("sol_price_state")
 }
 
 model TokenLifecycleCheck {

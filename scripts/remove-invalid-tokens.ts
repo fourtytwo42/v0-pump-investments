@@ -4,9 +4,9 @@
  * Invalid tokens are those with mint addresses that don't pass Solana address validation
  */
 
-import { PrismaClient } from "@prisma/client"
+import { createPrismaClient } from "@/lib/prisma-client"
 
-const prisma = new PrismaClient()
+const prisma = createPrismaClient("utility")
 
 function isValidSolanaAddress(address: string): boolean {
   // Solana addresses are base58 encoded and typically 32-44 characters

@@ -9,6 +9,7 @@ export function useAlertChecker(tokens: Map<string, any>) {
   const [lastCheckTime, setLastCheckTime] = useState<number>(0)
   const activeAlertSoundsRef = useRef<Map<string, () => void>>(new Map())
   const activeToastsRef = useRef<Map<string, { id: string; timeoutId: NodeJS.Timeout }>>(new Map())
+  const alertTokensRef = useRef<Map<string, any>>(new Map())
 
   // Use a ref to store tokens to avoid unnecessary effect triggers
   const tokensRef = useRef(tokens)
@@ -29,8 +30,8 @@ export function useAlertChecker(tokens: Map<string, any>) {
 
       // Check each alert against current token data
       for (const alert of enabledAlerts) {
-        const token = tokensRef.current.get(alert.mint)
-        if (!token) continue // Skip if token not in current view
+        const token = tokensRef.current.get(alert.mint) ?? alertTokensRef.current.get(alert.mint)
+        if (!token) continue
 
         const currentMarketCap = token.usd_market_cap
 
@@ -165,6 +166,109 @@ export function useAlertChecker(tokens: Map<string, any>) {
       console.error("Error checking alerts:", error)
     }
   }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    let controller: AbortController | null = null
+    let retryTimer: ReturnType<typeof setTimeout> | null = null
+    let fallbackTimer: ReturnType<typeof setInterval> | null = null
+    let enabledKey = ""
+    let failures = 0
+
+    const applyRecords = (records: Array<{ mint: string; name?: string; symbol?: string; market_cap: number }>) => {
+      for (const record of records) {
+        alertTokensRef.current.set(record.mint, {
+          mint: record.mint,
+          name: record.name ?? record.mint.slice(0, 6),
+          symbol: record.symbol ?? record.mint.slice(0, 6),
+          usd_market_cap: record.market_cap,
+        })
+      }
+      void checkAlerts()
+    }
+
+    const fetchFallback = async (mints: string[]) => {
+      try {
+        const response = await fetch("/api/alerts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mints }),
+        })
+        if (response.ok) applyRecords((await response.json()).records ?? [])
+      } catch {}
+    }
+
+    const connect = async (mints: string[]) => {
+      if (cancelled || mints.length === 0) return
+      controller = new AbortController()
+      try {
+        const response = await fetch("/api/alerts/stream", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "text/event-stream" },
+          body: JSON.stringify({ mints }),
+          signal: controller.signal,
+        })
+        if (!response.ok || !response.body) throw new Error(`Alert stream failed: ${response.status}`)
+        const reader = response.body.getReader()
+        const decoder = new TextDecoder()
+        let buffer = ""
+        while (!cancelled) {
+          const { done, value } = await reader.read()
+          if (done) throw new Error("Alert stream closed")
+          buffer += decoder.decode(value, { stream: true })
+          let boundary = buffer.indexOf("\n\n")
+          while (boundary >= 0) {
+            const block = buffer.slice(0, boundary)
+            buffer = buffer.slice(boundary + 2)
+            const name = block.match(/^event:\s*(.+)$/m)?.[1]
+            const data = block.match(/^data:\s*(.+)$/m)?.[1]
+            if ((name === "snapshot" || name === "patch") && data) {
+              applyRecords(JSON.parse(data).records ?? [])
+              failures = 0
+              if (fallbackTimer) clearInterval(fallbackTimer)
+              fallbackTimer = null
+            }
+            boundary = buffer.indexOf("\n\n")
+          }
+        }
+      } catch {
+        if (cancelled || controller.signal.aborted) return
+        failures += 1
+        if (failures >= 3 && !fallbackTimer) {
+          void fetchFallback(mints)
+          fallbackTimer = setInterval(() => void fetchFallback(mints), 5_000)
+        }
+        const delay = Math.min(30_000, 1_000 * 2 ** Math.min(failures - 1, 5))
+        retryTimer = setTimeout(() => void connect(mints), delay + Math.floor(Math.random() * 500))
+      }
+    }
+
+    const configure = async () => {
+      const enabled = (await db.getAllEnabledAlerts()).slice(0, 100)
+      const mints = enabled.map((alert) => alert.mint).sort()
+      const nextKey = mints.join(",")
+      if (nextKey === enabledKey) return
+      enabledKey = nextKey
+      controller?.abort()
+      if (retryTimer) clearTimeout(retryTimer)
+      if (fallbackTimer) clearInterval(fallbackTimer)
+      retryTimer = null
+      fallbackTimer = null
+      alertTokensRef.current.clear()
+      failures = 0
+      if (mints.length > 0) void connect(mints)
+    }
+
+    void configure()
+    const configurationTimer = setInterval(() => void configure(), 3_000)
+    return () => {
+      cancelled = true
+      clearInterval(configurationTimer)
+      controller?.abort()
+      if (retryTimer) clearTimeout(retryTimer)
+      if (fallbackTimer) clearInterval(fallbackTimer)
+    }
+  }, [checkAlerts])
 
   // Check alerts when tokens change
   useEffect(() => {

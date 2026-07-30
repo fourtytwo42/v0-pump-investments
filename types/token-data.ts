@@ -1,5 +1,7 @@
 export type GraduatedFilterValue = "all" | "bonding" | "graduated"
 export type TokenLifecycleStatus = "unknown" | "bonding" | "curve_complete" | "pumpswap" | "non_launchpad"
+export type TokenLaunchSource = "unknown" | "pump" | "moonshot" | "external"
+export type TokenTradeVenue = "unknown" | "pump_bonding" | "pumpswap" | "raydium_v4" | "meteora_dbc"
 
 export type TokenSortBy =
   | "marketCap"
@@ -11,7 +13,6 @@ export type TokenSortBy =
   | "lastTrade"
 
 export interface TokenQueryFilters {
-  hideKOTH?: boolean
   hideExternal?: boolean
   graduationFilter?: GraduatedFilterValue
   minMarketCap?: number
@@ -84,4 +85,8 @@ export interface TokenData {
   bonding_curve?: string | null
   associated_bonding_curve?: string | null
   is_bonding_curve?: boolean | null
+  launch_source: TokenLaunchSource
+  trade_venue: TokenTradeVenue
+  source_verified_at?: string | null
+  trade_venue_updated_at?: string | null
 }

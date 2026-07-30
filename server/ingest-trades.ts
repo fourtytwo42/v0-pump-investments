@@ -1,5 +1,9 @@
-import { PrismaClient, type TokenLifecycleStatus } from "@prisma/client"
-import { Decimal } from "@prisma/client/runtime/library"
+import "dotenv/config"
+import { Prisma, type TokenLifecycleStatus } from "@/generated/prisma/client"
+import { createPrismaClient } from "@/lib/prisma-client"
+import { mkdir, readFile, readdir, rename, rm, writeFile } from "node:fs/promises"
+import path from "node:path"
+import { randomUUID } from "node:crypto"
 import WebSocket from "ws"
 import {
   decodePumpPayload,
@@ -24,6 +28,8 @@ import {
   lifecycleRetryDelayMs,
   reduceLifecycle,
 } from "@/lib/token-lifecycle"
+import { reduceTokenProvenance } from "@/lib/token-provenance"
+import { ingestRetryDelayMs } from "@/lib/ingest-retry"
 
 // =============================================================================
 // Configuration
@@ -32,6 +38,14 @@ import {
 const QUEUE_BATCH_SIZE = 800 // Larger batches with token ID caching
 const QUEUE_FLUSH_INTERVAL_MS = 500 // Flush every 500ms for faster response
 const CONNECTION_LIMIT = 15 // Increased for 10 parallel processors
+const ATOMIC_PIPELINE_ENABLED = process.env.INGEST_ATOMIC_PIPELINE_ENABLED !== "false"
+const AGGREGATES_ENABLED = process.env.TOKEN_AGGREGATES_ENABLED !== "false"
+const CHANGED_JOURNAL_ENABLED = process.env.TOKEN_CHANGED_JOURNAL_ENABLED !== "false"
+const MAX_MEMORY_QUEUE = parseEnvNumber("INGEST_MAX_MEMORY_QUEUE", 20_000)
+const SPOOL_ROOT = process.env.INGEST_SPOOL_DIR ?? path.join(process.cwd(), "server", "data", "spool")
+const SPOOL_PENDING_DIR = path.join(SPOOL_ROOT, "pending")
+const SPOOL_DEAD_DIR = path.join(SPOOL_ROOT, "dead-letter")
+const SPOOL_MAX_ATTEMPTS = parseEnvNumber("INGEST_SPOOL_MAX_ATTEMPTS", 10)
 
 // Metadata retry configuration
 const METADATA_RETRY_INTERVAL_MS = 1_000 // Check queue every second
@@ -61,7 +75,7 @@ let logBatchCount = 0
 // This avoids backfilling old data and focuses on active tokens
 
 // NATS connection
-const NATS_URL = "wss://unified-prod.nats.realtime.pump.fun/"
+const NATS_URL = process.env.PUMP_NATS_URL ?? "wss://unified-prod.nats.realtime.pump.fun/"
 const NATS_HEADERS = {
   Origin: "https://pump.fun",
   "User-Agent": "pump-investments-ingester/1.0",
@@ -71,8 +85,8 @@ const NATS_CONNECT_PAYLOAD = {
   protocol: 1,
   verbose: false,
   pedantic: false,
-  user: "subscriber",
-  pass: "OX745xvUbNQMuFqV",
+  user: process.env.PUMP_NATS_USER ?? "",
+  pass: process.env.PUMP_NATS_PASSWORD ?? "",
   lang: "nats.ws",
   version: "1.30.3",
   headers: true,
@@ -123,26 +137,14 @@ const LIFECYCLE_FULL_RECHECK_MS = parseEnvNumber("LIFECYCLE_FULL_RECHECK_MS", 15
 // Database Setup
 // =============================================================================
 
-function buildConnectionUrl(url?: string): string | undefined {
-  if (!url) return url
-  try {
-    const parsed = new URL(url)
-    parsed.searchParams.set("connection_limit", String(CONNECTION_LIMIT))
-    parsed.searchParams.set("pool_timeout", "0")
-    return parsed.toString()
-  } catch {
-    return `${url}${url.includes("?") ? "&" : "?"}connection_limit=${CONNECTION_LIMIT}&pool_timeout=0`
-  }
-}
-
-const prisma = new PrismaClient({
-  datasources: { db: { url: buildConnectionUrl(process.env.DATABASE_URL) } },
-})
+const prisma = createPrismaClient("ingester")
 
 // =============================================================================
 // Constants
 // =============================================================================
 
+type Decimal = Prisma.Decimal
+const Decimal = Prisma.Decimal
 const TOKEN_DECIMALS = new Decimal(1_000_000)
 const TOTAL_SUPPLY_TOKENS = new Decimal("1000000000")
 
@@ -175,7 +177,7 @@ let lastPongAt = 0
 let lastDisconnectAt = 0
 
 // SOL price cache
-let solPriceCache = { value: 160, updatedAt: 0 }
+let solPriceCache = { value: 0, updatedAt: 0 }
 
 // Token ID cache (mint -> id) - avoids repeated SELECT queries
 const tokenIdCache = new BoundedCache<string, string>(100_000, 24 * 60 * 60 * 1000)
@@ -349,6 +351,38 @@ async function applyVerifiedLifecycle(
     )
   }
 
+  const nextPool = verified.pumpSwapPool ?? check.token.pumpSwapPool
+  const nextBondingCurve = verified.bondingCurve ?? check.token.bondingCurve
+  const nextAssociatedCurve =
+    verified.associatedBondingCurve ?? check.token.associatedBondingCurve
+  const nextLaunchSource = verified.status === "NON_LAUNCHPAD" ? "EXTERNAL" : "PUMP"
+  const nextTradeVenue =
+    verified.status === "PUMPSWAP"
+      ? "PUMPSWAP"
+      : verified.status === "BONDING"
+        ? "PUMP_BONDING"
+        : check.token.tradeVenue
+  const lifecycleChanged =
+    transition.next !== check.token.lifecycleStatus ||
+    nextPool !== check.token.pumpSwapPool ||
+    nextBondingCurve !== check.token.bondingCurve ||
+    nextAssociatedCurve !== check.token.associatedBondingCurve ||
+    nextLaunchSource !== check.token.launchSource ||
+    nextTradeVenue !== check.token.tradeVenue ||
+    (isCompletedLifecycle(transition.next) && !check.token.graduatedAt)
+
+  if (!lifecycleChanged) {
+    await prisma.$transaction([
+      prisma.tokenLifecycleCheck.delete({ where: { tokenId: check.tokenId } }),
+      prisma.tokenDataRevision.upsert({
+        where: { key: "lifecycle-verifier" },
+        create: { key: "lifecycle-verifier", revision: BigInt(1) },
+        update: { revision: { increment: BigInt(1) } },
+      }),
+    ])
+    return true
+  }
+
   await prisma.$transaction([
     prisma.token.update({
       where: { id: check.tokenId },
@@ -356,19 +390,23 @@ async function applyVerifiedLifecycle(
         lifecycleStatus: transition.next,
         lifecycleVerifiedAt: now,
         completed: isCompletedLifecycle(transition.next),
-        pumpSwapPool: verified.pumpSwapPool ?? check.token.pumpSwapPool,
+        pumpSwapPool: nextPool,
         graduatedAt:
           isCompletedLifecycle(transition.next) && !check.token.graduatedAt
             ? now
             : check.token.graduatedAt,
-        bondingCurve: verified.bondingCurve ?? check.token.bondingCurve,
-        associatedBondingCurve:
-          verified.associatedBondingCurve ?? check.token.associatedBondingCurve,
+        bondingCurve: nextBondingCurve,
+        associatedBondingCurve: nextAssociatedCurve,
+        launchSource: nextLaunchSource,
+        sourceVerifiedAt: now,
+        tradeVenue: nextTradeVenue,
+        tradeVenueUpdatedAt:
+          nextTradeVenue !== check.token.tradeVenue ? now : check.token.tradeVenueUpdatedAt,
       },
     }),
     prisma.tokenLifecycleCheck.delete({ where: { tokenId: check.tokenId } }),
   ])
-  tokenRevisionDirty = true
+  await recordDirtyMints([check.token.mintAddress], ["lifecycle"])
   return true
 }
 
@@ -386,6 +424,9 @@ async function getLifecycleChecks() {
           graduatedAt: true,
           bondingCurve: true,
           associatedBondingCurve: true,
+          launchSource: true,
+          tradeVenue: true,
+          tradeVenueUpdatedAt: true,
         },
       },
     },
@@ -456,6 +497,38 @@ async function flushTokenRevision(): Promise<void> {
   }
 }
 
+async function recordDirtyMints(mints: string[], changeKinds: string[]): Promise<void> {
+  if (!CHANGED_JOURNAL_ENABLED || mints.length === 0 || changeKinds.length === 0) {
+    tokenRevisionDirty = true
+    return
+  }
+  const uniqueMints = [...new Set(mints)]
+  await prisma.$transaction(async (tx) => {
+    const revision = await tx.tokenDataRevision.upsert({
+      where: { key: "tokens" },
+      create: { key: "tokens", revision: BigInt(1) },
+      update: { revision: { increment: BigInt(1) } },
+      select: { revision: true },
+    })
+    await Promise.all(uniqueMints.map((mintAddress) =>
+      tx.tokenDirtyMint.upsert({
+        where: { mintAddress },
+        create: { mintAddress, changeKinds, revision: revision.revision },
+        update: { changeKinds, revision: revision.revision },
+      }),
+    ))
+    await tx.tokenRevisionJournal.createMany({
+      data: uniqueMints.flatMap((mintAddress) =>
+        changeKinds.map((changeKind) => ({
+          revision: revision.revision,
+          mintAddress,
+          changeKind,
+        })),
+      ),
+    })
+  })
+}
+
 // =============================================================================
 // SOL Price
 // =============================================================================
@@ -477,6 +550,11 @@ async function getSolPriceUsd(): Promise<number> {
       const price = data.solana?.usd
       if (typeof price === "number" && Number.isFinite(price)) {
         solPriceCache = { value: price, updatedAt: now }
+        await prisma.solPriceState.upsert({
+          where: { key: "sol-usd" },
+          create: { key: "sol-usd", priceUsd: price, source: "coingecko", updatedAt: new Date(now) },
+          update: { priceUsd: price, source: "coingecko", updatedAt: new Date(now) },
+        })
         return price
       }
     }
@@ -484,6 +562,12 @@ async function getSolPriceUsd(): Promise<number> {
     console.warn("[ingest] Failed to fetch SOL price:", (error as Error).message)
   }
 
+  if (solPriceCache.value <= 0) {
+    const persisted = await prisma.solPriceState.findUnique({ where: { key: "sol-usd" } }).catch(() => null)
+    if (persisted) {
+      solPriceCache = { value: Number(persisted.priceUsd), updatedAt: persisted.updatedAt.getTime() }
+    }
+  }
   return solPriceCache.value
 }
 
@@ -516,6 +600,7 @@ interface PreparedTrade {
   bondingCurve: string | null
   associatedBondingCurve: string | null
   program: string
+  platform: string
   isBondingCurve: boolean | null
   poolAddress: string | null
   kingOfTheHillTimestamp: number | null
@@ -642,10 +727,199 @@ function prepareTrade(trade: PumpUnifiedTrade, solPriceUsd: number): PreparedTra
     bondingCurve,
     associatedBondingCurve,
     program,
+    platform: typeof trade.platform === "string" ? trade.platform.toLowerCase() : "",
     isBondingCurve: typeof trade.isBondingCurve === "boolean" ? trade.isBondingCurve : null,
     poolAddress: firstString(trade.poolAddress) ?? null,
     kingOfTheHillTimestamp,
-    raw: trade, // Store full raw payload including marketCap, supply, etc.
+    raw: process.env.INGEST_STORE_RAW_TRADES === "true" ? trade : null,
+  }
+}
+
+interface InsertedTradeRow {
+  token_id: string
+  tx_signature: string
+  timestamp: bigint
+}
+
+function sourceAndVenue(trade: PreparedTrade): {
+  source: "UNKNOWN" | "PUMP" | "MOONSHOT" | "EXTERNAL"
+  venue: "UNKNOWN" | "PUMP_BONDING" | "PUMPSWAP" | "RAYDIUM_V4" | "METEORA_DBC"
+} {
+  const result = reduceTokenProvenance(trade.program, trade.platform)
+  return {
+    source: result.launchSource.toUpperCase() as "UNKNOWN" | "PUMP" | "MOONSHOT" | "EXTERNAL",
+    venue: result.tradeVenue.toUpperCase() as
+      | "UNKNOWN"
+      | "PUMP_BONDING"
+      | "PUMPSWAP"
+      | "RAYDIUM_V4"
+      | "METEORA_DBC",
+  }
+}
+
+async function persistTradesAtomic(trades: PreparedTrade[]): Promise<void> {
+  if (trades.length === 0) return
+  const latestByMint = new Map<string, PreparedTrade>()
+  for (const trade of trades) {
+    const current = latestByMint.get(trade.mint)
+    if (!current || trade.timestampMs > current.timestampMs) latestByMint.set(trade.mint, trade)
+  }
+  const uniqueTokens = [...latestByMint.values()]
+
+  const result = await prisma.$transaction(async (tx) => {
+    const tokenValues = uniqueTokens.map((trade) => {
+      const { source, venue } = sourceAndVenue(trade)
+      return `(${escapeSQL(generateCuid())},${escapeSQL(trade.mint)},${escapeSQL(trade.symbol.slice(0, 50))},${escapeSQL(trade.name.slice(0, 200))},${escapeSQL(trade.imageUri)},${escapeSQL(trade.metadataUri)},${escapeSQL(trade.twitter)},${escapeSQL(trade.telegram)},${escapeSQL(trade.website)},${escapeSQL(trade.description?.slice(0, 1000) ?? null)},${escapeSQL(trade.creatorAddress)},${trade.createdTs},false,'UNKNOWN',${escapeSQL(trade.bondingCurve)},${escapeSQL(trade.associatedBondingCurve)},'${source}','${venue}',${source === "UNKNOWN" ? "NULL" : "NOW()"},NOW(),'first_observed')`
+    }).join(",")
+
+    await tx.$executeRawUnsafe(`
+      INSERT INTO tokens (
+        id,mint_address,symbol,name,image_uri,metadata_uri,twitter,telegram,website,description,
+        creator_address,created_timestamp,completed,lifecycle_status,bonding_curve,
+        associated_bonding_curve,launch_source,trade_venue,source_verified_at,
+        trade_venue_updated_at,created_timestamp_source,updated_at
+      )
+      VALUES ${tokenValues}
+      ON CONFLICT (mint_address) DO UPDATE SET
+        image_uri = COALESCE(tokens.image_uri, EXCLUDED.image_uri),
+        metadata_uri = COALESCE(tokens.metadata_uri, EXCLUDED.metadata_uri),
+        bonding_curve = COALESCE(tokens.bonding_curve, EXCLUDED.bonding_curve),
+        associated_bonding_curve = COALESCE(tokens.associated_bonding_curve, EXCLUDED.associated_bonding_curve),
+        launch_source = CASE WHEN tokens.launch_source = 'UNKNOWN' THEN EXCLUDED.launch_source ELSE tokens.launch_source END,
+        source_verified_at = CASE WHEN tokens.launch_source = 'UNKNOWN' AND EXCLUDED.launch_source <> 'UNKNOWN' THEN NOW() ELSE tokens.source_verified_at END,
+        trade_venue = EXCLUDED.trade_venue,
+        trade_venue_updated_at = CASE WHEN tokens.trade_venue IS DISTINCT FROM EXCLUDED.trade_venue THEN NOW() ELSE tokens.trade_venue_updated_at END,
+        updated_at = CASE WHEN
+          tokens.image_uri IS DISTINCT FROM COALESCE(tokens.image_uri, EXCLUDED.image_uri)
+          OR tokens.metadata_uri IS DISTINCT FROM COALESCE(tokens.metadata_uri, EXCLUDED.metadata_uri)
+          OR tokens.trade_venue IS DISTINCT FROM EXCLUDED.trade_venue
+          OR (tokens.launch_source = 'UNKNOWN' AND EXCLUDED.launch_source <> 'UNKNOWN')
+          THEN NOW() ELSE tokens.updated_at END
+    `)
+
+    const tokenRows = await tx.token.findMany({
+      where: { mintAddress: { in: uniqueTokens.map((trade) => trade.mint) } },
+      select: { id: true, mintAddress: true, metadataUri: true, imageUri: true },
+    })
+    const ids = new Map(tokenRows.map((row) => [row.mintAddress, row.id]))
+    const validTrades = trades.filter((trade) => ids.has(trade.mint))
+    const tradeValues = validTrades.map((trade) =>
+      `(${escapeSQL(ids.get(trade.mint)!)},${escapeSQL(trade.tx)},${escapeSQL(trade.userAddress)},${trade.isBuy},${trade.amountSol},${trade.amountUsd},${trade.baseAmount},${trade.priceSol},${trade.priceUsd},${trade.timestampMs},NULL,NOW())`,
+    ).join(",")
+    const inserted = tradeValues
+      ? await tx.$queryRawUnsafe<InsertedTradeRow[]>(`
+          INSERT INTO trades (
+            token_id,tx_signature,user_address,is_buy,amount_sol,amount_usd,base_amount,
+            price_sol,price_usd,timestamp,raw,created_at
+          )
+          VALUES ${tradeValues}
+          ON CONFLICT (tx_signature) DO NOTHING
+          RETURNING token_id, tx_signature, timestamp
+        `)
+      : []
+
+    if (inserted.length > 0) {
+      const insertedSignatures = inserted.map((row) => escapeSQL(row.tx_signature)).join(",")
+      await tx.$executeRawUnsafe(`
+        INSERT INTO token_prices (token_id,price_sol,price_usd,market_cap_usd,last_trade_timestamp,updated_at)
+        SELECT DISTINCT ON (tr.token_id)
+          tr.token_id,tr.price_sol,tr.price_usd,tr.price_usd * 1000000000,tr.timestamp,NOW()
+        FROM trades tr
+        WHERE tr.tx_signature IN (${insertedSignatures})
+        ORDER BY tr.token_id, tr.timestamp DESC
+        ON CONFLICT (token_id) DO UPDATE SET
+          price_sol=EXCLUDED.price_sol,price_usd=EXCLUDED.price_usd,
+          market_cap_usd=EXCLUDED.market_cap_usd,
+          last_trade_timestamp=EXCLUDED.last_trade_timestamp,updated_at=NOW()
+        WHERE EXCLUDED.last_trade_timestamp >= token_prices.last_trade_timestamp
+      `)
+
+      if (AGGREGATES_ENABLED) {
+        await tx.$executeRawUnsafe(`
+          INSERT INTO token_minute_aggregates (
+            token_id,minute,volume_usd,volume_sol,buy_volume_usd,buy_volume_sol,
+            sell_volume_usd,sell_volume_sol,buy_count,sell_count,
+            last_trade_timestamp,updated_at
+          )
+          SELECT token_id, to_timestamp(timestamp / 1000)::timestamp(0) -
+            (EXTRACT(second FROM to_timestamp(timestamp / 1000))::int * interval '1 second'),
+            SUM(amount_usd),SUM(amount_sol),
+            SUM(CASE WHEN is_buy THEN amount_usd ELSE 0 END),
+            SUM(CASE WHEN is_buy THEN amount_sol ELSE 0 END),
+            SUM(CASE WHEN NOT is_buy THEN amount_usd ELSE 0 END),
+            SUM(CASE WHEN NOT is_buy THEN amount_sol ELSE 0 END),
+            COUNT(*) FILTER (WHERE is_buy), COUNT(*) FILTER (WHERE NOT is_buy), MAX(timestamp), NOW()
+          FROM trades WHERE tx_signature IN (${insertedSignatures})
+          GROUP BY token_id, 2
+          ON CONFLICT (token_id,minute) DO UPDATE SET
+            volume_usd=token_minute_aggregates.volume_usd+EXCLUDED.volume_usd,
+            volume_sol=token_minute_aggregates.volume_sol+EXCLUDED.volume_sol,
+            buy_volume_usd=token_minute_aggregates.buy_volume_usd+EXCLUDED.buy_volume_usd,
+            buy_volume_sol=token_minute_aggregates.buy_volume_sol+EXCLUDED.buy_volume_sol,
+            sell_volume_usd=token_minute_aggregates.sell_volume_usd+EXCLUDED.sell_volume_usd,
+            sell_volume_sol=token_minute_aggregates.sell_volume_sol+EXCLUDED.sell_volume_sol,
+            buy_count=token_minute_aggregates.buy_count+EXCLUDED.buy_count,
+            sell_count=token_minute_aggregates.sell_count+EXCLUDED.sell_count,
+            last_trade_timestamp=GREATEST(token_minute_aggregates.last_trade_timestamp,EXCLUDED.last_trade_timestamp),
+            updated_at=NOW()
+        `)
+        await tx.$executeRawUnsafe(`
+          INSERT INTO token_buyer_minute_aggregates (
+            token_id,minute,buyer_address,buy_total_usd,buy_count,updated_at
+          )
+          SELECT token_id, to_timestamp(timestamp / 1000)::timestamp(0) -
+            (EXTRACT(second FROM to_timestamp(timestamp / 1000))::int * interval '1 second'),
+            user_address,SUM(amount_usd),COUNT(*),NOW()
+          FROM trades WHERE tx_signature IN (${insertedSignatures}) AND is_buy
+          GROUP BY token_id,2,user_address
+          ON CONFLICT (token_id,minute,buyer_address) DO UPDATE SET
+            buy_total_usd=token_buyer_minute_aggregates.buy_total_usd+EXCLUDED.buy_total_usd,
+            buy_count=token_buyer_minute_aggregates.buy_count+EXCLUDED.buy_count,updated_at=NOW()
+        `)
+      }
+
+      const changedMints = [...new Set(validTrades
+        .filter((trade) => inserted.some((row) => row.tx_signature === trade.tx))
+        .map((trade) => trade.mint))]
+      const revisionRows = await tx.$queryRawUnsafe<Array<{ revision: bigint }>>(`
+        INSERT INTO token_data_revisions (key,revision,updated_at) VALUES ('tokens',1,NOW())
+        ON CONFLICT (key) DO UPDATE SET revision=token_data_revisions.revision+1,updated_at=NOW()
+        RETURNING revision
+      `)
+      const revision = revisionRows[0]?.revision ?? BigInt(0)
+      if (CHANGED_JOURNAL_ENABLED && changedMints.length > 0) {
+        const dirtyValues = changedMints.map((mint) =>
+          `(${escapeSQL(mint)},ARRAY['price','trade']::text[],${revision},NOW())`,
+        ).join(",")
+        await tx.$executeRawUnsafe(`
+          INSERT INTO token_dirty_mints (mint_address,change_kinds,revision,updated_at)
+          VALUES ${dirtyValues}
+          ON CONFLICT (mint_address) DO UPDATE SET
+            change_kinds=(SELECT ARRAY(SELECT DISTINCT unnest(token_dirty_mints.change_kinds || EXCLUDED.change_kinds))),
+            revision=EXCLUDED.revision,updated_at=NOW()
+        `)
+        const journalValues = changedMints.flatMap((mint) => ["price", "trade"].map((kind) =>
+          `(${revision},${escapeSQL(mint)},${escapeSQL(kind)},NOW())`,
+        )).join(",")
+        await tx.$executeRawUnsafe(`
+          INSERT INTO token_revision_journal (revision,mint_address,change_kind,created_at)
+          VALUES ${journalValues}
+        `)
+      }
+    }
+
+    return { inserted, tokenRows }
+  }, { timeout: 30_000, maxWait: 10_000 })
+
+  for (const row of result.tokenRows) {
+    tokenIdCache.set(row.mintAddress, row.id)
+    if (!row.metadataUri || !row.imageUri) scheduleMetadataRetry(row.mintAddress)
+  }
+  if (result.inserted.length > 0) {
+    latestTradePersistedTimestampMs = Math.max(
+      latestTradePersistedTimestampMs,
+      ...result.inserted.map((row) => Number(row.timestamp)),
+    )
   }
 }
 
@@ -653,7 +927,7 @@ function prepareTrade(trade: PumpUnifiedTrade, solPriceUsd: number): PreparedTra
 // High-Performance Bulk Insert (Raw SQL)
 // =============================================================================
 
-async function persistTradesBulk(trades: PreparedTrade[]): Promise<void> {
+async function persistTradesBulkLegacy(trades: PreparedTrade[]): Promise<void> {
   if (trades.length === 0) return
 
   const startTime = Date.now()
@@ -948,8 +1222,10 @@ async function processQueue(): Promise<void> {
   const batchSize = Math.min(tradeQueue.length, QUEUE_BATCH_SIZE)
   const batch = tradeQueue.splice(0, batchSize)
   lastQueueFlush = Date.now()
+  let durableBatchPath: string | null = null
 
   try {
+    durableBatchPath = await spoolBatch(batch)
     const solPrice = await getSolPriceUsd()
     const prepared = batch
       .map((trade) => prepareTrade(trade, solPrice))
@@ -960,6 +1236,8 @@ async function processQueue(): Promise<void> {
       prepared.sort((a, b) => a.mint.localeCompare(b.mint))
       await persistTradesBulk(prepared)
     }
+    await rm(durableBatchPath, { force: true })
+    durableBatchPath = null
 
     // Only log queue size every 30 seconds
     const now = Date.now()
@@ -968,6 +1246,10 @@ async function processQueue(): Promise<void> {
     }
   } catch (error) {
     const errMsg = (error as Error).message
+    if (durableBatchPath) {
+      console.error(`[ingest] database batch deferred to durable spool: ${errMsg}`)
+      return
+    }
     // Retry on deadlock
     if (errMsg.includes("deadlock") || errMsg.includes("40P01")) {
       console.warn(`[ingest] ⚠️ Deadlock, retrying ${batch.length} trades...`)
@@ -1146,6 +1428,91 @@ async function fetchMetadataFromUri(uri: string): Promise<unknown | null> {
   return null
 }
 
+async function persistTradesBulk(trades: PreparedTrade[]): Promise<void> {
+  if (ATOMIC_PIPELINE_ENABLED) {
+    await persistTradesAtomic(trades)
+    return
+  }
+  await persistTradesBulkLegacy(trades)
+}
+
+interface SpoolEnvelope {
+  version: 1
+  attempts: number
+  createdAt: string
+  nextAttemptAt?: number
+  trades: PumpUnifiedTrade[]
+}
+
+async function ensureSpoolDirectories(): Promise<void> {
+  await Promise.all([
+    mkdir(SPOOL_PENDING_DIR, { recursive: true }),
+    mkdir(SPOOL_DEAD_DIR, { recursive: true }),
+  ])
+}
+
+async function spoolBatch(trades: PumpUnifiedTrade[], attempts = 0): Promise<string> {
+  await ensureSpoolDirectories()
+  const destination = path.join(SPOOL_PENDING_DIR, `${Date.now()}-${randomUUID()}.json`)
+  const temporary = `${destination}.tmp`
+  const envelope: SpoolEnvelope = {
+    version: 1,
+    attempts,
+    createdAt: new Date().toISOString(),
+    trades,
+  }
+  await writeFile(temporary, JSON.stringify(envelope), { encoding: "utf8", flag: "wx" })
+  await rename(temporary, destination)
+  return destination
+}
+
+async function replaySpoolFile(filePath: string): Promise<void> {
+  const envelope = JSON.parse(await readFile(filePath, "utf8")) as SpoolEnvelope
+  if (envelope.nextAttemptAt && envelope.nextAttemptAt > Date.now()) return
+  const solPrice = await getSolPriceUsd()
+  const prepared = envelope.trades
+    .map((trade) => prepareTrade(trade, solPrice))
+    .filter((trade): trade is PreparedTrade => trade !== null)
+    .sort((a, b) => a.mint.localeCompare(b.mint))
+  try {
+    await persistTradesBulk(prepared)
+    await rm(filePath, { force: true })
+  } catch (error) {
+    envelope.attempts += 1
+    if (envelope.attempts >= SPOOL_MAX_ATTEMPTS) {
+      await rename(filePath, path.join(SPOOL_DEAD_DIR, path.basename(filePath)))
+      console.error(`[spool] moved batch to dead-letter after ${envelope.attempts} attempts`)
+      return
+    }
+    envelope.nextAttemptAt = Date.now() + ingestRetryDelayMs(envelope.attempts)
+    const temporary = `${filePath}.tmp`
+    await writeFile(temporary, JSON.stringify(envelope), "utf8")
+    await rename(temporary, filePath)
+    console.warn(
+      `[spool] replay failed attempts=${envelope.attempts} message=${JSON.stringify((error as Error).message)}`,
+    )
+  }
+}
+
+let spoolReplayRunning = false
+async function replayPendingSpool(): Promise<void> {
+  if (spoolReplayRunning) return
+  spoolReplayRunning = true
+  try {
+    await ensureSpoolDirectories()
+    const files = (await readdir(SPOOL_PENDING_DIR))
+      .filter((name) => name.endsWith(".json"))
+      .sort()
+    for (const name of files.slice(0, 10)) {
+      await replaySpoolFile(path.join(SPOOL_PENDING_DIR, name))
+    }
+  } catch (error) {
+    console.warn(`[spool] replay scan failed: ${(error as Error).message}`)
+  } finally {
+    spoolReplayRunning = false
+  }
+}
+
 function mergeMetadata(base: TokenMetadata, next: TokenMetadata): TokenMetadata {
   const merged = { ...base }
   for (const [key, value] of Object.entries(next) as [keyof TokenMetadata, TokenMetadata[keyof TokenMetadata]][]) {
@@ -1185,6 +1552,7 @@ async function refreshTokenMetadata(mint: string): Promise<MetadataRefreshResult
 
     let metadataUri = token.metadataUri
     let metadata = normalizeTokenMetadata({})
+    let authoritativeCreatedAt: number | null = null
 
     // Most trade events already provide a metadata URI. Resolve it directly
     // before spending another Pump API request on the same token.
@@ -1206,6 +1574,12 @@ async function refreshTokenMetadata(mint: string): Promise<MetadataRefreshResult
       }
 
       const coinRecord = coinInfo as Record<string, unknown>
+      const pumpCreatedAt = Number(
+        coinRecord.created_timestamp ?? coinRecord.createdTimestamp ?? coinRecord.createdTs,
+      )
+      if (Number.isFinite(pumpCreatedAt) && pumpCreatedAt > 0) {
+        authoritativeCreatedAt = pumpCreatedAt < 10_000_000_000 ? pumpCreatedAt * 1000 : pumpCreatedAt
+      }
       const rawUri = firstString(coinRecord.metadataUri, coinRecord.metadata_uri, coinRecord.uri)
       metadataUri = metadataUri ?? (rawUri ? normalizeIpfsUri(rawUri) : null)
       metadata = mergeMetadata(
@@ -1253,11 +1627,21 @@ async function refreshTokenMetadata(mint: string): Promise<MetadataRefreshResult
     if (metadata.website && !token.website) {
       updates.website = metadata.website
     }
+    if (
+      authoritativeCreatedAt &&
+      (!token.createdTimestamp || authoritativeCreatedAt < Number(token.createdTimestamp))
+    ) {
+      updates.createdTimestamp = BigInt(authoritativeCreatedAt)
+      updates.createdTimestampSource = "pump_frontend_api"
+      updates.createdTimestampVerifiedAt = new Date()
+    }
 
     if (isCompletedLifecycle(token.lifecycleStatus)) {
       const dexCreatedAt = await getDexPairCreatedAt(mint)
       if (dexCreatedAt && (!token.createdTimestamp || dexCreatedAt < Number(token.createdTimestamp))) {
         updates.createdTimestamp = BigInt(dexCreatedAt)
+        updates.createdTimestampSource = "dexscreener"
+        updates.createdTimestampVerifiedAt = new Date()
       }
     }
 
@@ -1266,7 +1650,7 @@ async function refreshTokenMetadata(mint: string): Promise<MetadataRefreshResult
         where: { id: token.id },
         data: updates,
       })
-      tokenRevisionDirty = true
+      await recordDirtyMints([mint], ["metadata"])
     }
 
     // Only return true if we now have both metadataUri and imageUri (or already had both)
@@ -2041,7 +2425,13 @@ function handleMessageChunk(chunk: string, connectionId: number, socket: WebSock
 
     const trade = decodePumpPayload(payload)
     if (trade) {
-      tradeQueue.push(trade as PumpUnifiedTrade)
+      if (tradeQueue.length >= MAX_MEMORY_QUEUE) {
+        void spoolBatch([trade as PumpUnifiedTrade]).catch((error) => {
+          console.error(`[spool] overflow write failed: ${(error as Error).message}`)
+        })
+      } else {
+        tradeQueue.push(trade as PumpUnifiedTrade)
+      }
 
       // Only log queue size every 30 seconds (throttled above)
       // Removed frequent queue logging
@@ -2159,12 +2549,14 @@ async function shutdown(reason: string): Promise<void> {
 
 console.log("🚀 Trade ingestion (optimized)")
 console.log(`   Batch: ${QUEUE_BATCH_SIZE} | Flush: ${QUEUE_FLUSH_INTERVAL_MS}ms | Pool: ${CONNECTION_LIMIT}`)
+console.log(`   Atomic: ${ATOMIC_PIPELINE_ENABLED} | Spool: ${SPOOL_ROOT}`)
 
 setInterval(() => {
   logConnectionHealth()
 }, INGEST_HEALTH_LOG_INTERVAL_MS)
 
-startConnectionAttempt("startup")
+setInterval(() => void replayPendingSpool(), 2_000)
+void replayPendingSpool().finally(() => startConnectionAttempt("startup"))
 
 // Auto-restart every 24 hours
 setTimeout(async () => {

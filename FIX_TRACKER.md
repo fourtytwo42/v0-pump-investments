@@ -17,10 +17,96 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 
 ## Priorities
 
+### P0: Coordinated internal improvement release
+
+#### T28. Implement and deploy the complete internal improvement plan
+- Status: `in_progress`
+- Goal:
+  - Deliver the atomic ingestion, aggregate queries, source/venue data, realtime correctness, alert reliability, image/cache, dependency, client-efficiency, security, observability, and VM proxy improvements as one reversible release.
+- Constraints:
+  - Preserve the current visual design except for removal of obsolete KOTH surfaces.
+  - Keep `http://192.168.50.237:3000` as the LAN entrypoint.
+- Verification:
+  - Unit, integration, lint, typecheck, production build, dependency audit, migration/backfill, PM2/Nginx, API/SSE, fault-path, and live browser checks.
+  - Local release candidate passes ESLint, TypeScript, 22 unit tests, Prisma validation, Turbopack production build, and `npm audit --omit=dev` with zero findings.
+  - VM preflight recorded commit `b6ea963`, PostgreSQL 43 MB / 1,971 tokens / 14,112 trades, PM2 state, API baseline, and backup `/home/hendo420/backups/pumpinvestments-pre-v4-20260730-034106.dump` (SHA-256 `4d9b8b1076e032d40f1cca439ed254492a9d0b0373ed0cc07b8b9b1fccc37a72`).
+  - Additive migration completed a live-schema transaction dry run and rolled back cleanly.
+
+### P1: Whole-app efficiency and reliability audit
+
+#### T21. Identify no-visual-change improvements
+- Status: `done`
+- Goal:
+  - Review the deployed application and repository for performance, reliability, maintainability, observability, security, and data-quality improvements without changing the current visual design.
+- Constraints:
+  - Report only; do not implement product changes during the audit.
+  - Preserve the current layout, styling, and interaction model.
+- Verification:
+  - Repository architecture review, targeted checks, and live LAN browser/runtime inspection.
+- Notes:
+  - Added `APP_IMPROVEMENT_AUDIT.md` with a prioritized, no-redesign improvement plan.
+  - Live baseline measured snapshot API at 7.2 ms p50 and 10.3 ms p95, with 1.823 seconds newest-trade lag.
+  - Found silent trade-loss risk on swallowed database write errors, lifecycle no-op write/revision churn, an SSE revision race, visible-page-only alert evaluation, unbounded public query inputs, vulnerable dependencies, dead realtime/metadata paths, and avoidable browser work.
+  - Verification passed: 18 unit tests, TypeScript, production build, live browser inspection, PM2/host/database checks, and API timing samples. Lint remains unconfigured and interactive.
+
+### P0: Persistence correctness
+
+#### T22. Make ingester batches atomic and retryable
+- Status: `in_progress`
+- Goal:
+  - Prevent silent trade loss and false persisted-lag health during partial or transient database failures.
+- Verification:
+  - Failure-injection tests for disconnects, timeouts, deadlocks, partial writes, and process restarts.
+
+### P0: Dependency security
+
+#### T23. Patch vulnerable production dependencies
+- Status: `in_progress`
+- Goal:
+  - Upgrade Next.js, `ws`, and affected transitive dependencies through staged regression-tested releases.
+- Verification:
+  - No critical/high production audit findings without documented exceptions; tests, typecheck, build, and live smoke test pass.
+
+### P0: Alert correctness
+
+#### T24. Monitor all enabled alert mints
+- Status: `in_progress`
+- Goal:
+  - Evaluate alerts independently of the current visible token page and avoid eager missing-sound probes.
+- Verification:
+  - Off-page favorite alert test, closed-panel sound test, and browser-open/closed behavior specification.
+
+### P1: Realtime efficiency
+
+#### T25. Suppress lifecycle no-op revisions and fix SSE revision races
+- Status: `in_progress`
+- Goal:
+  - Avoid database/SSE churn for unchanged verification and guarantee each query group applies every relevant revision.
+- Verification:
+  - Concurrent subscribe/update integration tests and no patch for unchanged lifecycle responses.
+
+### P1: API and query hardening
+
+#### T26. Bound API inputs, stream groups, and rolling aggregation cost
+- Status: `in_progress`
+- Goal:
+  - Add schema validation, request/stream limits, and minute-level aggregates before retained trade volume grows.
+- Verification:
+  - Abuse-limit tests, ten-query load test, and `EXPLAIN (ANALYZE, BUFFERS)` latency gate.
+
+### P2: Client and maintenance cleanup
+
+#### T27. Reduce initial bundle and rerender work without redesign
+- Status: `in_progress`
+- Goal:
+  - Split realtime context updates, lazy-load closed panels, mount one Toaster, make Pause freeze ordering, and remove dead code/dependencies.
+- Verification:
+  - Bundle comparison, render-count test, Pause behavior test, and unchanged visual snapshots.
+
 ### P1: Token source and venue attribution
 
 #### T20. Persist launch source separately from trade venue
-- Status: `open`
+- Status: `in_progress`
 - Problem:
   - Live unified trades expose `program` and sometimes `platform`, but the token schema discards them and only retains Pump vs `NON_LAUNCHPAD`.
 - Goal:
@@ -31,7 +117,7 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 ### P1: Deprecated KOTH surface
 
 #### T19. Remove or replace dead KOTH UI
-- Status: `open`
+- Status: `in_progress`
 - Problem:
   - Current Pump v3 single and batch responses expose no KOTH field, and the production database has zero `king_of_the_hill_timestamp` values.
 - Goal:

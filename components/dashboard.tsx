@@ -14,6 +14,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { useLocalStorage } from "@/hooks/use-local-storage"
 import { useTheme } from "next-themes"
 import NextImage from "next/image"
+import dynamic from "next/dynamic"
 import {
   Pagination,
   PaginationContent,
@@ -24,13 +25,9 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 import DonationButton from "./donation-button"
-import { Toaster } from "@/components/ui/toaster"
 import { db } from "@/lib/db"
-import { OnboardingGuide } from "./onboarding/onboarding-guide"
 import { useOnboardingStore } from "./onboarding/onboarding-store"
-import { ChatBubble } from "./pi-bot/chat-bubble"
 import { useTokenContext } from "@/contexts/token-context"
-import { AlertSettingsModal } from "./alert-settings-modal"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -49,6 +46,19 @@ import { useSettings } from "@/hooks/use-settings"
 import { usePiBotData } from "@/hooks/use-pi-bot-data"
 import { useAlertChecker } from "@/hooks/use-alert-checker"
 import type { TokenSortBy } from "@/types/token-data"
+
+const OnboardingGuide = dynamic(
+  () => import("./onboarding/onboarding-guide").then((module) => module.OnboardingGuide),
+  { ssr: false },
+)
+const ChatBubble = dynamic(
+  () => import("./pi-bot/chat-bubble").then((module) => module.ChatBubble),
+  { ssr: false },
+)
+const AlertSettingsModal = dynamic(
+  () => import("./alert-settings-modal").then((module) => module.AlertSettingsModal),
+  { ssr: false },
+)
 
 export default function Dashboard() {
   // Get values from context
@@ -90,7 +100,6 @@ export default function Dashboard() {
     sortBy,
     timeRange,
     settings.tokensPerPage,
-    settings.hideKOTH,
     settings.hideExternal,
     settings.graduationFilter,
     settings.minMarketCap,
@@ -139,7 +148,6 @@ export default function Dashboard() {
       sortOrder: "desc" as const,
       timeRangeMinutes: Number.isFinite(safeTimeRange) ? safeTimeRange : 10,
       filters: {
-        hideKOTH: settings.hideKOTH,
         hideExternal: settings.hideExternal,
         graduationFilter: settings.graduationFilter,
         minMarketCap: settings.minMarketCapFilter,
@@ -164,7 +172,6 @@ export default function Dashboard() {
     settings.tokensPerPage,
     sortBy,
     timeRange,
-    settings.hideKOTH,
     settings.hideExternal,
     settings.graduationFilter,
     settings.minMarketCapFilter,
@@ -226,7 +233,7 @@ export default function Dashboard() {
         id={index === 4 ? "featured-token-card" : undefined}
       >
         <TokenCard
-          token={token}
+          mint={token.mint}
           size="medium"
           showAlertSettings={showFavorites} // Only show alert settings in favorites view
           showBonkBotLogo={settings.showBonkBotLogo} // Pass BonkBot setting to TokenCard
@@ -434,6 +441,7 @@ export default function Dashboard() {
               className="ml-2"
               data-onboarding="pause-button"
               title={isPaused ? "Resume auto-sorting" : "Pause auto-sorting"}
+              aria-label={isPaused ? "Resume automatic token ordering" : "Pause automatic token ordering"}
             >
               {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
             </Button>
@@ -444,6 +452,7 @@ export default function Dashboard() {
                 onClick={() => setShowFavorites(!showFavorites)}
                 className="ml-2"
                 title={showFavorites ? "Show all tokens" : "Show favorites only"}
+                aria-label={showFavorites ? "Show all tokens" : "Show favorite tokens only"}
               >
                 <Star className={`h-4 w-4 ${showFavorites ? "fill-yellow-400" : ""}`} />
               </Button>
@@ -460,7 +469,12 @@ export default function Dashboard() {
 
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="outline" size="icon" data-onboarding="settings-button">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  data-onboarding="settings-button"
+                  aria-label="Open settings"
+                >
                   <Settings className="h-4 w-4" />
                 </Button>
               </SheetTrigger>
@@ -491,28 +505,6 @@ export default function Dashboard() {
                   <div className="space-y-2">
                     <Label>Filters</Label>
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <NextImage
-                            src="/koth.png"
-                            alt="King of the Hill"
-                            width={40}
-                            height={40}
-                            className="object-contain"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement
-                              target.style.display = "none"
-                            }}
-                          />
-                          <Label htmlFor="hide-koth">Hide KOTH</Label>
-                        </div>
-                        <Switch
-                          id="hide-koth"
-                          checked={settings.hideKOTH}
-                          onCheckedChange={(checked) => updateSettings("hideKOTH", checked)}
-                        />
-                      </div>
-
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <NextImage
@@ -791,6 +783,8 @@ export default function Dashboard() {
                 <PaginationPrevious
                   onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                   className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  aria-disabled={currentPage === 1}
+                  tabIndex={currentPage === 1 ? -1 : 0}
                 />
               </PaginationItem>
 
@@ -837,7 +831,11 @@ export default function Dashboard() {
 
                 return (
                   <PaginationItem key={pageNum}>
-                    <PaginationLink isActive={currentPage === pageNum} onClick={() => setCurrentPage(pageNum)}>
+                    <PaginationLink
+                      isActive={currentPage === pageNum}
+                      aria-label={`Go to page ${pageNum}`}
+                      onClick={() => setCurrentPage(pageNum)}
+                    >
                       {pageNum}
                     </PaginationLink>
                   </PaginationItem>
@@ -848,6 +846,8 @@ export default function Dashboard() {
                 <PaginationNext
                   onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                   className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  aria-disabled={currentPage === totalPages}
+                  tabIndex={currentPage === totalPages ? -1 : 0}
                 />
               </PaginationItem>
             </PaginationContent>
@@ -859,7 +859,6 @@ export default function Dashboard() {
       {isOnboardingActive && <OnboardingGuide />}
 
       {/* Add Toaster for notifications */}
-      <Toaster />
       {/* PI Bot Chat Bubble */}
       <ChatBubble />
 

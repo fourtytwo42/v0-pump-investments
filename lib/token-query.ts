@@ -1,4 +1,4 @@
-import { Prisma, type TokenLifecycleStatus } from "@prisma/client"
+import { Prisma, type TokenLifecycleStatus } from "@/generated/prisma/client"
 
 import { prisma } from "@/lib/prisma"
 import { toPublicLifecycle } from "@/lib/token-lifecycle"
@@ -10,7 +10,6 @@ import type {
 } from "@/types/token-data"
 
 const MIN_TIME_RANGE_MINUTES = 1
-const FALLBACK_TIME_RANGE_MINUTES = 30
 const MAX_TIME_RANGE_MINUTES = 60
 const MAX_PAGE_SIZE = 100
 
@@ -32,6 +31,10 @@ interface TokenQueryRow {
   pump_swap_pool: string | null
   bonding_curve: string | null
   associated_bonding_curve: string | null
+  launch_source: string
+  trade_venue: string
+  source_verified_at: Date | null
+  trade_venue_updated_at: Date | null
   price_sol: Prisma.Decimal | null
   price_usd: Prisma.Decimal | null
   usd_market_cap: Prisma.Decimal | null
@@ -52,6 +55,8 @@ export interface TokenSnapshot {
   total: number
   totalPages: number
   effectiveTimeRangeMinutes: number
+  sol_price_usd: number
+  sol_price_updated_at: string | null
   tokens: TokenData[]
 }
 
@@ -67,13 +72,12 @@ function nullableFinite(value: unknown): number | null {
 }
 
 function normalizeFilters(filters?: TokenQueryFilters): Required<
-  Pick<TokenQueryFilters, "hideExternal" | "hideKOTH" | "graduationFilter" | "favoritesOnly">
+  Pick<TokenQueryFilters, "hideExternal" | "graduationFilter" | "favoritesOnly">
 > &
   TokenQueryFilters {
   return {
     ...filters,
     hideExternal: filters?.hideExternal ?? false,
-    hideKOTH: filters?.hideKOTH ?? false,
     graduationFilter: filters?.graduationFilter ?? "all",
     favoritesOnly: filters?.favoritesOnly ?? false,
   }
@@ -169,21 +173,19 @@ function rowToToken(row: TokenQueryRow): TokenData {
     is_bonding_curve: lifecycle === "unknown" ? null : lifecycle === "bonding",
     bonding_curve: row.bonding_curve,
     associated_bonding_curve: row.associated_bonding_curve,
+    launch_source: row.launch_source.toLowerCase() as TokenData["launch_source"],
+    trade_venue: row.trade_venue.toLowerCase() as TokenData["trade_venue"],
+    source_verified_at: row.source_verified_at?.toISOString() ?? null,
+    trade_venue_updated_at: row.trade_venue_updated_at?.toISOString() ?? null,
     trades: [],
   }
 }
 
-async function resolveEffectiveRange(requestedMinutes: number): Promise<number> {
-  if (requestedMinutes >= FALLBACK_TIME_RANGE_MINUTES) return requestedMinutes
-  const cutoff = BigInt(Date.now() - requestedMinutes * 60_000)
-  const recentCount = await prisma.trade.count({ where: { timestamp: { gte: cutoff } } })
-  return recentCount === 0 ? FALLBACK_TIME_RANGE_MINUTES : requestedMinutes
-}
-
 export async function queryTokenSnapshot(rawBody: Partial<TokenQueryRequest>): Promise<TokenSnapshot> {
   const request = normalizeTokenQuery(rawBody)
-  const effectiveTimeRangeMinutes = await resolveEffectiveRange(request.timeRangeMinutes)
+  const effectiveTimeRangeMinutes = request.timeRangeMinutes
   const cutoff = BigInt(Date.now() - effectiveTimeRangeMinutes * 60_000)
+  const aggregateBoundary = BigInt(Math.ceil(Number(cutoff) / 60_000) * 60_000)
   const now = BigInt(Date.now())
   const filters = request.filters
   const favorites = request.favoriteMints
@@ -191,33 +193,71 @@ export async function queryTokenSnapshot(rawBody: Partial<TokenQueryRequest>): P
   const maxTradeAmount = nullableFinite(filters.maxTradeAmount)
   const offset = (request.page - 1) * request.pageSize
   const direction = request.sortOrder === "asc" ? Prisma.sql`ASC` : Prisma.sql`DESC`
+  const tradeStatsSql =
+    process.env.TOKEN_AGGREGATES_ENABLED === "true"
+      ? Prisma.sql`
+          SELECT
+            token_id,
+            SUM(total_volume) AS total_volume,
+            SUM(total_volume_usd) AS total_volume_usd,
+            SUM(buy_volume) AS buy_volume,
+            SUM(buy_volume_usd) AS buy_volume_usd,
+            SUM(sell_volume) AS sell_volume,
+            SUM(sell_volume_usd) AS sell_volume_usd,
+            MAX(last_trade_timestamp) AS last_trade_timestamp
+          FROM (
+            SELECT
+              token_id,
+              volume_sol AS total_volume,
+              volume_usd AS total_volume_usd,
+              buy_volume_sol AS buy_volume,
+              buy_volume_usd,
+              sell_volume_sol AS sell_volume,
+              sell_volume_usd,
+              last_trade_timestamp
+            FROM token_minute_aggregates
+            WHERE minute >= to_timestamp(${aggregateBoundary} / 1000.0)
+            UNION ALL
+            SELECT
+              token_id,
+              SUM(amount_sol),
+              SUM(amount_usd),
+              SUM(amount_sol) FILTER (WHERE is_buy),
+              SUM(amount_usd) FILTER (WHERE is_buy),
+              SUM(amount_sol) FILTER (WHERE NOT is_buy),
+              SUM(amount_usd) FILTER (WHERE NOT is_buy),
+              MAX(timestamp)
+            FROM trades
+            WHERE timestamp >= ${cutoff} AND timestamp < ${aggregateBoundary}
+            GROUP BY token_id
+          ) exact_stats
+          GROUP BY token_id
+        `
+      : Prisma.sql`
+          SELECT
+            token_id,
+            SUM(amount_sol) AS total_volume,
+            SUM(amount_usd) AS total_volume_usd,
+            SUM(amount_sol) FILTER (WHERE is_buy) AS buy_volume,
+            SUM(amount_usd) FILTER (WHERE is_buy) AS buy_volume_usd,
+            SUM(amount_sol) FILTER (WHERE NOT is_buy) AS sell_volume,
+            SUM(amount_usd) FILTER (WHERE NOT is_buy) AS sell_volume_usd,
+            MAX(timestamp) AS last_trade_timestamp
+          FROM trades
+          WHERE timestamp >= ${cutoff}
+          GROUP BY token_id
+        `
 
   const rows = await prisma.$queryRaw<TokenQueryRow[]>(Prisma.sql`
     WITH trade_stats AS (
-      SELECT
-        token_id,
-        SUM(amount_sol) AS total_volume,
-        SUM(amount_usd) AS total_volume_usd,
-        SUM(amount_sol) FILTER (WHERE is_buy) AS buy_volume,
-        SUM(amount_usd) FILTER (WHERE is_buy) AS buy_volume_usd,
-        SUM(amount_sol) FILTER (WHERE NOT is_buy) AS sell_volume,
-        SUM(amount_usd) FILTER (WHERE NOT is_buy) AS sell_volume_usd,
-        MAX(timestamp) AS last_trade_timestamp
-      FROM trades
-      WHERE timestamp >= ${cutoff}
-      GROUP BY token_id
-    ),
-    buyer_totals AS (
-      SELECT token_id, user_address, SUM(amount_usd) AS buyer_total_usd
-      FROM trades
-      WHERE timestamp >= ${cutoff} AND is_buy
-      GROUP BY token_id, user_address
+      ${tradeStatsSql}
     ),
     buyer_stats AS (
-      SELECT token_id, COUNT(*)::bigint AS unique_trader_count
-      FROM buyer_totals
-      WHERE buyer_total_usd >= ${minTradeAmount}
-        AND (${maxTradeAmount}::double precision IS NULL OR buyer_total_usd <= ${maxTradeAmount})
+      SELECT token_id, COUNT(DISTINCT user_address)::bigint AS unique_trader_count
+      FROM trades
+      WHERE timestamp >= ${cutoff} AND is_buy
+        AND amount_usd >= ${minTradeAmount}
+        AND (${maxTradeAmount}::double precision IS NULL OR amount_usd <= ${maxTradeAmount})
       GROUP BY token_id
     ),
     filtered AS (
@@ -233,12 +273,16 @@ export async function queryTokenSnapshot(rawBody: Partial<TokenQueryRequest>): P
         t.website,
         t.twitter,
         t.telegram,
-        t.king_of_the_hill_timestamp,
+        NULL::bigint AS king_of_the_hill_timestamp,
         t.lifecycle_status,
         t.lifecycle_verified_at,
         t.pump_swap_pool,
         t.bonding_curve,
         t.associated_bonding_curve,
+        t.launch_source,
+        t.trade_venue,
+        t.source_verified_at,
+        t.trade_venue_updated_at,
         p.price_sol,
         p.price_usd,
         p.market_cap_usd AS usd_market_cap,
@@ -258,7 +302,6 @@ export async function queryTokenSnapshot(rawBody: Partial<TokenQueryRequest>): P
         (${filters.favoritesOnly} = false AND s.token_id IS NOT NULL
           OR ${filters.favoritesOnly} = true AND t.mint_address IN (${Prisma.join(favorites.length ? favorites : ["__none__"])}))
         AND (${filters.hideExternal} = false OR t.lifecycle_status <> 'NON_LAUNCHPAD'::"TokenLifecycleStatus")
-        AND (${filters.hideKOTH} = false OR t.king_of_the_hill_timestamp IS NULL)
         AND (${filters.graduationFilter} <> 'bonding' OR t.lifecycle_status = 'BONDING'::"TokenLifecycleStatus")
         AND (${filters.graduationFilter} <> 'graduated' OR t.lifecycle_status IN ('CURVE_COMPLETE'::"TokenLifecycleStatus", 'PUMPSWAP'::"TokenLifecycleStatus", 'NON_LAUNCHPAD'::"TokenLifecycleStatus"))
         AND (${nullableFinite(filters.minMarketCap)}::double precision IS NULL OR p.market_cap_usd >= ${nullableFinite(filters.minMarketCap)})
@@ -282,12 +325,15 @@ export async function queryTokenSnapshot(rawBody: Partial<TokenQueryRequest>): P
   `)
 
   const total = rows.length ? Number(rows[0].total_count) : 0
+  const solPrice = await prisma.solPriceState.findUnique({ where: { key: "sol-usd" } })
   return {
     page: request.page,
     pageSize: request.pageSize,
     total,
     totalPages: Math.max(1, Math.ceil(total / request.pageSize)),
     effectiveTimeRangeMinutes,
+    sol_price_usd: solPrice ? Number(solPrice.priceUsd) : 0,
+    sol_price_updated_at: solPrice?.updatedAt.toISOString() ?? null,
     tokens: rows.map(rowToToken),
   }
 }
@@ -295,4 +341,17 @@ export async function queryTokenSnapshot(rawBody: Partial<TokenQueryRequest>): P
 export async function getTokenDataRevision(): Promise<bigint> {
   const revision = await prisma.tokenDataRevision.findUnique({ where: { key: "tokens" } })
   return revision?.revision ?? BigInt(0)
+}
+
+export async function getTokenRevisionChanges(
+  afterRevision: bigint,
+  throughRevision: bigint,
+): Promise<Array<{ mintAddress: string; changeKind: string }>> {
+  return prisma.tokenRevisionJournal.findMany({
+    where: {
+      revision: { gt: afterRevision, lte: throughRevision },
+    },
+    select: { mintAddress: true, changeKind: true },
+    distinct: ["mintAddress", "changeKind"],
+  })
 }

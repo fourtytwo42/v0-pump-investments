@@ -39,7 +39,7 @@ const steps: OnboardingGuideStep[] = [
   {
     title: "Settings",
     description:
-      "Access important settings like tokens per page, filters for KOTH tokens, minimum market cap, and more.",
+      "Access important settings like tokens per page, source filters, minimum market cap, and more.",
     target: "[data-onboarding='settings-button']",
     placement: "bottom",
   },

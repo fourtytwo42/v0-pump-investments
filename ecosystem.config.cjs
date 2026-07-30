@@ -16,7 +16,7 @@ module.exports = {
       exec_mode: 'fork',
       env: {
         NODE_ENV: 'production',
-        PORT: 3000,
+        PORT: 3001,
       },
       error_file: path.join(logDir, 'web-error.log'),
       out_file: path.join(logDir, 'web-out.log'),

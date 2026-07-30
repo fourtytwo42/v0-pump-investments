@@ -7,16 +7,16 @@ import NextImage from "next/image"
 import { formatDistanceToNow } from "date-fns"
 import { Globe, Twitter, MessageCircle, Star, Bell, ChevronDown, ChevronUp } from "lucide-react"
 import Link from "next/link"
-import { useTokenContext } from "@/contexts/token-context"
 import { openAlertSettingsModal } from "./alert-settings-modal"
 import { db } from "@/lib/db"
 import { alertStatusCache } from "@/lib/alert-status-cache"
 import type { TokenData } from "@/types/token-data"
 import { tokenImagePath } from "@/lib/token-image"
+import { useTokenStore } from "@/stores/token-store"
 
 // Update the TokenCardProps interface to include the description field and BonkBot setting
 interface TokenCardProps {
-  token: TokenData
+  mint: string
   size?: string
   showAlertSettings?: boolean
   showBonkBotLogo?: boolean // New prop for BonkBot logo
@@ -52,8 +52,11 @@ const FavoriteStarIcon = React.memo(
 
 FavoriteStarIcon.displayName = "FavoriteStarIcon"
 
-function TokenCard({ token, size = "medium", showAlertSettings = false, showBonkBotLogo = false }: TokenCardProps) {
-  const { solPrice, favorites, toggleFavorite } = useTokenContext()
+function TokenCard({ mint, size = "medium", showAlertSettings = false, showBonkBotLogo = false }: TokenCardProps) {
+  const token = useTokenStore((state) => state.tokensByMint.get(mint)) as TokenData
+  const solPrice = useTokenStore((state) => state.solPrice)
+  const isFavorite = useTokenStore((state) => state.favoriteMints.has(mint))
+  const toggleFavorite = useTokenStore((state) => state.toggleFavorite)
   const BONDING_TARGET_SOL = 415
   const solPriceUsd = solPrice ?? 0
   const lifecycleStatus = token.lifecycle_status ?? "unknown"
@@ -64,7 +67,6 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
     Number.isFinite(progressPercent) &&
     progressPercent >= 0 &&
     token.is_bonding_curve === true
-  const isFavorite = favorites.includes(token.mint)
 
   // Use global state for drawer to persist across re-renders
   const [isDrawerOpen, setIsDrawerOpen] = useState(() => drawerStates.get(token.mint) || false)
@@ -172,15 +174,10 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
     return `https://app.bonkbot.io/trading/${token.mint}`
   }, [token.mint])
 
-  // Check if token has reached KOTH status - memoize
-  const isKOTH = useMemo(() => {
-    return token.king_of_the_hill_timestamp !== null && token.king_of_the_hill_timestamp !== undefined
-  }, [token.king_of_the_hill_timestamp])
-
   // Check if token is from pump.fun - memoize
   const isFromPumpFun = useMemo(() => {
-    return lifecycleStatus !== "non_launchpad"
-  }, [lifecycleStatus])
+    return token.launch_source !== "external" && lifecycleStatus !== "non_launchpad"
+  }, [token.launch_source, lifecycleStatus])
 
   // Handle click on the card
   const handleCardClick = useCallback(() => {
@@ -336,21 +333,6 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
   const statusIcons = useMemo(() => {
     return (
       <div className="flex items-center gap-2 h-10">
-        {isKOTH && (
-          <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center">
-            <NextImage
-              src="/koth.png"
-              alt="King of the Hill"
-              width={40}
-              height={40}
-              className="object-contain"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement
-                target.style.display = "none"
-              }}
-            />
-          </div>
-        )}
         {!isFromPumpFun && (
           <div className="flex-shrink-0 w-4 h-4 flex items-center justify-center">
             <NextImage
@@ -368,18 +350,10 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
         )}
       </div>
     )
-  }, [isKOTH, isFromPumpFun])
+  }, [isFromPumpFun])
 
   // Check if token has a description
   const hasDescription = token.description && token.description.trim() !== ""
-
-  // Store the description in a ref to prevent re-renders
-  const descriptionRef = useRef<string | null>(token.description ?? null)
-
-  // Update the ref if the description changes
-  useEffect(() => {
-    descriptionRef.current = token.description ?? null
-  }, [token.description])
 
   const proxiedImageSrc = useMemo(
     () => tokenImagePath(token.mint),
@@ -502,7 +476,7 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
                     <ChevronUp className="h-4 w-4 text-gray-500" />
                   </button>
                 </div>
-                <p className="text-sm">{descriptionRef.current}</p>
+                <p className="text-sm">{token.description}</p>
               </div>
             )}
           </div>
@@ -537,34 +511,10 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
 
 // Use a more aggressive memoization strategy
 export default React.memo(TokenCard, (prevProps, nextProps) => {
-  // Only re-render if these specific props change
-  const mintSame = prevProps.token.mint === nextProps.token.mint
-  const sizeSame = prevProps.size === nextProps.size
-  const showAlertSettingsSame = prevProps.showAlertSettings === nextProps.showAlertSettings
-  const showBonkBotLogoSame = prevProps.showBonkBotLogo === nextProps.showBonkBotLogo
-
-  // For market cap, only re-render if it changes significantly (more than 1%)
-  const marketCapSame =
-    prevProps.token.usd_market_cap === 0
-      ? nextProps.token.usd_market_cap === 0
-      : Math.abs(prevProps.token.usd_market_cap - nextProps.token.usd_market_cap) /
-          prevProps.token.usd_market_cap <
-        0.01
-  const lifecycleSame =
-    prevProps.token.lifecycle_status === nextProps.token.lifecycle_status &&
-    prevProps.token.lifecycle_verified_at === nextProps.token.lifecycle_verified_at &&
-    prevProps.token.pump_swap_pool === nextProps.token.pump_swap_pool
-  const imageSourceSame =
-    prevProps.token.image_uri === nextProps.token.image_uri &&
-    prevProps.token.metadata_uri === nextProps.token.metadata_uri
-
   return (
-    mintSame &&
-    sizeSame &&
-    showAlertSettingsSame &&
-    showBonkBotLogoSame &&
-    marketCapSame &&
-    lifecycleSame &&
-    imageSourceSame
+    prevProps.mint === nextProps.mint &&
+    prevProps.size === nextProps.size &&
+    prevProps.showAlertSettings === nextProps.showAlertSettings &&
+    prevProps.showBonkBotLogo === nextProps.showBonkBotLogo
   )
 })

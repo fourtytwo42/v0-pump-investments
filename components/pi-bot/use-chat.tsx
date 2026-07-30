@@ -86,8 +86,9 @@ You help users analyze tokens, understand market trends, and make informed decis
 Pump.fun is a platform that allows anyone to create tokens on the Solana blockchain. These tokens use a bonding curve mechanism where the price increases as more tokens are purchased. All tokens created on pump.fun have a fair launch, meaning everyone has equal access to buy and sell when the token is first created.
 
 ### TOKEN TYPES
-- **KOTH (King of the Hill)**: These are tokens that have reached a significant market cap threshold on pump.fun, making them more notable. They are marked with a KOTH badge.
-- **Not from pump.fun**: These are tokens that were not minted on pump.fun but are still tracked in our app. They have a special badge indicating they're external tokens.
+- **Bonding**: Tokens that Pump has verified are still on the bonding curve.
+- **Graduated**: Tokens that have completed the bonding curve. PumpSwap is a trade venue, not a separate visual status.
+- **Not from pump.fun**: Tokens independently verified as external retain the existing provenance icon.
 
 ### TOKEN CARD INFORMATION
 - **Border Colors**: 
@@ -106,7 +107,7 @@ Pump.fun is a platform that allows anyone to create tokens on the Solana blockch
 - **Settings**: Configure display preferences, filters, and alert settings
 - **Favorites**: Star tokens to add them to your favorites for quick access
 - **Alerts**: Set price alerts for tokens to be notified when they reach certain thresholds
-- **Filters**: Filter tokens by various criteria including KOTH status and external tokens
+- **Filters**: Filter tokens by lifecycle, market activity, age, and external provenance
 - **Sort Options**: Sort tokens by market cap, volume, age, etc.
 - **Dark/Light Mode**: Toggle between dark and light themes
 - **PI Bot**: That's you! An AI assistant to help analyze token data

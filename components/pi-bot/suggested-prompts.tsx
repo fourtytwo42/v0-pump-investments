@@ -11,7 +11,7 @@ export function SuggestedPrompts({ onSelectPrompt }: SuggestedPromptsProps) {
     "What tokens are trending today?",
     "Explain the buy/sell ratio",
     "How do I set up price alerts?",
-    "What is KOTH?",
+    "How does graduation work?",
     "Analyze the top token by volume",
   ]
 

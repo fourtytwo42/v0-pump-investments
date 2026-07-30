@@ -1,5 +1,11 @@
-import { subscribeTokenStream, type TokenStreamEvent } from "@/lib/token-stream"
+import { canSubscribeTokenStream, subscribeTokenStream, type TokenStreamEvent } from "@/lib/token-stream"
 import type { TokenQueryRequest } from "@/types/token-data"
+import {
+  acquireClientConnection,
+  apiErrorResponse,
+  readJsonBody,
+  tokenQuerySchema,
+} from "@/lib/api-request"
 
 export const dynamic = "force-dynamic"
 export const runtime = "nodejs"
@@ -16,10 +22,15 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   let query: Partial<TokenQueryRequest>
+  let releaseConnection: (() => void) | null = null
   try {
-    query = (await request.json()) as Partial<TokenQueryRequest>
-  } catch {
-    return Response.json({ error: "Invalid token stream request" }, { status: 400 })
+    query = await readJsonBody(request, tokenQuerySchema, 64 * 1024) as Partial<TokenQueryRequest>
+    if (!canSubscribeTokenStream(query)) {
+      return Response.json({ error: "Too many unique token stream queries" }, { status: 429 })
+    }
+    releaseConnection = acquireClientConnection(request)
+  } catch (error) {
+    return apiErrorResponse(error)
   }
 
   let unsubscribe: (() => void) | null = null
@@ -32,6 +43,8 @@ export async function POST(request: Request): Promise<Response> {
         heartbeat = null
         unsubscribe?.()
         unsubscribe = null
+        releaseConnection?.()
+        releaseConnection = null
         try {
           controller.close()
         } catch {
@@ -64,6 +77,8 @@ export async function POST(request: Request): Promise<Response> {
     cancel() {
       if (heartbeat) clearInterval(heartbeat)
       unsubscribe?.()
+      releaseConnection?.()
+      releaseConnection = null
     },
   })
 

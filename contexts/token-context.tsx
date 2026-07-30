@@ -5,6 +5,7 @@ import { createContext, useContext, useState, useEffect, useCallback, useMemo, u
 import { db } from "@/lib/db"
 import { toast } from "@/components/ui/use-toast"
 import type { TokenData, TokenQueryOptions } from "@/types/token-data"
+import { useTokenStore } from "@/stores/token-store"
 
 interface TokenContextType {
   tokens: Map<string, TokenData>
@@ -35,7 +36,6 @@ const DEFAULT_QUERY_OPTIONS: TokenQueryOptions = {
   timeRangeMinutes: 10,
   filters: {
     hideExternal: false,
-    hideKOTH: false,
     graduationFilter: "all",
     minTradeAmount: 0,
     favoritesOnly: false,
@@ -47,7 +47,7 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
   const [visibleTokens, setVisibleTokens] = useState<TokenData[]>([])
   const [favorites, setFavorites] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
-  const [solPrice, setSolPrice] = useState<number>(175)
+  const [solPrice, setSolPrice] = useState<number>(0)
   const [showFavorites, setShowFavorites] = useState<boolean>(false)
   const [isPaused, setIsPaused] = useState<boolean>(false)
   const [queryOptions, setQueryOptions] = useState<TokenQueryOptions>(DEFAULT_QUERY_OPTIONS)
@@ -55,6 +55,9 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
   const [totalCount, setTotalCount] = useState<number>(0)
   const [isConnected, setIsConnected] = useState<boolean>(false)
   const tokenMapRef = useRef<Map<string, TokenData>>(new Map())
+  const displayOrderRef = useRef<string[]>([])
+  const pendingOrderRef = useRef<string[] | null>(null)
+  const pausedRef = useRef(false)
 
   const loadFavorites = useCallback(async () => {
     try {
@@ -101,19 +104,13 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
     [loadFavorites],
   )
 
-  const fetchSolPrice = useCallback(async () => {
-    try {
-      const response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd")
-      const data = await response.json()
-      if (data.solana && data.solana.usd) {
-        setSolPrice(data.solana.usd)
-      }
-    } catch (error) {
-      console.warn("Failed to fetch SOL price:", (error as Error).message)
-    }
-  }, [])
+  useEffect(() => {
+    useTokenStore.getState().setCardState(favorites, solPrice, toggleFavorite)
+  }, [favorites, solPrice, toggleFavorite])
 
   const setTokenQueryOptions = useCallback((options: TokenQueryOptions) => {
+    pausedRef.current = false
+    setIsPaused(false)
     setQueryOptions((previous) => {
       const previousSerialized = JSON.stringify(previous)
       const nextSerialized = JSON.stringify(options)
@@ -126,7 +123,6 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(true)
       try {
         await loadFavorites()
-        await fetchSolPrice()
       } catch (error) {
         console.error("Error initializing token context:", error)
       } finally {
@@ -135,11 +131,19 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
     }
 
     initialize()
-    const solPriceInterval = setInterval(fetchSolPrice, 60000)
-    return () => {
-      clearInterval(solPriceInterval)
+  }, [loadFavorites])
+
+  useEffect(() => {
+    pausedRef.current = isPaused
+    if (!isPaused && pendingOrderRef.current) {
+      const order = pendingOrderRef.current
+      pendingOrderRef.current = null
+      displayOrderRef.current = order
+      setVisibleTokens(
+        order.map((mint) => tokenMapRef.current.get(mint)).filter((token): token is TokenData => Boolean(token)),
+      )
     }
-  }, [loadFavorites, fetchSolPrice])
+  }, [isPaused])
 
   useEffect(() => {
     let cancelled = false
@@ -153,11 +157,31 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
       favoriteMints: favorites,
     })
 
-    const applySnapshot = (payload: { tokens: TokenData[]; totalPages: number; total: number }) => {
+    const applySnapshot = (payload: {
+      tokens: TokenData[]
+      totalPages: number
+      total: number
+      sol_price_usd?: number
+    }) => {
       const tokenMap = new Map(payload.tokens.map((token) => [token.mint, token]))
       tokenMapRef.current = tokenMap
       setTokens(tokenMap)
-      setVisibleTokens(payload.tokens)
+      const serverOrder = payload.tokens.map((token) => token.mint)
+      if (pausedRef.current && displayOrderRef.current.length > 0) {
+        pendingOrderRef.current = serverOrder
+        setVisibleTokens(
+          displayOrderRef.current
+            .map((mint) => tokenMap.get(mint))
+            .filter((token): token is TokenData => Boolean(token)),
+        )
+      } else {
+        displayOrderRef.current = serverOrder
+        setVisibleTokens(payload.tokens)
+      }
+      if (typeof payload.sol_price_usd === "number" && payload.sol_price_usd > 0) {
+        setSolPrice(payload.sol_price_usd)
+      }
+      useTokenStore.getState().replaceTokens(tokenMap, serverOrder)
       setTotalPages(payload.totalPages)
       setTotalCount(payload.total)
       setIsLoading(false)
@@ -170,13 +194,28 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
       order: string[]
       totalPages: number
       total: number
+      sol_price_usd?: number
     }) => {
       const next = new Map(tokenMapRef.current)
       payload.removedMints.forEach((mint) => next.delete(mint))
       payload.upserts.forEach((token) => next.set(token.mint, token))
       tokenMapRef.current = next
       setTokens(next)
-      setVisibleTokens(payload.order.map((mint) => next.get(mint)).filter((token): token is TokenData => Boolean(token)))
+      if (pausedRef.current) {
+        pendingOrderRef.current = payload.order
+        setVisibleTokens(
+          displayOrderRef.current
+            .map((mint) => next.get(mint))
+            .filter((token): token is TokenData => Boolean(token)),
+        )
+      } else {
+        displayOrderRef.current = payload.order
+        setVisibleTokens(payload.order.map((mint) => next.get(mint)).filter((token): token is TokenData => Boolean(token)))
+      }
+      if (typeof payload.sol_price_usd === "number" && payload.sol_price_usd > 0) {
+        setSolPrice(payload.sol_price_usd)
+      }
+      useTokenStore.getState().replaceTokens(next, payload.order)
       setTotalPages(payload.totalPages)
       setTotalCount(payload.total)
       setIsLoading(false)
