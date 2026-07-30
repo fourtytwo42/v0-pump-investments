@@ -110,6 +110,13 @@ This file stores durable project memory for recovery after context compression o
 - `npm ci` reported 25 dependency audit findings (5 low, 2 moderate, 17 high, 1 critical); no force-upgrade was applied during deployment.
 - Some third-party token metadata URLs return 403 or 404; the API continues serving token data and uses its existing fallback/cooldown behavior.
 
+## 2026-07-29 Settings slider hardening
+- Release v3.1.1 makes all Settings sliders keep local preview state while dragging and commit filter changes only when the interaction ends.
+- Slider values are clamped and snapped centrally before rendering or committing, preventing stale or invalid persisted values from producing unstable thumb positions.
+- Radix track clicks do not reliably emit `onValueCommit` in every browser path, so both slider wrappers explicitly commit on pointer release and suppress duplicate commits.
+- Slider thumbs are 28px with an expanded 44px interaction target and explicit screen-reader labels.
+- Live verification covered keyboard changes, single-slider and range-slider track clicks, displayed-summary synchronization, and restoration of the original 12-token/$3K settings.
+
 ## Commands / Checks
 - VM app path:
   - `cd /home/hendo420/pumpInvestments/v0-pump-investments`

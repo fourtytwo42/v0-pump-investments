@@ -20,11 +20,15 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 ### P0: Cross-browser settings controls
 
 #### T15. Harden settings sliders
-- Status: `in_progress`
+- Status: `done`
 - Goal:
   - Make all settings sliders reliable with mouse, touch, pen, and keyboard input without filter-query churn or controlled-value snapback.
 - Verification:
   - Unit tests for normalization, typecheck/build, and live keyboard plus pointer/touch-oriented browser checks.
+- Notes:
+  - Added normalized local slider state, commit-on-release settings updates, explicit pointer-release handling, and duplicate-commit suppression.
+  - Enlarged every thumb and interaction area, added accessible labels, and removed hover scaling that could shift pointer geometry.
+  - Verified v3.1.1 live with single-value and range track clicks, keyboard changes, parent-setting synchronization, and restoration to the original 12-token/$3K settings.
 
 ### P1: User-facing release notes
 
