@@ -54,6 +54,8 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - Published unrestricted hostname `pump.investments` to `http://127.0.0.1:3000`.
   - Public `/` and `/api/health` returned HTTP 200 through Cloudflare; browser verification loaded the expected Pump.Investments v4 page at `https://pump.investments/`.
   - Added the v4.0.1 in-app changelog entry and aligned package, badge, health, and browser-test versions.
+  - PR #4 was promoted from draft, merged into `main` as `a0b9445`, and deployed to the VM.
+  - Deployment passed TypeScript, 22 unit tests, and the production build. Both PM2 services remained online, and LAN/public health returned version `4.0.1`.
 - Runbook:
   - `deploy/cloudflare/README.md`
 

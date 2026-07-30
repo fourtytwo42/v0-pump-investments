@@ -24,7 +24,7 @@ This file stores durable project memory for recovery after context compression o
   - `pump-investments-ingest`
 
 ## Current Operational State
-- Version 4.0.0 is deployed at `http://192.168.50.237:3000` from commit `98725f8`.
+- Version 4.0.1 is deployed from merged `main` commit `a0b9445` at both `http://192.168.50.237:3000` and `https://pump.investments`.
 - Token lifecycle is verified without RPC from Pump frontend batch responses; NATS `pump_amm` and bonding flags are hints only.
 - Nginx owns LAN port `3000` and proxies Next.js on `3001`; SSE buffering is disabled and successful token images are proxy-cached.
 - The token client uses a fetch-based SSE stream with SQL-backed snapshots instead of 500 ms full polling.
@@ -185,6 +185,8 @@ This file stores durable project memory for recovery after context compression o
 - Activation command: `sudo cloudflared service install <TUNNEL_TOKEN>`. Never store the token in the repo or `.env`.
 - Public `https://pump.investments/` and `/api/health` returned HTTP 200 through Cloudflare after route activation; the browser loaded the expected application.
 - Release v4.0.1 records the public Cloudflare Tunnel launch in the in-app changelog.
+- PR #4 was merged into `main` as `a0b9445` and deployed on 2026-07-30. TypeScript, all 22 unit tests, and the production build passed on the VM; public `/` and `/api/health` returned 200 with version `4.0.1`.
+- Keep the VM-only `APP_VERSION` value aligned with each release and restart `pump-investments-web` with `--update-env`; otherwise `/api/health` can report the prior version after a successful build.
 - Full setup and verification steps are in `deploy/cloudflare/README.md`.
 
 ## Commands / Checks
