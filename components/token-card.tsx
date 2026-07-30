@@ -57,18 +57,13 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
   const BONDING_TARGET_SOL = 415
   const solPriceUsd = solPrice ?? 0
   const lifecycleStatus = token.lifecycle_status ?? "unknown"
-  const isGraduated = lifecycleStatus !== "bonding" && lifecycleStatus !== "unknown"
   const rawProgress = solPriceUsd > 0 ? (token.usd_market_cap / (solPriceUsd * BONDING_TARGET_SOL)) * 100 : 0
-  const cappedProgress = Math.min(Math.max(rawProgress, 0), isGraduated ? 100 : 99)
-  const progressPercent = isGraduated ? 100 : cappedProgress
+  const progressPercent = Math.min(Math.max(rawProgress, 0), 99)
   const showBondingProgress =
     lifecycleStatus === "bonding" &&
     Number.isFinite(progressPercent) &&
     progressPercent >= 0 &&
     token.is_bonding_curve === true
-  const lifecycleLabel =
-    lifecycleStatus === "bonding" ? "Bonding" : lifecycleStatus === "unknown" ? "Verifying" : "Graduated"
-
   const isFavorite = favorites.includes(token.mint)
 
   // Use global state for drawer to persist across re-renders
@@ -517,7 +512,7 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
             {showBondingProgress && (
               <div className="relative w-full h-2 rounded-full bg-muted overflow-hidden">
                 <div
-                  className={`h-full ${isGraduated ? "bg-green-500" : "bg-sky-500"}`}
+                  className="h-full bg-sky-500"
                   style={{ width: `${progressPercent}%` }}
                 />
                 <span className="absolute inset-0 flex items-center justify-center text-[10px] font-medium text-muted-foreground">
@@ -531,9 +526,6 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
                 <p className="text-xs text-muted-foreground">Token Age</p>
                 <p className="font-medium">{timeInfo.tokenAge}</p>
               </div>
-              <Badge variant="outline" className="text-[10px]">
-                {lifecycleLabel}
-              </Badge>
               {statusIcons}
             </div>
           </div>

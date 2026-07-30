@@ -31,6 +31,16 @@ interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: "3.1.3",
+    date: "July 29, 2026",
+    changes: [
+      {
+        type: "improved",
+        description: "Removed redundant Bonding, Graduated, and Verifying chips from token cards. Bonding status is now communicated by the existing progress bar.",
+      },
+    ],
+  },
+  {
     version: "3.1.2",
     date: "July 29, 2026",
     changes: [

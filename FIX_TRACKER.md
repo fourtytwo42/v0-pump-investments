@@ -17,6 +17,15 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 
 ## Priorities
 
+### P1: Simplify lifecycle presentation
+
+#### T17. Remove redundant lifecycle chips
+- Status: `in_progress`
+- Goal:
+  - Remove Bonding, Graduated, and Verifying chips from token cards; retain the bonding progress bar as the only lifecycle treatment on cards.
+- Verification:
+  - Tests, typecheck/build, deployment, and live LAN card inspection.
+
 ### P0: Reliable token images
 
 #### T16. Eliminate avoidable default token images
