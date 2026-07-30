@@ -42,7 +42,10 @@ export async function GET(request: Request): Promise<Response> {
     deadLetter,
     images,
   ] = await Promise.all([
-    prisma.trade.aggregate({ _max: { timestamp: true } }),
+    prisma.trade.findFirst({
+      orderBy: { createdAt: "desc" },
+      select: { timestamp: true, createdAt: true },
+    }),
     prisma.tokenLifecycleCheck.count(),
     prisma.token.count({ where: { OR: [{ imageUri: null }, { metadataUri: null }] } }),
     prisma.tokenDataRevision.findMany(),
@@ -52,13 +55,18 @@ export async function GET(request: Request): Promise<Response> {
     directoryMetrics(path.join(spoolRoot, "dead-letter")),
     directoryMetrics(imageRoot),
   ])
-  const latestTimestamp = Number(latestTrade._max.timestamp ?? 0)
+  const latestTimestamp = Number(latestTrade?.timestamp ?? 0)
+  const persistedLagMs =
+    latestTrade && latestTimestamp
+      ? Math.max(0, latestTrade.createdAt.getTime() - latestTimestamp)
+      : null
 
   return Response.json({
     version: process.env.APP_VERSION ?? "4.0.0",
     database: { status: "ok" },
     ingestion: {
-      persisted_lag_ms: latestTimestamp ? Math.max(0, Date.now() - latestTimestamp) : null,
+      persisted_lag_ms: persistedLagMs,
+      source_idle_ms: latestTimestamp ? Math.max(0, Date.now() - latestTimestamp) : null,
       spool,
       dead_letter: deadLetter,
     },
