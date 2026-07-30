@@ -38,6 +38,10 @@ export const changelogData: ChangelogEntry[] = [
         type: "improved",
         description: "Removed redundant Bonding, Graduated, and Verifying chips from token cards. Bonding status is now communicated by the existing progress bar.",
       },
+      {
+        type: "improved",
+        description: "Kept graduated cards visually clean without a replacement status label, while retaining the existing external-token provenance icon.",
+      },
     ],
   },
   {
@@ -55,6 +59,14 @@ export const changelogData: ChangelogEntry[] = [
       {
         type: "improved",
         description: "Accelerated missing-image recovery by resolving metadata URIs already captured from live trades before making additional Pump API requests.",
+      },
+      {
+        type: "fixed",
+        description: "Restored automatic image recovery for valid pump.fun mint addresses ending in “pump” and included active tokens that existed before a service restart.",
+      },
+      {
+        type: "improved",
+        description: "Backfilled image metadata for the active token set so currently traded tokens no longer depend on the default artwork while metadata catches up.",
       },
     ],
   },

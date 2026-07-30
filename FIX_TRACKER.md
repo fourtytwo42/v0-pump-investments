@@ -17,6 +17,15 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 
 ## Priorities
 
+### P1: User-facing release notes
+
+#### T18. Expand recent v3.1.x changelog entries
+- Status: `in_progress`
+- Goal:
+  - Fully document the slider, image-recovery, and lifecycle-card cleanup work in the live changelog.
+- Verification:
+  - Typecheck/build, deployment, and live changelog inspection.
+
 ### P1: Simplify lifecycle presentation
 
 #### T17. Remove redundant lifecycle chips
