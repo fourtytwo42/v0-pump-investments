@@ -62,7 +62,7 @@ export async function GET(request: Request): Promise<Response> {
       : null
 
   return Response.json({
-    version: process.env.APP_VERSION ?? "4.0.1",
+    version: process.env.APP_VERSION ?? "4.0.2",
     database: { status: "ok" },
     ingestion: {
       persisted_lag_ms: persistedLagMs,

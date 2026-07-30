@@ -31,6 +31,24 @@ interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: "4.0.2",
+    date: "July 30, 2026",
+    changes: [
+      {
+        type: "new",
+        description: "Connected PI Bot to the private GPU45 appliance and its Ornith 1.0 35B model.",
+      },
+      {
+        type: "improved",
+        description: "Added a 100,000-token PI Bot context ceiling, private server-side routing, and clearer appliance timeout and availability handling.",
+      },
+      {
+        type: "improved",
+        description: "Removed the unused hosted Groq integration so PI Bot analysis stays on the local network appliance.",
+      },
+    ],
+  },
+  {
     version: "4.0.1",
     date: "July 30, 2026",
     changes: [

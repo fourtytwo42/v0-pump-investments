@@ -164,9 +164,8 @@ ${tokenData}
 
 Your purpose is to help users understand the token data better, not to provide financial advice.`
 
-        // Prepare conversation history for context
-        // We'll limit to the last 10 messages to avoid token limits
-        const conversationHistory = updatedMessages
+        // Keep recent history without repeating the current question.
+        const conversationHistory = messages
           .slice(-10)
           .map((msg) => `${msg.role === "user" ? "User" : "Assistant"}: ${msg.content}`)
           .join("\n\n")
@@ -198,6 +197,9 @@ Current question: ${content}
           }
 
           const data = await response.json()
+          if (data.error || typeof data.text !== "string") {
+            throw new Error(data.error || "PI Bot returned an invalid response")
+          }
 
           // Add assistant message to the chat
           const assistantMessage: Message = { role: "assistant", content: data.text }

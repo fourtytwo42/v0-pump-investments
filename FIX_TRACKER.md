@@ -17,6 +17,16 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 
 ## Priorities
 
+### P0: Appliance-backed PI Bot
+
+#### T30. Connect PI Bot to the GPU45 Ornith model
+- Status: `in_progress`
+- Goal:
+  - Route server-side PI Bot requests to the LAN GPU45 appliance using `ornith-1.0-35b-Q5_K_M-688b8d0a`.
+  - Cap PI Bot context at 100,000 tokens without exposing the appliance directly to browsers.
+- Verification:
+  - Real appliance Responses API smoke test, unit/type/lint/build checks, VM deployment, and public `/api/chat` response.
+
 ### P0: Coordinated internal improvement release
 
 #### T28. Implement and deploy the complete internal improvement plan
