@@ -117,6 +117,14 @@ This file stores durable project memory for recovery after context compression o
 - Slider thumbs are 28px with an expanded 44px interaction target and explicit screen-reader labels.
 - Live verification covered keyboard changes, single-slider and range-slider track clicks, displayed-summary synchronization, and restoration of the original 12-token/$3K settings.
 
+## 2026-07-29 Token image reliability
+- Release v3.1.2 routes card images through same-origin `/api/token-image/[mint]`; IPFS images are fetched with gateway fallback and successful responses are browser-cacheable.
+- Token cards no longer cache URLs before a successful load and now rerender when `image_uri` or `metadata_uri` changes.
+- Metadata recovery must use a token's stored metadata URI before making another Pump coin request.
+- Pump vanity mints ending in `pump` are valid Solana addresses and must never be filtered from ingestion or recovery queues.
+- Startup recovery uses `INGEST_METADATA_ACTIVE_WINDOW_MS`, not the process start timestamp, so active pre-existing tokens are seeded.
+- Live v3.1.2 verification reached zero missing stored images among tokens active in the previous 30 minutes; the visible 12-card page used 12 same-origin image endpoints and no default images.
+
 ## Commands / Checks
 - VM app path:
   - `cd /home/hendo420/pumpInvestments/v0-pump-investments`

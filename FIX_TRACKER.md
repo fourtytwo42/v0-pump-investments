@@ -20,11 +20,16 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 ### P0: Reliable token images
 
 #### T16. Eliminate avoidable default token images
-- Status: `in_progress`
+- Status: `done`
 - Goal:
   - Make token images resolve reliably from stored metadata without depending on fragile third-party browser access.
 - Verification:
   - Image-path tests, typecheck/build, VM metadata audit, and live LAN card/image checks.
+- Notes:
+  - Added a same-origin `/api/token-image/[mint]` path with IPFS gateway fallback and successful-response browser caching.
+  - Removed pre-load URL caching, made cards rerender when image metadata arrives, and made the ingester resolve stored metadata URIs before calling Pump again.
+  - Fixed startup recovery to include the active metadata backlog and stopped rejecting valid Pump vanity mints ending in `pump`.
+  - Live verification returned WebP/JPEG/PNG bytes through the new endpoint, reduced missing stored images from 879 to 524 while new tokens continued arriving, reached zero missing images among tokens active in the last 30 minutes, and showed 12 proxied card images with zero defaults on the visible page.
 
 ### P0: Cross-browser settings controls
 
