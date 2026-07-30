@@ -769,7 +769,7 @@ async function persistTradesAtomic(trades: PreparedTrade[]): Promise<void> {
   const result = await prisma.$transaction(async (tx) => {
     const tokenValues = uniqueTokens.map((trade) => {
       const { source, venue } = sourceAndVenue(trade)
-      return `(${escapeSQL(generateCuid())},${escapeSQL(trade.mint)},${escapeSQL(trade.symbol.slice(0, 50))},${escapeSQL(trade.name.slice(0, 200))},${escapeSQL(trade.imageUri)},${escapeSQL(trade.metadataUri)},${escapeSQL(trade.twitter)},${escapeSQL(trade.telegram)},${escapeSQL(trade.website)},${escapeSQL(trade.description?.slice(0, 1000) ?? null)},${escapeSQL(trade.creatorAddress)},${trade.createdTs},false,'UNKNOWN',${escapeSQL(trade.bondingCurve)},${escapeSQL(trade.associatedBondingCurve)},'${source}','${venue}',${source === "UNKNOWN" ? "NULL" : "NOW()"},NOW(),'first_observed')`
+      return `(${escapeSQL(generateCuid())},${escapeSQL(trade.mint)},${escapeSQL(trade.symbol.slice(0, 50))},${escapeSQL(trade.name.slice(0, 200))},${escapeSQL(trade.imageUri)},${escapeSQL(trade.metadataUri)},${escapeSQL(trade.twitter)},${escapeSQL(trade.telegram)},${escapeSQL(trade.website)},${escapeSQL(trade.description?.slice(0, 1000) ?? null)},${escapeSQL(trade.creatorAddress)},${trade.createdTs},false,'UNKNOWN',${escapeSQL(trade.bondingCurve)},${escapeSQL(trade.associatedBondingCurve)},'${source}','${venue}',${source === "UNKNOWN" ? "NULL" : "NOW()"},NOW(),'first_observed',NOW())`
     }).join(",")
 
     await tx.$executeRawUnsafe(`

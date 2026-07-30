@@ -69,7 +69,9 @@ async function main(): Promise<void> {
       FROM token_minute_aggregates
     `),
   ])
-  const equivalent = JSON.stringify(raw[0]) === JSON.stringify(aggregated[0])
+  const equivalent = (["volume", "buys", "sells"] as const).every(
+    (field) => Math.abs(Number(raw[0][field]) - Number(aggregated[0][field])) < 0.000001,
+  )
   console.log(JSON.stringify({ tokenRows, buyerRows, equivalent, raw: raw[0], aggregated: aggregated[0] }))
   if (!equivalent) process.exitCode = 1
 }
