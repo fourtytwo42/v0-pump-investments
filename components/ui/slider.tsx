@@ -32,24 +32,35 @@ const Slider = React.forwardRef<React.ElementRef<typeof SliderPrimitive.Root>, S
     },
     ref,
   ) => {
-    const [localValue, setLocalValue] = React.useState(() => [
-      normalizeSliderValue(value[0], min, max, step),
-    ])
+    const normalizedValue = normalizeSliderValue(value[0], min, max, step)
+    const [localValue, setLocalValue] = React.useState(() => [normalizedValue])
+    const localValueRef = React.useRef(localValue)
+    const lastCommittedValueRef = React.useRef(normalizedValue)
 
     React.useEffect(() => {
-      setLocalValue([normalizeSliderValue(value[0], min, max, step)])
+      const nextValue = [normalizeSliderValue(value[0], min, max, step)]
+      localValueRef.current = nextValue
+      lastCommittedValueRef.current = nextValue[0]
+      setLocalValue(nextValue)
     }, [value[0], min, max, step])
 
     const handleChange = (next: number[]) => {
       const normalized = [normalizeSliderValue(next[0], min, max, step)]
+      localValueRef.current = normalized
       setLocalValue(normalized)
       onValueChange?.(normalized)
     }
 
-    const handleCommit = (next: number[]) => {
-      const normalized = [normalizeSliderValue(next[0], min, max, step)]
+    const commitValue = (normalized: number[]) => {
+      if (normalized[0] === lastCommittedValueRef.current) return
+      lastCommittedValueRef.current = normalized[0]
+      localValueRef.current = normalized
       setLocalValue(normalized)
       onValueCommit?.(normalized)
+    }
+
+    const handleCommit = (next: number[]) => {
+      commitValue([normalizeSliderValue(next[0], min, max, step)])
     }
 
     return (
@@ -62,6 +73,7 @@ const Slider = React.forwardRef<React.ElementRef<typeof SliderPrimitive.Root>, S
         step={step}
         onValueChange={handleChange}
         onValueCommit={handleCommit}
+        onPointerUp={() => commitValue(localValueRef.current)}
         {...props}
       >
         <SliderPrimitive.Track className="relative h-2.5 w-full grow overflow-hidden rounded-full bg-secondary">
