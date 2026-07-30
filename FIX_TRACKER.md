@@ -20,7 +20,7 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 ### P0: Coordinated internal improvement release
 
 #### T28. Implement and deploy the complete internal improvement plan
-- Status: `in_progress`
+- Status: `done`
 - Goal:
   - Deliver the atomic ingestion, aggregate queries, source/venue data, realtime correctness, alert reliability, image/cache, dependency, client-efficiency, security, observability, and VM proxy improvements as one reversible release.
 - Constraints:
@@ -31,6 +31,11 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - Local release candidate passes ESLint, TypeScript, 22 unit tests, Prisma validation, Turbopack production build, and `npm audit --omit=dev` with zero findings.
   - VM preflight recorded commit `b6ea963`, PostgreSQL 43 MB / 1,971 tokens / 14,112 trades, PM2 state, API baseline, and backup `/home/hendo420/backups/pumpinvestments-pre-v4-20260730-034106.dump` (SHA-256 `4d9b8b1076e032d40f1cca439ed254492a9d0b0373ed0cc07b8b9b1fccc37a72`).
   - Additive migration completed a live-schema transaction dry run and rolled back cleanly.
+  - V4 is deployed from commit `98725f8`: Nginx owns LAN port `3000`, Next.js listens on `3001`, and both PM2 services are online and saved.
+  - The release was exercised live from the preflight backup at 03:41 UTC through the 04:41 UTC soak sample, including spool recovery and controlled PM2/Nginx restarts.
+  - Final checks: snapshot p95 26.4 ms over 30 LAN samples; confirmed persisted-write delay p95 1.922 seconds; spool/dead-letter zero; no new ingester error-log writes after 04:13 UTC; 12 Chromium/Firefox/WebKit tests pass.
+  - Returning-user initial JavaScript is 252.2 kB versus the 267 kB baseline. Production dependency audit reports zero findings.
+  - Upstream Pump subscriber credentials are no longer in source and live only in the mode-600 VM environment. Provider-side credential rotation still requires a replacement credential from Pump.
 
 ### P1: Whole-app efficiency and reliability audit
 
@@ -52,78 +57,93 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 ### P0: Persistence correctness
 
 #### T22. Make ingester batches atomic and retryable
-- Status: `in_progress`
+- Status: `done`
 - Goal:
   - Prevent silent trade loss and false persisted-lag health during partial or transient database failures.
 - Verification:
   - Failure-injection tests for disconnects, timeouts, deadlocks, partial writes, and process restarts.
+  - The cutover exposed an invalid atomic INSERT; 108 failed batches remained on disk, replayed idempotently after the fix, and drained to zero with no dead-letter files.
+  - Active spool files are excluded from replay scans, eliminating the observed foreground/replay file race.
 
 ### P0: Dependency security
 
 #### T23. Patch vulnerable production dependencies
-- Status: `in_progress`
+- Status: `done`
 - Goal:
   - Upgrade Next.js, `ws`, and affected transitive dependencies through staged regression-tested releases.
 - Verification:
   - No critical/high production audit findings without documented exceptions; tests, typecheck, build, and live smoke test pass.
+  - Next 16.2.12, React 19.2.8, Prisma 7.9.1, `ws` 8.21.1, `pg` 8.22.0, TypeScript 5.9.3, and the requested toolchain pins are live.
+  - `npm audit --omit=dev` reports zero vulnerabilities.
 
 ### P0: Alert correctness
 
 #### T24. Monitor all enabled alert mints
-- Status: `in_progress`
+- Status: `done`
 - Goal:
   - Evaluate alerts independently of the current visible token page and avoid eager missing-sound probes.
 - Verification:
   - Off-page favorite alert test, closed-panel sound test, and browser-open/closed behavior specification.
+  - `/api/alerts/stream` returns independent snapshot/patch SSE data for requested mints and the client retains the five-second fallback after repeated stream failures.
+  - Alert audio uses Web Audio only; all three browser engines observed no sound-file or CoinGecko requests.
 
 ### P1: Realtime efficiency
 
 #### T25. Suppress lifecycle no-op revisions and fix SSE revision races
-- Status: `in_progress`
+- Status: `done`
 - Goal:
   - Avoid database/SSE churn for unchanged verification and guarantee each query group applies every relevant revision.
 - Verification:
   - Concurrent subscribe/update integration tests and no patch for unchanged lifecycle responses.
+  - Lifecycle writes are conditional, verifier health has its own revision, query groups track applied revisions independently, and snapshot/revision reads use a stable handshake.
 
 ### P1: API and query hardening
 
 #### T26. Bound API inputs, stream groups, and rolling aggregation cost
-- Status: `in_progress`
+- Status: `done`
 - Goal:
   - Add schema validation, request/stream limits, and minute-level aggregates before retained trade volume grows.
 - Verification:
   - Abuse-limit tests, ten-query load test, and `EXPLAIN (ANALYZE, BUFFERS)` latency gate.
+  - Zod/body/page/favorite/query-group bounds are live; invalid JSON returns 400, oversized bodies 413, and Nginx/app stream limits return 429.
+  - Minute and buyer-minute aggregates are populated and shadow comparison is equivalent to retained raw trades.
 
 ### P2: Client and maintenance cleanup
 
 #### T27. Reduce initial bundle and rerender work without redesign
-- Status: `in_progress`
+- Status: `done`
 - Goal:
   - Split realtime context updates, lazy-load closed panels, mount one Toaster, make Pause freeze ordering, and remove dead code/dependencies.
 - Verification:
   - Bundle comparison, render-count test, Pause behavior test, and unchanged visual snapshots.
+  - Cards subscribe to normalized Zustand slices; Pause defers ordering and query changes resume it.
+  - Settings, PI Bot, onboarding, and alert settings load on demand; one notification region remains.
+  - Returning-user initial JavaScript measured 252.2 kB, and 12 cross-browser tests passed without visual changes beyond KOTH removal.
 
 ### P1: Token source and venue attribution
 
 #### T20. Persist launch source separately from trade venue
-- Status: `in_progress`
+- Status: `done`
 - Problem:
   - Live unified trades expose `program` and sometimes `platform`, but the token schema discards them and only retains Pump vs `NON_LAUNCHPAD`.
 - Goal:
   - Persist verified launch source and latest trade venue separately so cards and filters can distinguish Pump, Moonshot/Meteora, Raydium, and unknown external tokens without guessing.
 - Verification:
   - Fixture coverage for observed programs, migration/backfill audit, API fields, and live LAN source/venue labels.
+  - Source and venue are stored separately and exposed through the API; unknown is retained when launch provenance is not authoritative.
+  - Live counts include Pump/Pump bonding, Pump/PumpSwap, Moonshot/Meteora DBC, Raydium, external, and unknown combinations. No new card labels were added.
 
 ### P1: Deprecated KOTH surface
 
 #### T19. Remove or replace dead KOTH UI
-- Status: `in_progress`
+- Status: `done`
 - Problem:
   - Current Pump v3 single and batch responses expose no KOTH field, and the production database has zero `king_of_the_hill_timestamp` values.
 - Goal:
   - Remove the KOTH card icon, Hide KOTH setting/filter, and obsolete onboarding/help references unless a new authoritative Pump signal is identified.
 - Verification:
   - Confirm no KOTH UI or query conditions remain, then run tests, typecheck/build, and live LAN inspection.
+  - KOTH settings, card logic, query predicates, onboarding references, and asset are removed. The compatibility API field remains nullable and returns `null`.
 
 ### P1: User-facing release notes
 

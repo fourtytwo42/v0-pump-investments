@@ -24,8 +24,9 @@ This file stores durable project memory for recovery after context compression o
   - `pump-investments-ingest`
 
 ## Current Operational State
-- Version 3.1.0 is deployed at `http://192.168.50.237:3000` from commit `daecc44`.
+- Version 4.0.0 is deployed at `http://192.168.50.237:3000` from commit `98725f8`.
 - Token lifecycle is verified without RPC from Pump frontend batch responses; NATS `pump_amm` and bonding flags are hints only.
+- Nginx owns LAN port `3000` and proxies Next.js on `3001`; SSE buffering is disabled and successful token images are proxy-cached.
 - The token client uses a fetch-based SSE stream with SQL-backed snapshots instead of 500 ms full polling.
 - Prisma migrations are now baselined and deployed through `prisma migrate deploy`.
 - The LAN deployment at `192.168.50.237:3000` was provisioned and verified on 2026-07-29.
@@ -38,6 +39,22 @@ This file stores durable project memory for recovery after context compression o
 - The reconnect hardening commit was pushed to `main`.
 
 ## Important Recent Changes
+- V4 atomic ingestion writes tokens, trades, newest prices, rolling aggregates, dirty mints, and revisions transactionally. Every incoming batch is atomically spooled before database work and removed only after commit.
+- V4 cutover proved the spool recovery path: 108 batches survived a bad INSERT, replayed after correction, and drained with zero dead-letter files and no confirmed trade loss.
+- Rolling token-minute and token/buyer-minute aggregates are live. Backfill shadow comparison matched retained raw-trade totals.
+- Launch source and trade venue are separate fields. Pump, PumpSwap, Moonshot/Meteora DBC, Raydium v4, external, and unknown are retained without guessing.
+- SOL/USD is acquired centrally by the ingester, persisted, and distributed through snapshots/SSE. The browser no longer calls CoinGecko.
+- Token images use the same-origin proxy, SSRF/redirect/content limits, shared filesystem cache, Nginx cache, negative caching, and 512 MB LRU cleanup.
+- Alerts use `/api/alerts/stream` independently of the visible page and Web Audio patterns instead of probing sound files.
+- Cards subscribe to normalized Zustand state; Pause defers order only and automatically resumes on query changes.
+- Settings, onboarding, PI Bot, and alert settings load on demand. Returning-user initial JavaScript is 252.2 kB versus the prior 267 kB baseline.
+- KOTH UI/query/asset surfaces are removed. The compatibility field remains and always returns `null`.
+- Dependencies are pinned to the V4 release set; `npm audit --omit=dev` reports zero findings.
+- Nginx and the app enforce request, page, favorite, query-group, body, and stream-connection bounds with 400/413/429/503 semantics.
+- Public `/api/health` and bearer-protected `/api/health/details` are live. Confirmed persisted-write lag uses database `created_at - event timestamp`; source idle time is reported separately.
+- V4 verification passed ESLint, TypeScript, 22 unit tests, Prisma migration validation, production build, 12 Chromium/Firefox/WebKit tests, SSE/alert/image/API checks, and a live 03:41-04:41 UTC release exercise.
+- V4 preflight backup: `/home/hendo420/backups/pumpinvestments-pre-v4-20260730-034106.dump`, SHA-256 `4d9b8b1076e032d40f1cca439ed254492a9d0b0373ed0cc07b8b9b1fccc37a72`.
+- Pump subscriber credentials now exist only in the VM mode-600 environment. Actual upstream rotation requires Pump to issue a replacement credential.
 - The in-app v3.1.0 changelog now documents the lifecycle, filtering, SQL/SSE, metadata, cache, and price-ordering changes.
 - Token cards intentionally show no Bonding, Graduated, or Verifying chip. Verified bonding tokens use the progress bar; graduated and unknown tokens have no lifecycle label, and the existing provenance icon still distinguishes external tokens.
 - T12 in `FIX_TRACKER.md` is implemented and live:
@@ -107,8 +124,8 @@ This file stores durable project memory for recovery after context compression o
 ## Known Problems
 - PM2 env changes require `--update-env` on restart if `.env` has changed.
 - Pi Bot chat requires `GROQ_API_KEY`; no key was available during the 2026-07-29 VM deployment.
-- `npm ci` reported 25 dependency audit findings (5 low, 2 moderate, 17 high, 1 critical); no force-upgrade was applied during deployment.
 - Some third-party token metadata URLs return 403 or 404; the API continues serving token data and uses its existing fallback/cooldown behavior.
+- Next 16 emits a non-fatal output-file-tracing warning for the filesystem-backed token-image route during build; compilation, type validation, and runtime image tests pass.
 
 ## 2026-07-29 No-visual-change whole-app audit
 - The prioritized report is `APP_IMPROVEMENT_AUDIT.md`; no product behavior or visuals were changed during the audit.
