@@ -36,15 +36,31 @@ export const changelogData: ChangelogEntry[] = [
     changes: [
       {
         type: "fixed",
-        description: "Replaced market-cap graduation guesses with verified pump.fun lifecycle states, including bonding, curve completion, and PumpSwap migration.",
+        description: "Replaced market-cap graduation guesses with lifecycle data verified directly from pump.fun, so high-market-cap tokens can remain Bonding and low-market-cap tokens can remain Graduated when that is their real state.",
+      },
+      {
+        type: "fixed",
+        description: "Corrected Bonding and Graduated filters to use verified lifecycle state instead of market cap or unreliable websocket flags.",
       },
       {
         type: "improved",
-        description: "Moved token aggregation into PostgreSQL and removed third-party metadata requests from the token-list request path.",
+        description: "Simplified token status labels to Bonding or Graduated. External tokens retain the existing provenance icon, while unresolved tokens display Verifying.",
+      },
+      {
+        type: "improved",
+        description: "Moved token aggregation, filtering, sorting, and pagination into PostgreSQL for substantially faster token-list responses.",
       },
       {
         type: "new",
-        description: "Added realtime token updates over a shared server-sent event stream with snapshot recovery.",
+        description: "Added realtime token updates over a shared server-sent event stream with automatic reconnect and snapshot recovery, replacing 500 ms full-page polling.",
+      },
+      {
+        type: "improved",
+        description: "Moved metadata enrichment out of the token-list request path and added bounded caches to prevent long-running memory growth.",
+      },
+      {
+        type: "fixed",
+        description: "Prevented delayed trade batches from overwriting newer prices and added continuous lifecycle reconciliation for newly created and actively traded tokens.",
       },
     ],
   },

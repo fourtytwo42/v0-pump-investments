@@ -17,6 +17,17 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 
 ## Priorities
 
+### P1: User-facing release notes
+
+#### T14. Expand the v3.1.0 in-app changelog
+- Status: `done`
+- Goal:
+  - Document the verified lifecycle, realtime delivery, performance, filtering, and status-presentation changes on the live changelog page.
+- Verification:
+  - Typecheck, production build, deployment, and live changelog-dialog inspection.
+- Notes:
+  - Expanded v3.1.0 with seven user-facing entries covering verified graduation, corrected filters, binary lifecycle labels, SQL query performance, SSE delivery, asynchronous metadata, bounded caches, and out-of-order price protection.
+
 ### P0: Align lifecycle presentation
 
 #### T13. Restore binary Bonding/Graduated status labels
