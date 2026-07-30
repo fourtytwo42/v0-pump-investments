@@ -24,6 +24,10 @@ This file stores durable project memory for recovery after context compression o
   - `pump-investments-ingest`
 
 ## Current Operational State
+- Version 3.1.0 is deployed at `http://192.168.50.237:3000` from commit `daecc44`.
+- Token lifecycle is verified without RPC from Pump frontend batch responses; NATS `pump_amm` and bonding flags are hints only.
+- The token client uses a fetch-based SSE stream with SQL-backed snapshots instead of 500 ms full polling.
+- Prisma migrations are now baselined and deployed through `prisma migrate deploy`.
 - The LAN deployment at `192.168.50.237:3000` was provisioned and verified on 2026-07-29.
 - `pm2-hendo420.service` is enabled and active; both PM2 processes are online.
 - The homepage and POST `/api/tokens` respond successfully over the LAN, and the ingester is writing live token/trade data.
@@ -34,6 +38,17 @@ This file stores durable project memory for recovery after context compression o
 - The reconnect hardening commit was pushed to `main`.
 
 ## Important Recent Changes
+- T12 in `FIX_TRACKER.md` is implemented and live:
+  - lifecycle states are `UNKNOWN`, `BONDING`, `CURVE_COMPLETE`, `PUMPSWAP`, and `NON_LAUNCHPAD`
+  - `$60k` market-cap graduation inference was removed
+  - `POST /coins-v2/mints` is the primary verifier with a durable coalescing retry queue
+  - `/api/tokens` aggregates in PostgreSQL and performs no external metadata hydration
+  - `/api/tokens/stream` shares query recomputations and emits snapshot/patch SSE events
+  - client-side automatic metadata hydration was removed; ingestion owns asynchronous enrichment
+  - raw trade retention is configured for 24 hours
+- Initial lifecycle backfill on 2026-07-29 resolved 728/736 stored tokens with 8 unsupported/non-Pump mints left `UNKNOWN`; live reconciliation continues for new and unresolved tokens.
+- Live validation measured `/api/tokens` at 9 ms p95 over 20 samples, observed about 1.5 seconds trade lag, and found zero `completed` compatibility mismatches.
+- Pre-migration database backup: `/home/hendo420/pumpInvestments/backups/pre-lifecycle-20260730-015803.dump`.
 - T9 in `FIX_TRACKER.md` is now implemented:
   - `lib/pump-coin.ts` now clears settled inflight requests and uses expiring cooldowns instead of permanent failure pinning
   - `server/ingest-trades.ts` now prioritizes active metadata backlog items, keeps retry state over time, and logs metadata queue/freshness health
@@ -104,6 +119,10 @@ This file stores durable project memory for recovery after context compression o
 - Full typecheck:
   - `npm run typecheck`
   - `npx tsc --noEmit --project tsconfig.json`
+- Lifecycle:
+  - `npm run backfill:lifecycle`
+  - `npx prisma migrate deploy`
+  - `npm test`
 - PM2 normal restart:
   - `npm run pm2:web:restart`
   - `npm run pm2:ingest:restart`

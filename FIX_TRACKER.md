@@ -20,7 +20,7 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 ### P0: Reliable lifecycle and realtime token delivery
 
 #### T12. Replace market-cap graduation inference and 500 ms polling
-- Status: `in_progress`
+- Status: `done`
 - Files:
   - `prisma/schema.prisma`
   - `server/ingest-trades.ts`
@@ -38,6 +38,18 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - `npm run typecheck`
   - `npm run build`
   - Live VM backfill, PM2 health, API latency, SSE reconnect, and LAN browser checks.
+- Notes:
+  - Added explicit `UNKNOWN`, `BONDING`, `CURVE_COMPLETE`, `PUMPSWAP`, and `NON_LAUNCHPAD` states verified from Pump frontend batch responses; NATS fields only enqueue checks.
+  - Removed the `$60k` completion write and guarded price upserts against out-of-order trade timestamps.
+  - Added durable lifecycle checks, a full backfill command, bounded caches, 24-hour raw-trade retention, SQL aggregation, shared SSE query groups, and snapshot fallback.
+  - The initial VM backfill resolved 728 of 736 stored tokens with zero transition conflicts; 8 unsupported/non-Pump mints remained explicit `UNKNOWN`.
+  - Compatibility audit reports zero rows where `completed` disagrees with verified lifecycle.
+  - Live counterexamples validate the fix: CUP remained bonding near `$97.9k`, DrTrump remained bonding near `$758k`, and multiple sub-dollar tokens were correctly identified as PumpSwap.
+  - Twenty live `/api/tokens` requests measured 9 ms p95 and 44 ms maximum; SSE produced both snapshot and patch events.
+  - Browser validation showed v3.1.0 connected, lifecycle labels, bonding-only and graduated-only filtering, and no stale status rendering.
+  - VM ingestion was about 1.5 seconds behind at final sampling, with both PM2 processes online and no ingest errors.
+  - Database backup: `/home/hendo420/pumpInvestments/backups/pre-lifecycle-20260730-015803.dump`.
+  - Verification passed: 8 tests, `npm run typecheck`, `npm run build`, Prisma migrations, LAN API, SSE, browser filters, and PM2 persistence.
 
 ### P0: Restore TypeScript Baseline
 
