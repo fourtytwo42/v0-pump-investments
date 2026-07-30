@@ -2,6 +2,20 @@
 
 This file is the durable work queue for repo maintenance and recovery. If chat context is lost, start here.
 
+### P0: Production lifecycle correction
+
+#### T15. Reverify Dre. MAGA graduation
+- Status: `done`
+- Goal:
+  - Identify the exact production mint, compare its stored lifecycle with Pump's authoritative response, and make the existing verifier apply any confirmed graduation.
+- Verification:
+  - Confirm Pump response, persisted lifecycle/compatibility fields, and the public token API after correction.
+- Notes:
+  - The exact token is Dr. MAGA (`ADzmJCZfwf5vFQ6y9EysRS7xWqFgRc33QAAnj7Mipump`).
+  - Pump's batch API was stale (`complete=false`, no pool), but production retained 120 `pump_amm` trades and the token's live venue was already `PUMPSWAP`.
+  - Promoted the lifecycle monotonically to `PUMPSWAP` using the observed pool `5xdVJp6rSZ3TnfcY2SCmefy74TdwhSGewkxJ3yGqkqE6`, updated compatibility fields, and journaled the lifecycle revision.
+  - Verified the public API returns `lifecycle_status=pumpswap`, `is_completed=true`, and `is_bonding_curve=false`; no lifecycle check remains queued.
+
 ## How To Use
 - Read `memory.md` first for current facts, decisions, and recent changes.
 - Read this tracker second for prioritized work and open issues.

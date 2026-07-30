@@ -126,6 +126,12 @@ This file stores durable project memory for recovery after context compression o
 - PI Bot shares the GPU45 appliance with other clients. A Qwen-to-Ornith model swap can take about a minute, so `/api/chat` sends non-buffered JSON whitespace heartbeats while it waits.
 - Some third-party token metadata URLs return 403 or 404; the API continues serving token data and uses its existing fallback/cooldown behavior.
 - Next 16 emits a non-fatal output-file-tracing warning for the filesystem-backed token-image route during build; compilation, type validation, and runtime image tests pass.
+- Pump's lifecycle batch API can lag confirmed PumpSwap activity. On 2026-07-30 it still returned `complete=false` for Dr. MAGA after 120 stored `pump_amm` trades; the production token was manually promoted from that pool evidence and protected by the monotonic `PUMPSWAP` state.
+
+## 2026-07-30 Dr. MAGA lifecycle correction
+- Dr. MAGA mint: `ADzmJCZfwf5vFQ6y9EysRS7xWqFgRc33QAAnj7Mipump`.
+- Confirmed PumpSwap pool: `5xdVJp6rSZ3TnfcY2SCmefy74TdwhSGewkxJ3yGqkqE6`.
+- Production now stores `PUMPSWAP`, `completed=true`, the pool address, and a lifecycle revision; the public API returns non-bonding/completed.
 
 ## 2026-07-29 No-visual-change whole-app audit
 - The prioritized report is `APP_IMPROVEMENT_AUDIT.md`; no product behavior or visuals were changed during the audit.
