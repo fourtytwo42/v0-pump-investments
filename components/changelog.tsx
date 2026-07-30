@@ -31,6 +31,24 @@ interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: "3.1.1",
+    date: "July 29, 2026",
+    changes: [
+      {
+        type: "fixed",
+        description: "Hardened every Settings slider for consistent mouse, touch, pen, and keyboard control across browsers.",
+      },
+      {
+        type: "fixed",
+        description: "Stopped range sliders from restarting token queries while they are still being dragged, preventing lag and values snapping back mid-adjustment.",
+      },
+      {
+        type: "improved",
+        description: "Added larger slider controls and touch targets, stable value clamping, and explicit screen-reader labels for every slider thumb.",
+      },
+    ],
+  },
+  {
     version: "3.1.0",
     date: "July 29, 2026",
     changes: [

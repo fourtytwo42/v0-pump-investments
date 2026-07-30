@@ -17,6 +17,15 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 
 ## Priorities
 
+### P0: Cross-browser settings controls
+
+#### T15. Harden settings sliders
+- Status: `in_progress`
+- Goal:
+  - Make all settings sliders reliable with mouse, touch, pen, and keyboard input without filter-query churn or controlled-value snapback.
+- Verification:
+  - Unit tests for normalization, typecheck/build, and live keyboard plus pointer/touch-oriented browser checks.
+
 ### P1: User-facing release notes
 
 #### T14. Expand the v3.1.0 in-app changelog

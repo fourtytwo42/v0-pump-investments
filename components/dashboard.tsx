@@ -483,7 +483,8 @@ export default function Dashboard() {
                       min={4}
                       max={48}
                       step={4}
-                      onValueChange={(value) => updateSettings("tokensPerPage", value[0])}
+                      onValueCommit={(value) => updateSettings("tokensPerPage", value[0])}
+                      thumbLabel="Tokens per page"
                     />
                   </div>
 
@@ -579,7 +580,7 @@ export default function Dashboard() {
                       mapMarketCapValueToSlider(settings.minMarketCapFilter),
                       mapMarketCapValueToSlider(settings.maxMarketCapFilter),
                     ]}
-                    onValueChange={(sliderValues) => {
+                    onValueCommit={(sliderValues) => {
                       const minValue = mapMarketCapSliderToValue(sliderValues[0])
                       const maxValue = mapMarketCapSliderToValue(sliderValues[1])
                       updateSettingsBatch({
@@ -610,7 +611,7 @@ export default function Dashboard() {
                     min={1}
                     max={500}
                     value={[settings.minUniqueTraderCountFilter, settings.maxUniqueTraderCountFilter]}
-                    onValueChange={(value) => {
+                    onValueCommit={(value) => {
                       updateSettingsBatch({
                         minUniqueTraderCountFilter: value[0],
                         maxUniqueTraderCountFilter: value[1],
@@ -638,7 +639,7 @@ export default function Dashboard() {
                       mapTradeAmountValueToSlider(settings.minTradeAmountFilter),
                       mapTradeAmountValueToSlider(settings.maxTradeAmountFilter),
                     ]}
-                    onValueChange={(sliderValues) => {
+                    onValueCommit={(sliderValues) => {
                       const minValue = mapTradeAmountSliderToValue(sliderValues[0])
                       const maxValue = mapTradeAmountSliderToValue(sliderValues[1])
                       updateSettingsBatch({
@@ -672,7 +673,7 @@ export default function Dashboard() {
                       mapTokenAgeValueToSlider(settings.minTokenAgeMinutes),
                       mapTokenAgeValueToSlider(settings.maxTokenAgeMinutes),
                     ]}
-                    onValueChange={(sliderValues) => {
+                    onValueCommit={(sliderValues) => {
                       const minValue = mapTokenAgeSliderToValue(sliderValues[0])
                       const maxValue = mapTokenAgeSliderToValue(sliderValues[1])
                       updateSettingsBatch({
