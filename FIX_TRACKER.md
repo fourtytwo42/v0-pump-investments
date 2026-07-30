@@ -17,6 +17,21 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 
 ## Priorities
 
+### P0: Align lifecycle presentation
+
+#### T13. Restore binary Bonding/Graduated status labels
+- Status: `done`
+- Goal:
+  - Present PumpSwap, curve-complete, and non-launchpad tokens as `Graduated`, while retaining the existing external provenance icon.
+- Constraint:
+  - Keep `Verifying` for unresolved tokens rather than guessing.
+- Verification:
+  - Unit/type/build checks and live LAN filter/card validation.
+- Notes:
+  - Cards now label verified `BONDING` tokens as `Bonding` and all verified non-bonding states as `Graduated`.
+  - `UNKNOWN` remains `Verifying`; external provenance continues to use the existing icon.
+  - The Graduated filter now includes curve-complete, PumpSwap, and non-launchpad tokens.
+
 ### P0: Reliable lifecycle and realtime token delivery
 
 #### T12. Replace market-cap graduation inference and 500 ms polling

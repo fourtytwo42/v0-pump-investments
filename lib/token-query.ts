@@ -260,7 +260,7 @@ export async function queryTokenSnapshot(rawBody: Partial<TokenQueryRequest>): P
         AND (${filters.hideExternal} = false OR t.lifecycle_status <> 'NON_LAUNCHPAD'::"TokenLifecycleStatus")
         AND (${filters.hideKOTH} = false OR t.king_of_the_hill_timestamp IS NULL)
         AND (${filters.graduationFilter} <> 'bonding' OR t.lifecycle_status = 'BONDING'::"TokenLifecycleStatus")
-        AND (${filters.graduationFilter} <> 'graduated' OR t.lifecycle_status IN ('CURVE_COMPLETE'::"TokenLifecycleStatus", 'PUMPSWAP'::"TokenLifecycleStatus"))
+        AND (${filters.graduationFilter} <> 'graduated' OR t.lifecycle_status IN ('CURVE_COMPLETE'::"TokenLifecycleStatus", 'PUMPSWAP'::"TokenLifecycleStatus", 'NON_LAUNCHPAD'::"TokenLifecycleStatus"))
         AND (${nullableFinite(filters.minMarketCap)}::double precision IS NULL OR p.market_cap_usd >= ${nullableFinite(filters.minMarketCap)})
         AND (${nullableFinite(filters.maxMarketCap)}::double precision IS NULL OR p.market_cap_usd <= ${nullableFinite(filters.maxMarketCap)})
         AND (${nullableFinite(filters.minTotalVolume)}::double precision IS NULL OR COALESCE(s.total_volume_usd, 0) >= ${nullableFinite(filters.minTotalVolume)})

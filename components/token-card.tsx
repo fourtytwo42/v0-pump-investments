@@ -57,7 +57,7 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
   const BONDING_TARGET_SOL = 415
   const solPriceUsd = solPrice ?? 0
   const lifecycleStatus = token.lifecycle_status ?? "unknown"
-  const isGraduated = lifecycleStatus === "curve_complete" || lifecycleStatus === "pumpswap"
+  const isGraduated = lifecycleStatus !== "bonding" && lifecycleStatus !== "unknown"
   const rawProgress = solPriceUsd > 0 ? (token.usd_market_cap / (solPriceUsd * BONDING_TARGET_SOL)) * 100 : 0
   const cappedProgress = Math.min(Math.max(rawProgress, 0), isGraduated ? 100 : 99)
   const progressPercent = isGraduated ? 100 : cappedProgress
@@ -67,15 +67,7 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
     progressPercent >= 0 &&
     token.is_bonding_curve === true
   const lifecycleLabel =
-    lifecycleStatus === "pumpswap"
-      ? "PumpSwap"
-      : lifecycleStatus === "curve_complete"
-        ? "Graduated"
-        : lifecycleStatus === "bonding"
-          ? "Bonding"
-          : lifecycleStatus === "non_launchpad"
-            ? "External"
-            : "Verifying"
+    lifecycleStatus === "bonding" ? "Bonding" : lifecycleStatus === "unknown" ? "Verifying" : "Graduated"
 
   const isFavorite = favorites.includes(token.mint)
 

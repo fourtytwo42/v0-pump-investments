@@ -38,6 +38,7 @@ This file stores durable project memory for recovery after context compression o
 - The reconnect hardening commit was pushed to `main`.
 
 ## Important Recent Changes
+- Lifecycle presentation is intentionally binary: `BONDING` displays as Bonding; `CURVE_COMPLETE`, `PUMPSWAP`, and `NON_LAUNCHPAD` display as Graduated. `UNKNOWN` remains Verifying, and the existing provenance icon distinguishes external tokens.
 - T12 in `FIX_TRACKER.md` is implemented and live:
   - lifecycle states are `UNKNOWN`, `BONDING`, `CURVE_COMPLETE`, `PUMPSWAP`, and `NON_LAUNCHPAD`
   - `$60k` market-cap graduation inference was removed
