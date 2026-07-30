@@ -7,7 +7,7 @@ import {
   getIpfsGatewayUrls,
   normalizeIpfsUri,
 } from "@/lib/pump-trades"
-import { normalizeTokenMetadata } from "@/lib/token-metadata"
+import { normalizeTokenMetadata, type TokenMetadata } from "@/lib/token-metadata"
 import { fetchPumpCoin, PUMP_HEADERS, shouldSkipPumpCoinFetch } from "@/lib/pump-coin"
 import { getDexPairCreatedAt } from "@/lib/dexscreener"
 import { BoundedCache } from "@/lib/bounded-cache"
@@ -1156,6 +1156,16 @@ async function fetchMetadataFromUri(uri: string): Promise<unknown | null> {
   return null
 }
 
+function mergeMetadata(base: TokenMetadata, next: TokenMetadata): TokenMetadata {
+  const merged = { ...base }
+  for (const [key, value] of Object.entries(next) as [keyof TokenMetadata, TokenMetadata[keyof TokenMetadata]][]) {
+    if (value !== null && value !== undefined && value !== "") {
+      Object.assign(merged, { [key]: value })
+    }
+  }
+  return merged
+}
+
 async function refreshTokenMetadata(mint: string): Promise<MetadataRefreshResult> {
   try {
     const token = await prisma.token.findUnique({
@@ -1183,28 +1193,44 @@ async function refreshTokenMetadata(mint: string): Promise<MetadataRefreshResult
       return "success"
     }
 
-    if (shouldSkipPumpCoinFetch(mint)) {
-      return "cooldown"
+    let metadataUri = token.metadataUri
+    let metadata = normalizeTokenMetadata({})
+
+    // Most trade events already provide a metadata URI. Resolve it directly
+    // before spending another Pump API request on the same token.
+    if (metadataUri) {
+      const storedRemoteData = await fetchMetadataFromUri(metadataUri)
+      if (storedRemoteData && typeof storedRemoteData === "object") {
+        metadata = normalizeTokenMetadata(storedRemoteData as Record<string, unknown>)
+      }
     }
 
-    const coinInfo = await fetchPumpCoin(mint)
-    if (!coinInfo) {
-      return "retry"
-    }
+    if (!metadata.image) {
+      if (shouldSkipPumpCoinFetch(mint)) {
+        return "cooldown"
+      }
 
-    const coinRecord = coinInfo as Record<string, unknown>
-    const rawUri = firstString(coinRecord.metadataUri, coinRecord.metadata_uri, coinRecord.uri)
-    const metadataUri = rawUri ? normalizeIpfsUri(rawUri) : null
+      const coinInfo = await fetchPumpCoin(mint)
+      if (!coinInfo) {
+        return "retry"
+      }
 
-    let metadata = normalizeTokenMetadata(
-      (coinRecord.metadata as Record<string, unknown>) ?? coinRecord
-    )
+      const coinRecord = coinInfo as Record<string, unknown>
+      const rawUri = firstString(coinRecord.metadataUri, coinRecord.metadata_uri, coinRecord.uri)
+      metadataUri = metadataUri ?? (rawUri ? normalizeIpfsUri(rawUri) : null)
+      metadata = mergeMetadata(
+        metadata,
+        normalizeTokenMetadata((coinRecord.metadata as Record<string, unknown>) ?? coinRecord),
+      )
 
-    if (rawUri) {
-      const remoteData = await fetchMetadataFromUri(rawUri)
-      if (remoteData && typeof remoteData === "object") {
-        const remoteMeta = normalizeTokenMetadata(remoteData as Record<string, unknown>)
-        metadata = { ...metadata, ...remoteMeta }
+      if (rawUri) {
+        const remoteData = await fetchMetadataFromUri(rawUri)
+        if (remoteData && typeof remoteData === "object") {
+          metadata = mergeMetadata(
+            metadata,
+            normalizeTokenMetadata(remoteData as Record<string, unknown>),
+          )
+        }
       }
     }
 

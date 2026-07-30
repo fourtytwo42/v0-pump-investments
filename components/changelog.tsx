@@ -31,6 +31,24 @@ interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: "3.1.2",
+    date: "July 29, 2026",
+    changes: [
+      {
+        type: "fixed",
+        description: "Made token images load through Pump.Investments with automatic IPFS gateway fallback instead of relying on one third-party image host in each browser.",
+      },
+      {
+        type: "fixed",
+        description: "Stopped failed image URLs from being saved as successful images and refreshed cards when newly resolved image metadata arrives.",
+      },
+      {
+        type: "improved",
+        description: "Accelerated missing-image recovery by resolving metadata URIs already captured from live trades before making additional Pump API requests.",
+      },
+    ],
+  },
+  {
     version: "3.1.1",
     date: "July 29, 2026",
     changes: [

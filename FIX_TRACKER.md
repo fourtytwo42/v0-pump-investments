@@ -17,6 +17,15 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 
 ## Priorities
 
+### P0: Reliable token images
+
+#### T16. Eliminate avoidable default token images
+- Status: `in_progress`
+- Goal:
+  - Make token images resolve reliably from stored metadata without depending on fragile third-party browser access.
+- Verification:
+  - Image-path tests, typecheck/build, VM metadata audit, and live LAN card/image checks.
+
 ### P0: Cross-browser settings controls
 
 #### T15. Harden settings sliders

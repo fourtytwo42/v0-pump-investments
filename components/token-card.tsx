@@ -12,7 +12,7 @@ import { openAlertSettingsModal } from "./alert-settings-modal"
 import { db } from "@/lib/db"
 import { alertStatusCache } from "@/lib/alert-status-cache"
 import type { TokenData } from "@/types/token-data"
-import { getCachedTokenImage, setCachedTokenImage } from "@/lib/token-image-cache"
+import { tokenImagePath } from "@/lib/token-image"
 
 // Update the TokenCardProps interface to include the description field and BonkBot setting
 interface TokenCardProps {
@@ -386,47 +386,20 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
     descriptionRef.current = token.description ?? null
   }, [token.description])
 
-  const [imageSrc, setImageSrc] = useState(FALLBACK_IMAGE)
-
-  useEffect(() => {
-    if (token.image_uri) {
-      const normalized = token.image_uri
-      setImageSrc(normalized)
-      setCachedTokenImage(token.mint, normalized)
-      return
-    }
-
-    const cached = getCachedTokenImage(token.mint)
-    if (cached) {
-      setImageSrc(cached)
-    } else {
-      setImageSrc(FALLBACK_IMAGE)
-    }
-  }, [token.image_uri, token.mint])
-
-  const handleImageError = useCallback(
-    (event: React.SyntheticEvent<HTMLImageElement>) => {
-      event.preventDefault()
-      const cached = getCachedTokenImage(token.mint)
-      if (cached) {
-        setImageSrc(cached)
-      } else if (imageSrc !== FALLBACK_IMAGE) {
-        setImageSrc(FALLBACK_IMAGE)
-      }
-    },
-    [token.mint, imageSrc],
-  )
-
-  const handleImageLoad = useCallback(
-    (img: HTMLImageElement) => {
-      const loadedSrc = img.currentSrc || img.src
-      if (loadedSrc) {
-        setCachedTokenImage(token.mint, loadedSrc)
-        setImageSrc(loadedSrc)
-      }
-    },
+  const proxiedImageSrc = useMemo(
+    () => tokenImagePath(token.mint),
     [token.mint],
   )
+  const hasImageSource = Boolean(token.image_uri || token.metadata_uri)
+  const [imageSrc, setImageSrc] = useState(() => (hasImageSource ? proxiedImageSrc : FALLBACK_IMAGE))
+
+  useEffect(() => {
+    setImageSrc(hasImageSource ? proxiedImageSrc : FALLBACK_IMAGE)
+  }, [hasImageSource, proxiedImageSrc, token.image_uri, token.metadata_uri])
+
+  const handleImageError = useCallback(() => {
+    setImageSrc(FALLBACK_IMAGE)
+  }, [])
 
   return (
     <div className="relative">
@@ -454,7 +427,6 @@ function TokenCard({ token, size = "medium", showAlertSettings = false, showBonk
                 height={imageSize}
                 className="rounded-md object-contain max-h-full max-w-full"
                 onError={handleImageError}
-                onLoadingComplete={handleImageLoad}
               />
             </div>
             <div className="flex-1 min-w-0 overflow-hidden">
@@ -590,6 +562,17 @@ export default React.memo(TokenCard, (prevProps, nextProps) => {
     prevProps.token.lifecycle_status === nextProps.token.lifecycle_status &&
     prevProps.token.lifecycle_verified_at === nextProps.token.lifecycle_verified_at &&
     prevProps.token.pump_swap_pool === nextProps.token.pump_swap_pool
+  const imageSourceSame =
+    prevProps.token.image_uri === nextProps.token.image_uri &&
+    prevProps.token.metadata_uri === nextProps.token.metadata_uri
 
-  return mintSame && sizeSame && showAlertSettingsSame && showBonkBotLogoSame && marketCapSame && lifecycleSame
+  return (
+    mintSame &&
+    sizeSame &&
+    showAlertSettingsSame &&
+    showBonkBotLogoSame &&
+    marketCapSame &&
+    lifecycleSame &&
+    imageSourceSame
+  )
 })
