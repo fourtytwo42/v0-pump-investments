@@ -52,3 +52,14 @@ test("browser uses same-origin pricing, images, and generated alert audio", asyn
     await expect(images.first()).toBeVisible()
   }
 })
+
+test("alert settings load on demand", async ({ page }) => {
+  await page.goto("/")
+  await dismissOnboarding(page)
+  await page.getByRole("button", { name: "Add to favorites" }).first().click()
+  await page.getByRole("button", { name: "Show favorite tokens only" }).click()
+  await page.getByRole("button", { name: "Alert settings" }).first().click()
+  await expect(page.getByRole("heading", { name: /Alert Settings for/ })).toBeVisible()
+  await page.getByRole("button", { name: "Close" }).click()
+  await expect(page.getByRole("heading", { name: /Alert Settings for/ })).toBeHidden()
+})
