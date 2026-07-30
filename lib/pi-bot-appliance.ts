@@ -66,6 +66,13 @@ export function extractChatCompletionText(payload: unknown): string {
   return typeof message?.content === "string" ? message.content : ""
 }
 
+export function removeModelThinking(text: string): string {
+  return text
+    .replace(/<think>[\s\S]*?<\/think>/gi, "")
+    .replace(/^\s*<think>[\s\S]*$/i, "")
+    .trim()
+}
+
 export async function generatePiBotText(options: {
   baseUrl: string
   apiKey?: string
@@ -96,6 +103,8 @@ export async function generatePiBotText(options: {
           { role: "user", content: options.prompt },
         ],
         max_tokens: options.maxOutputTokens ?? DEFAULT_PI_BOT_OUTPUT_TOKENS,
+        chat_template_kwargs: { enable_thinking: false },
+        reasoning_budget: 0,
         reasoning_format: "none",
         stream: false,
       }),
@@ -108,7 +117,7 @@ export async function generatePiBotText(options: {
       throw new PiBotError("PI Bot's appliance is temporarily unavailable.", 503)
     }
 
-    const text = extractChatCompletionText(JSON.parse(body)).trim()
+    const text = removeModelThinking(extractChatCompletionText(JSON.parse(body)))
     if (!text) throw new PiBotError("PI Bot's appliance returned an empty response.", 503)
     return text
   } catch (error) {

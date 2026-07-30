@@ -6,6 +6,7 @@ import {
   extractChatCompletionText,
   getPiBotContextLimit,
   PiBotError,
+  removeModelThinking,
 } from "../lib/pi-bot-appliance"
 
 test("PI Bot context limit never exceeds 100,000 tokens", () => {
@@ -29,4 +30,9 @@ test("extracts text from chat completion payloads", () => {
     }),
     "PI BOT READY",
   )
+})
+
+test("removes model thinking from the visible PI Bot answer", () => {
+  assert.equal(removeModelThinking("<think>private reasoning</think>\nPI BOT READY"), "PI BOT READY")
+  assert.equal(removeModelThinking("<think>unfinished private reasoning"), "")
 })

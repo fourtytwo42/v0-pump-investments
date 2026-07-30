@@ -10,7 +10,7 @@ async function main(): Promise<void> {
     model: process.env.PI_BOT_MODEL ?? DEFAULT_PI_BOT_MODEL,
     systemPrompt: "Reply exactly as requested.",
     prompt: "Reply with exactly: PI BOT READY",
-    maxOutputTokens: 64,
+    maxOutputTokens: 512,
   })
 
   console.log(text)
