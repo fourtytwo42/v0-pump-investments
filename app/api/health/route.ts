@@ -9,7 +9,7 @@ export async function GET(): Promise<Response> {
     const sol = await prisma.solPriceState.findUnique({ where: { key: "sol-usd" } })
     const solHealthy = Boolean(sol && Date.now() - sol.updatedAt.getTime() < 10 * 60_000)
     return Response.json({
-      version: process.env.APP_VERSION ?? "4.0.0",
+      version: process.env.APP_VERSION ?? "4.0.1",
       status: solHealthy ? "ok" : "degraded",
       dependencies: {
         database: { status: "ok", latency_ms: Date.now() - startedAt },
@@ -22,7 +22,7 @@ export async function GET(): Promise<Response> {
   } catch {
     return Response.json(
       {
-        version: process.env.APP_VERSION ?? "4.0.0",
+        version: process.env.APP_VERSION ?? "4.0.1",
         status: "unavailable",
         dependencies: { database: { status: "unavailable" } },
       },

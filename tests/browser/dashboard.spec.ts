@@ -11,7 +11,7 @@ async function dismissOnboarding(page: import("@playwright/test").Page) {
 test("dashboard preserves controls and removes obsolete KOTH surfaces", async ({ page }) => {
   await page.goto("/")
   await dismissOnboarding(page)
-  await expect(page.getByText("v4.0.0")).toBeVisible()
+  await expect(page.getByText("v4.0.1")).toBeVisible()
   await expect(page.getByRole("button", { name: "Pause automatic token ordering" })).toBeVisible()
   await expect(page.getByRole("button", { name: "Open settings" })).toBeVisible()
   await expect(page.locator("[data-notification-region]")).toHaveCount(1)

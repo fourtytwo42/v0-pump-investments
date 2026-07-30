@@ -173,6 +173,20 @@ This file stores durable project memory for recovery after context compression o
 - `PreparedTrade.program` and incoming `platform` are not persisted. Current API/card data can reliably identify Pump vs `NON_LAUNCHPAD`, lifecycle stage, and PumpSwap pool, but cannot name every external launch market.
 - Model future attribution as separate `launchSource` and `tradeVenue` fields, retaining unknown rather than inferring a launchpad from an AMM venue.
 
+## 2026-07-30 Cloudflare Tunnel setup
+- The production VM is Ubuntu 24.04 x86-64; use Cloudflare's Linux APT package, not the Windows MSI.
+- `cloudflared` 2026.7.3 is installed from Cloudflare's official APT repository and runs as an enabled systemd service.
+- Cloudflare tunnel `Pump.Investments-4` (`7deb01c2-df95-40ea-a9b2-9ca49a80c9ed`) is Healthy with one connected Linux amd64 connector.
+- Publish exactly one unrestricted HTTP route: `pump.investments` to `http://127.0.0.1:3000`.
+- Nginx on 3000 is the only tunnel origin. Next.js on 3001, PostgreSQL on 5432, SSH, and the obsolete port 4000 must not be published.
+- Browser realtime uses same-origin fetch-based SSE at `POST /api/tokens/stream` and `POST /api/alerts/stream`; there is no separate public WebSocket server.
+- The ingester's WebSocket/NATS connection is outbound to the upstream trade feed and needs no Cloudflare route.
+- Both SSE routes were verified through Nginx with 200 `text/event-stream`, cache disabled, and proxy buffering disabled before tunnel activation.
+- Activation command: `sudo cloudflared service install <TUNNEL_TOKEN>`. Never store the token in the repo or `.env`.
+- Public `https://pump.investments/` and `/api/health` returned HTTP 200 through Cloudflare after route activation; the browser loaded the expected application.
+- Release v4.0.1 records the public Cloudflare Tunnel launch in the in-app changelog.
+- Full setup and verification steps are in `deploy/cloudflare/README.md`.
+
 ## Commands / Checks
 - VM app path:
   - `cd /home/hendo420/pumpInvestments/v0-pump-investments`

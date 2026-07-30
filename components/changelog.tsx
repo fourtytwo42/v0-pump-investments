@@ -31,6 +31,20 @@ interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: "4.0.1",
+    date: "July 30, 2026",
+    changes: [
+      {
+        type: "new",
+        description: "Published Pump.Investments at https://pump.investments through a secure Cloudflare Tunnel while preserving the existing LAN address.",
+      },
+      {
+        type: "improved",
+        description: "Added an auto-starting Ubuntu tunnel connector and routed the app, APIs, token images, health checks, and realtime token and alert streams through one HTTPS hostname.",
+      },
+    ],
+  },
+  {
     version: "4.0.0",
     date: "July 29, 2026",
     changes: [
