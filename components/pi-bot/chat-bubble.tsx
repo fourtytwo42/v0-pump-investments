@@ -13,27 +13,31 @@ import { Spinner } from "@/components/ui/spinner"
 import { MarkdownRenderer } from "./markdown-renderer"
 import { SuggestedPrompts } from "./suggested-prompts"
 import Image from "next/image"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet"
 
 interface Message {
   role: "user" | "assistant"
   content: string
 }
 
-export function ChatBubble() {
+interface ChatBubbleProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}
+
+export function ChatBubble({ open, onOpenChange }: ChatBubbleProps) {
   const [input, setInput] = useState("")
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const { messages, sendMessage, isLoading, clearChatHistory } = useChat()
   const [hasError, setHasError] = useState(false)
-  const [isOpen, setIsOpen] = useState(false)
 
   // Focus input when chat opens
   useEffect(() => {
-    if (isOpen && inputRef.current) {
+    if (open && inputRef.current) {
       inputRef.current.focus()
     }
-  }, [isOpen])
+  }, [open])
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -75,19 +79,7 @@ export function ChatBubble() {
     messages.length === 0 || messages[messages.length - 1]?.content?.includes("Here are some questions you can ask")
 
   return (
-    <>
-      {/* Fixed chat button */}
-      <div className="fixed bottom-4 right-4 z-40 md:bottom-6 md:right-6">
-        <Sheet open={isOpen} onOpenChange={setIsOpen}>
-          <SheetTrigger asChild>
-            <Button
-              className="h-14 w-14 rounded-full shadow-lg p-0 overflow-hidden"
-              aria-label="Chat with PI Bot"
-              data-onboarding="pi-bot-button"
-            >
-              <Image src="/pi-bot-avatar.png" alt="PI Bot" width={56} height={56} className="rounded-full" />
-            </Button>
-          </SheetTrigger>
+    <Sheet open={open} onOpenChange={onOpenChange}>
           <SheetContent className="flex flex-col p-0 w-full sm:max-w-md overflow-hidden">
             <SheetHeader className="p-4 border-b bg-primary/5 shrink-0">
               <div className="flex items-center">
@@ -222,8 +214,6 @@ export function ChatBubble() {
               </div>
             </form>
           </SheetContent>
-        </Sheet>
-      </div>
-    </>
+    </Sheet>
   )
 }

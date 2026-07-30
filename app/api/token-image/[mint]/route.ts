@@ -14,9 +14,7 @@ const MAX_IMAGE_BYTES = 8 * 1024 * 1024
 const MAX_CACHE_BYTES = 512 * 1024 * 1024
 const NEGATIVE_TTL_MS = 5 * 60_000
 const CACHE_ENABLED = process.env.TOKEN_IMAGE_CACHE_ENABLED !== "false"
-const CACHE_ROOT =
-  process.env.TOKEN_IMAGE_CACHE_DIR ??
-  path.join(/* turbopackIgnore: true */ process.cwd(), "server", "data", "images")
+const CACHE_ROOT = process.env.TOKEN_IMAGE_CACHE_DIR ?? "server/data/images"
 
 interface RouteParams {
   params: Promise<{ mint: string }>

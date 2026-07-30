@@ -1,10 +1,10 @@
 import { expect, test } from "@playwright/test"
 
 async function dismissOnboarding(page: import("@playwright/test").Page) {
-  const skip = page.getByRole("button", { name: "Skip" })
-  if (await skip.isVisible({ timeout: 2_000 }).catch(() => false)) {
-    await skip.click()
-    await expect(skip).toBeHidden()
+  const welcome = page.getByRole("heading", { name: "Welcome to Pump.Investments Lite!" })
+  if (await welcome.waitFor({ state: "visible", timeout: 10_000 }).then(() => true).catch(() => false)) {
+    await page.getByRole("button", { name: "Close" }).click()
+    await expect(welcome).toBeHidden()
   }
 }
 
@@ -17,7 +17,7 @@ test("dashboard preserves controls and removes obsolete KOTH surfaces", async ({
   await expect(page.locator("[data-notification-region]")).toHaveCount(1)
 
   await page.getByRole("button", { name: "Open settings" }).click()
-  await expect(page.getByRole("heading", { name: "Settings" })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "Settings", exact: true })).toBeVisible()
   await expect(page.getByText("KOTH", { exact: false })).toHaveCount(0)
   const firstSlider = page.getByRole("slider").first()
   await firstSlider.focus()

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
@@ -59,6 +59,10 @@ const AlertSettingsModal = dynamic(
   () => import("./alert-settings-modal").then((module) => module.AlertSettingsModal),
   { ssr: false },
 )
+const SettingsSheet = dynamic(
+  () => import("./settings-sheet").then((module) => module.SettingsSheet),
+  { ssr: false },
+)
 
 export default function Dashboard() {
   // Get values from context
@@ -81,6 +85,9 @@ export default function Dashboard() {
   const [timeRange, setTimeRange] = useLocalStorage<string>("pump-investments-time-range", "10")
   const [sortBy, setSortBy] = useLocalStorage<TokenSortBy>("pump-investments-sort-by", "marketCap")
   const [currentPage, setCurrentPage] = useState<number>(queryOptions.page ?? 1)
+  const [chatOpen, setChatOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const settingsButtonRef = useRef<HTMLButtonElement>(null)
 
   // Onboarding state
   const { isOnboardingActive, setOnboardingActive } = useOnboardingStore()
@@ -467,7 +474,31 @@ export default function Dashboard() {
           <div className="flex items-center gap-4 w-full md:w-auto">
             <DonationButton address="8oRZGW7wDEkmxMWhRo7eaQes4zR1smh9Q1wDwiDaCKnx" />
 
-            <Sheet>
+            <Button
+              ref={settingsButtonRef}
+              variant="outline"
+              size="icon"
+              data-onboarding="settings-button"
+              aria-label="Open settings"
+              onClick={() => setSettingsOpen(true)}
+            >
+              <Settings className="h-4 w-4" />
+            </Button>
+            {settingsOpen && (
+              <SettingsSheet
+                open={settingsOpen}
+                settings={settings}
+                updateSettings={updateSettings}
+                updateSettingsBatch={updateSettingsBatch}
+                restartOnboarding={restartOnboarding}
+                onOpenChange={(open) => {
+                  setSettingsOpen(open)
+                  if (!open) requestAnimationFrame(() => settingsButtonRef.current?.focus())
+                }}
+              />
+            )}
+
+            {false && <Sheet>
               <SheetTrigger asChild>
                 <Button
                   variant="outline"
@@ -754,7 +785,7 @@ export default function Dashboard() {
                   </p>
                 </div>
               </SheetContent>
-            </Sheet>
+            </Sheet>}
           </div>
         </div>
 
@@ -859,8 +890,19 @@ export default function Dashboard() {
       {isOnboardingActive && <OnboardingGuide />}
 
       {/* Add Toaster for notifications */}
-      {/* PI Bot Chat Bubble */}
-      <ChatBubble />
+      {!chatOpen && (
+        <div className="fixed bottom-4 right-4 z-40 md:bottom-6 md:right-6">
+          <Button
+            className="h-14 w-14 rounded-full shadow-lg p-0 overflow-hidden"
+            aria-label="Chat with PI Bot"
+            data-onboarding="pi-bot-button"
+            onClick={() => setChatOpen(true)}
+          >
+            <NextImage src="/pi-bot-avatar.png" alt="PI Bot" width={56} height={56} className="rounded-full" />
+          </Button>
+        </div>
+      )}
+      {chatOpen && <ChatBubble open={chatOpen} onOpenChange={setChatOpen} />}
 
       {/* Add the Alert Settings Modal */}
       <AlertSettingsModal />

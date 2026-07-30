@@ -3,7 +3,6 @@ import { Inter, Quicksand } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import Script from "next/script"
-import { Analytics } from "@vercel/analytics/react"
 import { Suspense } from "react"
 
 const inter = Inter({ subsets: ["latin"], display: "swap" })
@@ -132,7 +131,6 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
             {children}
-            <Analytics />
           </ThemeProvider>
         </Suspense>
 

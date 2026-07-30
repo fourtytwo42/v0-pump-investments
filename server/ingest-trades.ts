@@ -36,7 +36,7 @@ import { ingestRetryDelayMs } from "@/lib/ingest-retry"
 // =============================================================================
 
 const QUEUE_BATCH_SIZE = 800 // Larger batches with token ID caching
-const QUEUE_FLUSH_INTERVAL_MS = 500 // Flush every 500ms for faster response
+const QUEUE_FLUSH_INTERVAL_MS = parseEnvNumber("INGEST_QUEUE_FLUSH_INTERVAL_MS", 250)
 const CONNECTION_LIMIT = 15 // Increased for 10 parallel processors
 const ATOMIC_PIPELINE_ENABLED = process.env.INGEST_ATOMIC_PIPELINE_ENABLED !== "false"
 const AGGREGATES_ENABLED = process.env.TOKEN_AGGREGATES_ENABLED !== "false"
@@ -1278,7 +1278,7 @@ setInterval(() => {
   if (tradeQueue.length > 0 && Date.now() - lastQueueFlush >= QUEUE_FLUSH_INTERVAL_MS) {
     void processQueue()
   }
-}, QUEUE_FLUSH_INTERVAL_MS / 2)
+}, Math.max(50, QUEUE_FLUSH_INTERVAL_MS / 2))
 
 // =============================================================================
 // Metadata Retry System

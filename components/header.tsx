@@ -41,10 +41,6 @@ export default function Header() {
   // Get solPrice from context
   const { solPrice, isConnected } = useTokenContext()
 
-  useEffect(() => {
-    console.log("[Header] isConnected (from context) changed to:", isConnected)
-  }, [isConnected])
-
   const latestChangelogVersion = changelogData[0]?.version
   const [lastSeenChangelogVersion, setLastSeenChangelogVersion] = useLocalStorage<string | null>(
     "lastSeenChangelogVersion",
