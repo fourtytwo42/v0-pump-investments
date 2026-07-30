@@ -130,6 +130,19 @@ This file stores durable project memory for recovery after context compression o
 - The bonding progress bar remains the only card-level lifecycle treatment; graduated and unknown tokens show no replacement chip.
 - The live changelog now fully records v3.1.1 slider hardening, v3.1.2 image proxy/backfill and Pump mint recovery, and v3.1.3 lifecycle-chip removal.
 
+## 2026-07-29 KOTH deprecation audit
+- The `koth.png` asset is healthy, but production has zero tokens with `king_of_the_hill_timestamp`.
+- Current Pump v3 `/coins-v3/{mint}` and `/coins-v2/mints` responses contain no keys matching KOTH, king, or hill; official Pump program docs do not define KOTH as a lifecycle stage.
+- Treat the KOTH card icon, Hide KOTH filter, and KOTH onboarding/help text as obsolete UI pending removal; do not infer KOTH from market cap.
+- The external-token icon remains functional and is driven by verified `NON_LAUNCHPAD` lifecycle state; production had 40 external tokens, 31 active within one hour during the audit.
+
+## 2026-07-29 Launch source and trade venue audit
+- The unified feed's `program` identifies the trade execution venue, not necessarily the token's original launchpad; do not present it as launch source without corroboration.
+- Two live samples totaling 106 events observed `pump` (Pump bonding curve), `pump_amm` (PumpSwap), `raydium_v4_amm` (Raydium v4), and `meteora_dbc` with `platform=moonshot`.
+- `platform=moonshot` is an explicit launch-source signal for those Meteora DBC events. Raydium v4 only identifies the current venue and does not prove where the token launched.
+- `PreparedTrade.program` and incoming `platform` are not persisted. Current API/card data can reliably identify Pump vs `NON_LAUNCHPAD`, lifecycle stage, and PumpSwap pool, but cannot name every external launch market.
+- Model future attribution as separate `launchSource` and `tradeVenue` fields, retaining unknown rather than inferring a launchpad from an AMM venue.
+
 ## Commands / Checks
 - VM app path:
   - `cd /home/hendo420/pumpInvestments/v0-pump-investments`

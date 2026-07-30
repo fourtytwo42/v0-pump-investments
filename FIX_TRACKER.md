@@ -17,6 +17,28 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 
 ## Priorities
 
+### P1: Token source and venue attribution
+
+#### T20. Persist launch source separately from trade venue
+- Status: `open`
+- Problem:
+  - Live unified trades expose `program` and sometimes `platform`, but the token schema discards them and only retains Pump vs `NON_LAUNCHPAD`.
+- Goal:
+  - Persist verified launch source and latest trade venue separately so cards and filters can distinguish Pump, Moonshot/Meteora, Raydium, and unknown external tokens without guessing.
+- Verification:
+  - Fixture coverage for observed programs, migration/backfill audit, API fields, and live LAN source/venue labels.
+
+### P1: Deprecated KOTH surface
+
+#### T19. Remove or replace dead KOTH UI
+- Status: `open`
+- Problem:
+  - Current Pump v3 single and batch responses expose no KOTH field, and the production database has zero `king_of_the_hill_timestamp` values.
+- Goal:
+  - Remove the KOTH card icon, Hide KOTH setting/filter, and obsolete onboarding/help references unless a new authoritative Pump signal is identified.
+- Verification:
+  - Confirm no KOTH UI or query conditions remain, then run tests, typecheck/build, and live LAN inspection.
+
 ### P1: User-facing release notes
 
 #### T18. Expand recent v3.1.x changelog entries
