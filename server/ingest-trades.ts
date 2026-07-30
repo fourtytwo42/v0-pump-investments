@@ -58,7 +58,6 @@ let logBatchCount = 0
 
 // Track when the service started - only process tokens with trades from this point forward
 // This avoids backfilling old data and focuses on active tokens
-const SERVICE_START_TIMESTAMP = BigInt(Date.now())
 
 // NATS connection
 const NATS_URL = "wss://unified-prod.nats.realtime.pump.fun/"
@@ -1514,6 +1513,8 @@ if (LIFECYCLE_VERIFIER_ENABLED) {
 
 async function seedMetadataRetryQueue(): Promise<void> {
   try {
+    const activeCutoff = BigInt(Date.now() - INGEST_METADATA_ACTIVE_WINDOW_MS)
+
     // Count total tokens missing metadata (for logging only)
     const totalMissing = await prisma.token.count({
       where: {
@@ -1525,7 +1526,7 @@ async function seedMetadataRetryQueue(): Promise<void> {
       },
     })
 
-    // Count tokens with recent trades (from service start) that are missing metadata
+    // Count tokens traded during the configured active window that are missing metadata.
     const activeMissing = await prisma.token.count({
       where: {
         OR: [
@@ -1535,13 +1536,14 @@ async function seedMetadataRetryQueue(): Promise<void> {
         ],
         price: {
           lastTradeTimestamp: {
-            gte: SERVICE_START_TIMESTAMP,
+            gte: activeCutoff,
           },
         },
       },
     })
 
-    // Only seed tokens missing metadata AND having recent trades (from service start forward)
+    // Seed active tokens from before and after this process start. Using the
+    // service start timestamp here leaves the entire existing backlog stranded.
     // Process in batches to avoid memory issues and stop if queue gets too large
     const batchSize = 5000
     let totalSeeded = 0
@@ -1559,7 +1561,7 @@ async function seedMetadataRetryQueue(): Promise<void> {
           ],
           price: {
             lastTradeTimestamp: {
-              gte: SERVICE_START_TIMESTAMP,
+              gte: activeCutoff,
             },
           },
         },
