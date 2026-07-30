@@ -24,7 +24,7 @@ This file stores durable project memory for recovery after context compression o
   - `pump-investments-ingest`
 
 ## Current Operational State
-- Version 4.0.1 is deployed from merged `main` commit `a0b9445` at both `http://192.168.50.237:3000` and `https://pump.investments`.
+- Version 4.0.2 is deployed from `main` commit `e1fa692` at both `http://192.168.50.237:3000` and `https://pump.investments`.
 - Token lifecycle is verified without RPC from Pump frontend batch responses; NATS `pump_amm` and bonding flags are hints only.
 - Nginx owns LAN port `3000` and proxies Next.js on `3001`; SSE buffering is disabled and successful token images are proxy-cached.
 - The token client uses a fetch-based SSE stream with SQL-backed snapshots instead of 500 ms full polling.
@@ -123,7 +123,7 @@ This file stores durable project memory for recovery after context compression o
 
 ## Known Problems
 - PM2 env changes require `--update-env` on restart if `.env` has changed.
-- Pi Bot chat requires `GROQ_API_KEY`; no key was available during the 2026-07-29 VM deployment.
+- PI Bot shares the GPU45 appliance with other clients. A Qwen-to-Ornith model swap can take about a minute, so `/api/chat` sends non-buffered JSON whitespace heartbeats while it waits.
 - Some third-party token metadata URLs return 403 or 404; the API continues serving token data and uses its existing fallback/cooldown behavior.
 - Next 16 emits a non-fatal output-file-tracing warning for the filesystem-backed token-image route during build; compilation, type validation, and runtime image tests pass.
 
@@ -188,6 +188,15 @@ This file stores durable project memory for recovery after context compression o
 - PR #4 was merged into `main` as `a0b9445` and deployed on 2026-07-30. TypeScript, all 22 unit tests, and the production build passed on the VM; public `/` and `/api/health` returned 200 with version `4.0.1`.
 - Keep the VM-only `APP_VERSION` value aligned with each release and restart `pump-investments-web` with `--update-env`; otherwise `/api/health` can report the prior version after a successful build.
 - Full setup and verification steps are in `deploy/cloudflare/README.md`.
+
+## 2026-07-30 Appliance-backed PI Bot
+- Release v4.0.2 routes PI Bot server-side to `http://192.168.50.189:30001` using `ornith-1.0-35b-Q5_K_M-688b8d0a`; browsers only call same-origin `/api/chat`.
+- `PI_BOT_MAX_CONTEXT_TOKENS` is hard-capped at 100,000. The route accepts at most 512 KB and rejects estimated context above the configured ceiling.
+- Nginx disables buffering for `/api/chat`, permits 512 KB bodies, and keeps upstream reads open for five minutes. The Next.js route emits whitespace heartbeats every 15 seconds until its 180-second appliance timeout.
+- Ornith is the appliance catalog default. Requests also name the exact model so other appliance clients can use their own models without changing PI Bot behavior.
+- PI Bot requests disable model reasoning where supported and remove any remaining `<think>` block before returning browser-visible text.
+- The unused Groq and Vercel AI SDK dependencies were removed; no `GROQ_API_KEY` is required.
+- Production verification on 2026-07-30: VM smoke returned exactly `PI BOT READY` in 58 seconds; public `https://pump.investments/api/chat` returned HTTP 200 with `PUBLIC PI BOT READY` in 50.379 seconds.
 
 ## Commands / Checks
 - VM app path:

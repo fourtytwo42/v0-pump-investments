@@ -20,12 +20,18 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 ### P0: Appliance-backed PI Bot
 
 #### T30. Connect PI Bot to the GPU45 Ornith model
-- Status: `in_progress`
+- Status: `done`
 - Goal:
   - Route server-side PI Bot requests to the LAN GPU45 appliance using `ornith-1.0-35b-Q5_K_M-688b8d0a`.
   - Cap PI Bot context at 100,000 tokens without exposing the appliance directly to browsers.
 - Verification:
-  - Real appliance Responses API smoke test, unit/type/lint/build checks, VM deployment, and public `/api/chat` response.
+  - Real appliance chat-completions smoke test, unit/type/lint/build checks, VM deployment, and public `/api/chat` response.
+  - Implemented server-side OpenAI-compatible chat routing to exact Ornith model alias with a hard 100,000-token context ceiling and no browser-to-appliance access.
+  - Added non-buffered JSON heartbeats through Nginx/Next.js so model swaps survive public proxy idle limits.
+  - Disabled or stripped Ornith reasoning from visible answers and removed the unused Groq/AI SDK integration.
+  - Passed 26 unit tests, TypeScript, ESLint, production build, and `npm audit --omit=dev` with zero findings.
+  - VM smoke returned exactly `PI BOT READY` in 58 seconds. Public `/api/chat` returned HTTP 200 with `PUBLIC PI BOT READY` in 50.379 seconds.
+  - v4.0.2 is live from `main` commit `e1fa692`; both PM2 services are online and `/api/health` reports version 4.0.2.
 
 ### P0: Coordinated internal improvement release
 
