@@ -2,6 +2,15 @@
 
 This file is the durable work queue for repo maintenance and recovery. If chat context is lost, start here.
 
+### P2: Token card fit
+
+#### T19. Restore bottom-section clearance
+- Status: `in_progress`
+- Goal:
+  - Increase the fixed token-card height only enough to accommodate the enlarged bonding bar without clipping Token Age.
+- Verification:
+  - Confirm a live bonding card contains the full progress and age sections within its card bounds.
+
 ### P2: Bonding progress readability
 
 #### T18. Improve bonding percentage contrast

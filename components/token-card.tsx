@@ -120,7 +120,7 @@ function TokenCard({ mint, size = "medium", showAlertSettings = false, showBonkB
   }, [])
 
   // Fixed card height
-  const cardHeight = "h-[330px]"
+  const cardHeight = "h-[338px]"
 
   // Fixed image size
   const imageSize = 80
