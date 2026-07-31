@@ -56,6 +56,9 @@ test("browser uses same-origin pricing, images, and generated alert audio", asyn
 test("token cards preserve bright borders and refined content fit", async ({ page }, testInfo) => {
   await page.goto("/")
   await dismissOnboarding(page)
+  const graduationFilter = page.locator('[data-onboarding="graduation-filter"]')
+  await graduationFilter.click()
+  await page.getByRole("option", { name: "Bonding" }).click()
 
   const grid = page.locator("[data-token-card-grid]")
   const cards = page.locator("[data-token-card]")
@@ -132,6 +135,18 @@ test("token cards preserve bright borders and refined content fit", async ({ pag
     body: await grid.screenshot(),
     contentType: "image/png",
   })
+
+  await graduationFilter.click()
+  await page.getByRole("option", { name: "Graduated" }).click()
+  await expect(cards.first()).toBeVisible()
+  await expect(page.locator("[data-token-bonding-progress]")).toHaveCount(0)
+  const graduatedFits = await cards.first().evaluate((card) => {
+    const footer = card.querySelector<HTMLElement>("[data-token-footer]")
+    const cardRect = card.getBoundingClientRect()
+    const footerRect = footer?.getBoundingClientRect()
+    return Boolean(footerRect && footerRect.bottom <= cardRect.bottom)
+  })
+  expect(graduatedFits).toBe(true)
 })
 
 test("alert settings load on demand", async ({ page }) => {
