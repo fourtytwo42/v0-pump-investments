@@ -24,8 +24,8 @@ This file stores durable project memory for recovery after context compression o
   - `pump-investments-ingest`
 
 ## Current Operational State
-- Version 4.0.3 is deployed from `main` commit `29e21b9` at both `http://192.168.50.237:3000` and `https://pump.investments`.
-- Token lifecycle is verified without RPC from Pump frontend batch responses; NATS `pump_amm` and bonding flags are hints only.
+- Version 4.0.4 is deployed from `main` commit `8c33055` at both `http://192.168.50.237:3000` and `https://pump.investments`.
+- Token lifecycle is verified without RPC from Pump frontend batch responses. A live `pump_amm` trade with a concrete pool address is also definitive, monotonic PumpSwap evidence; incomplete venue hints alone never graduate a token.
 - Nginx owns LAN port `3000` and proxies Next.js on `3001`; SSE buffering is disabled and successful token images are proxy-cached.
 - The token client uses a fetch-based SSE stream with SQL-backed snapshots instead of 500 ms full polling.
 - Prisma migrations are now baselined and deployed through `prisma migrate deploy`.
@@ -39,6 +39,10 @@ This file stores durable project memory for recovery after context compression o
 - The reconnect hardening commit was pushed to `main`.
 
 ## Important Recent Changes
+- V4.0.4 stores `Token.bondingProgress` from Pump's real token reserves and total supply. The card no longer estimates bonding progress from USD market cap or a fixed SOL threshold.
+- The atomic ingester immediately promotes concrete `pump_amm` pool trades to `PUMPSWAP`, sets completion/progress fields, and removes stale lifecycle checks. Queue deletion is idempotent because the verifier and trade transaction can race safely.
+- The 2026-07-31 production audit found two stale `BONDING + PUMPSWAP` records, Vludhood and Maybe. Both now return `pumpswap`, `is_completed=true`, and `bonding_progress=100`; the production mismatch count is zero.
+- High market cap is not graduation proof. Pump still reported several high-cap tokens as incomplete; after a priority refresh, all high-cap bonding records had reserve-derived progress and none remained null.
 - V4 atomic ingestion writes tokens, trades, newest prices, rolling aggregates, dirty mints, and revisions transactionally. Every incoming batch is atomically spooled before database work and removed only after commit.
 - V4 cutover proved the spool recovery path: 108 batches survived a bad INSERT, replayed after correction, and drained with zero dead-letter files and no confirmed trade loss.
 - Rolling token-minute and token/buyer-minute aggregates are live. Backfill shadow comparison matched retained raw-trade totals.

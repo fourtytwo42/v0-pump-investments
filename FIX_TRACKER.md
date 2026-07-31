@@ -5,12 +5,20 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 ### P0: Stale 99% bonding state
 
 #### T17. Promote confirmed PumpSwap trades to graduated
-- Status: `in_progress`
+- Status: `done`
 - Goal:
   - Remove stale Bonding states when the live feed proves a token is trading through a concrete PumpSwap pool.
   - Preserve monotonic lifecycle behavior and never infer graduation from market cap.
 - Verification:
   - Audit production mismatches, add transition tests, backfill confirmed mismatches, and verify public bonding/graduated responses after deployment.
+- Notes:
+  - Root cause was twofold: lifecycle ignored concrete `pump_amm` pool evidence, while the card independently estimated progress from market cap and capped it at 99%.
+  - Release v4.0.4 promotes a live `pump_amm` trade only when it contains a concrete pool address, preserving monotonic lifecycle behavior without a market-cap guess.
+  - Bonding progress is now persisted from Pump's `real_token_reserves` and `total_supply`; verified completed states store 100.
+  - Production mismatches Vludhood and Maybe now return `pumpswap`, `is_completed=true`, `is_bonding_curve=false`, a pool address, and progress 100.
+  - Prioritized 1,099 active or high-market-cap records for immediate verification. The queue drained, all high-market-cap bonding records received reserve progress, and `BONDING + PUMPSWAP` count is zero.
+  - A production race between trade-driven queue cleanup and the verifier exposed one failed batch; cleanup now uses idempotent `deleteMany`. No further post-restart ingestion errors were logged.
+  - Local release gates passed: 27 tests, TypeScript, ESLint, and the Next.js production build. Public health reports v4.0.4 with both PM2 services online.
 
 ### P0: Intermittent and incomplete live feed
 
