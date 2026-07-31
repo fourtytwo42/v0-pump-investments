@@ -14,6 +14,7 @@ import type { TokenData } from "@/types/token-data"
 import { tokenImagePath } from "@/lib/token-image"
 import { useTokenStore } from "@/stores/token-store"
 import { formatCompactTimeAgo } from "@/lib/format-relative-time"
+import { deriveMarketCapBondingProgress } from "@/lib/bonding-display-progress"
 
 // Update the TokenCardProps interface to include the description field and BonkBot setting
 interface TokenCardProps {
@@ -59,11 +60,7 @@ function TokenCard({ mint, size = "medium", showAlertSettings = false, showBonkB
   const isFavorite = useTokenStore((state) => state.favoriteMints.has(mint))
   const toggleFavorite = useTokenStore((state) => state.toggleFavorite)
   const lifecycleStatus = token.lifecycle_status ?? "unknown"
-  const verifiedProgress = token.bonding_progress
-  const progressPercent =
-    typeof verifiedProgress === "number" && Number.isFinite(verifiedProgress)
-      ? Math.min(Math.max(verifiedProgress, 0), 99)
-      : 0
+  const progressPercent = deriveMarketCapBondingProgress(token.usd_market_cap, solPrice)
   const showBondingProgress =
     lifecycleStatus === "bonding" &&
     Number.isFinite(progressPercent) &&
@@ -383,6 +380,7 @@ function TokenCard({ mint, size = "medium", showAlertSettings = false, showBonkB
         className={`${cardHeight} relative cursor-pointer overflow-hidden border-2 transition-[transform,box-shadow] duration-150 ease-out motion-safe:hover:-translate-y-0.5 hover:shadow-lg ${borderColor} ${backgroundColor}`}
         onClick={handleCardClick}
         data-token-card
+        data-token-market-cap={token.usd_market_cap}
       >
         <CardContent className="p-0 h-full flex flex-col relative">
           {/* BonkBot logo in top-left corner */}
@@ -503,6 +501,7 @@ function TokenCard({ mint, size = "medium", showAlertSettings = false, showBonkB
               <div
                 className="relative h-4 w-full overflow-hidden rounded-full bg-muted"
                 data-token-bonding-progress
+                data-token-progress={progressPercent}
               >
                 <div
                   className="h-full bg-sky-500"

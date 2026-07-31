@@ -2,6 +2,15 @@
 
 This file is the durable work queue for repo maintenance and recovery. If chat context is lost, start here.
 
+### P1: Market-cap-aligned bonding display
+
+#### T21. Align card percentage with market cap
+- Status: `in_progress`
+- Goal:
+  - Make the displayed bonding percentage increase consistently with market cap while keeping verified lifecycle detection independent from price.
+- Verification:
+  - Reproduce the Gary/Bushman inversion, add calculation tests, deploy, and verify live card ordering and lifecycle isolation.
+
 ### P2: Token card visual refinement
 
 #### T20. Improve card scan speed and consistency

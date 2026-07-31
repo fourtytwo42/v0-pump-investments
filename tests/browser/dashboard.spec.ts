@@ -11,7 +11,7 @@ async function dismissOnboarding(page: import("@playwright/test").Page) {
 test("dashboard preserves controls and removes obsolete KOTH surfaces", async ({ page }) => {
   await page.goto("/")
   await dismissOnboarding(page)
-  await expect(page.getByText("v4.0.5")).toBeVisible()
+  await expect(page.getByText("v4.0.6")).toBeVisible()
   await expect(page.getByRole("button", { name: "Pause automatic token ordering" })).toBeVisible()
   await expect(page.getByRole("button", { name: "Open settings" })).toBeVisible()
   await expect(page.locator("[data-notification-region]")).toHaveCount(1)
@@ -66,6 +66,21 @@ test("token cards preserve bright borders and refined content fit", async ({ pag
   expect(await cards.count()).toBeGreaterThan(0)
   const bondingCards = page.locator("[data-token-card]:has([data-token-bonding-progress])")
   await expect(bondingCards.first()).toBeVisible()
+  const marketCapProgress = await bondingCards.evaluateAll((visibleCards) =>
+    visibleCards
+      .map((card) => ({
+        marketCap: Number(card.getAttribute("data-token-market-cap")),
+        progress: Number(
+          card.querySelector("[data-token-bonding-progress]")?.getAttribute("data-token-progress"),
+        ),
+      }))
+      .sort((a, b) => b.marketCap - a.marketCap),
+  )
+  for (let index = 1; index < marketCapProgress.length; index += 1) {
+    expect(marketCapProgress[index - 1].progress).toBeGreaterThanOrEqual(
+      marketCapProgress[index].progress,
+    )
+  }
 
   const cardChecks = await bondingCards.first().evaluate((card) => {
     const imageSurface = card.querySelector<HTMLElement>("[data-token-image-surface]")

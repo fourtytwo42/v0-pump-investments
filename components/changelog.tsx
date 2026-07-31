@@ -31,6 +31,20 @@ interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: "4.0.6",
+    date: "July 31, 2026",
+    changes: [
+      {
+        type: "fixed",
+        description: "Aligned the visible bonding percentage with market cap and the live SOL price so higher-cap bonding tokens consistently show greater progress.",
+      },
+      {
+        type: "improved",
+        description: "Kept market-cap progress visual-only while Pump and confirmed PumpSwap evidence remain authoritative for graduation.",
+      },
+    ],
+  },
+  {
     version: "4.0.5",
     date: "July 31, 2026",
     changes: [
