@@ -381,7 +381,7 @@ async function applyVerifiedLifecycle(
 
   if (!lifecycleChanged) {
     await prisma.$transaction([
-      prisma.tokenLifecycleCheck.delete({ where: { tokenId: check.tokenId } }),
+      prisma.tokenLifecycleCheck.deleteMany({ where: { tokenId: check.tokenId } }),
       prisma.tokenDataRevision.upsert({
         where: { key: "lifecycle-verifier" },
         create: { key: "lifecycle-verifier", revision: BigInt(1) },
@@ -413,7 +413,7 @@ async function applyVerifiedLifecycle(
           nextTradeVenue !== check.token.tradeVenue ? now : check.token.tradeVenueUpdatedAt,
       },
     }),
-    prisma.tokenLifecycleCheck.delete({ where: { tokenId: check.tokenId } }),
+    prisma.tokenLifecycleCheck.deleteMany({ where: { tokenId: check.tokenId } }),
   ])
   await recordDirtyMints([check.token.mintAddress], ["lifecycle"])
   return true
