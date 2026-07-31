@@ -31,6 +31,20 @@ interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: "4.0.4",
+    date: "July 31, 2026",
+    changes: [
+      {
+        type: "fixed",
+        description: "Tokens now graduate immediately when the live feed confirms trading through a concrete PumpSwap pool, even if Pump's token metadata is delayed.",
+      },
+      {
+        type: "fixed",
+        description: "Bonding progress now follows Pump's remaining curve reserves instead of estimating graduation from market cap.",
+      },
+    ],
+  },
+  {
     version: "4.0.3",
     date: "July 31, 2026",
     changes: [

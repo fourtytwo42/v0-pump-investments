@@ -57,11 +57,12 @@ function TokenCard({ mint, size = "medium", showAlertSettings = false, showBonkB
   const solPrice = useTokenStore((state) => state.solPrice)
   const isFavorite = useTokenStore((state) => state.favoriteMints.has(mint))
   const toggleFavorite = useTokenStore((state) => state.toggleFavorite)
-  const BONDING_TARGET_SOL = 415
-  const solPriceUsd = solPrice ?? 0
   const lifecycleStatus = token.lifecycle_status ?? "unknown"
-  const rawProgress = solPriceUsd > 0 ? (token.usd_market_cap / (solPriceUsd * BONDING_TARGET_SOL)) * 100 : 0
-  const progressPercent = Math.min(Math.max(rawProgress, 0), 99)
+  const verifiedProgress = token.bonding_progress
+  const progressPercent =
+    typeof verifiedProgress === "number" && Number.isFinite(verifiedProgress)
+      ? Math.min(Math.max(verifiedProgress, 0), 99)
+      : 0
   const showBondingProgress =
     lifecycleStatus === "bonding" &&
     Number.isFinite(progressPercent) &&

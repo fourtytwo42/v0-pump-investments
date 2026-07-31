@@ -47,6 +47,7 @@ model Token {
   completed                  Boolean              @default(false) @map("completed")
   lifecycleStatus            TokenLifecycleStatus @default(UNKNOWN) @map("lifecycle_status")
   lifecycleVerifiedAt        DateTime?            @map("lifecycle_verified_at")
+  bondingProgress            Float?               @map("bonding_progress")
   pumpSwapPool               String?              @map("pump_swap_pool")
   graduatedAt                DateTime?            @map("graduated_at")
   launchSource               TokenLaunchSource    @default(UNKNOWN) @map("launch_source")

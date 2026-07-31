@@ -29,6 +29,7 @@ interface TokenQueryRow {
   lifecycle_status: TokenLifecycleStatus
   lifecycle_verified_at: Date | null
   pump_swap_pool: string | null
+  bonding_progress: number | null
   bonding_curve: string | null
   associated_bonding_curve: string | null
   launch_source: string
@@ -169,6 +170,7 @@ function rowToToken(row: TokenQueryRow): TokenData {
     lifecycle_status: lifecycle,
     lifecycle_verified_at: row.lifecycle_verified_at?.toISOString() ?? null,
     pump_swap_pool: row.pump_swap_pool,
+    bonding_progress: row.bonding_progress,
     is_completed: completed,
     is_bonding_curve: lifecycle === "unknown" ? null : lifecycle === "bonding",
     bonding_curve: row.bonding_curve,
@@ -277,6 +279,7 @@ export async function queryTokenSnapshot(rawBody: Partial<TokenQueryRequest>): P
         t.lifecycle_status,
         t.lifecycle_verified_at,
         t.pump_swap_pool,
+        t.bonding_progress,
         t.bonding_curve,
         t.associated_bonding_curve,
         t.launch_source,

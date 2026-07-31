@@ -2,7 +2,9 @@ import assert from "node:assert/strict"
 import test from "node:test"
 
 import {
+  classifyPumpSwapTradeEvidence,
   classifyPumpLifecycle,
+  deriveBondingProgress,
   isCompletedLifecycle,
   lifecycleRetryDelayMs,
   reduceLifecycle,
@@ -36,9 +38,51 @@ test("distinguishes completed curve from completed PumpSwap migration", () => {
   )
 })
 
-test("requires explicit Pump API evidence and does not treat pump_amm as graduation", () => {
+test("requires a concrete pool before PumpSwap trade evidence graduates a token", () => {
   assert.equal(classifyPumpLifecycle({ complete: false, program: "pump_amm" }), null)
+  assert.equal(
+    classifyPumpSwapTradeEvidence({
+      program: "pump_amm",
+      poolAddress: null,
+      isBondingCurve: false,
+    }),
+    null,
+  )
+  assert.equal(
+    classifyPumpSwapTradeEvidence({
+      program: "pump_amm",
+      poolAddress: "confirmed-pool",
+      isBondingCurve: false,
+    })?.status,
+    "PUMPSWAP",
+  )
+  assert.equal(
+    classifyPumpSwapTradeEvidence({
+      program: "pump",
+      poolAddress: "bonding-curve",
+      isBondingCurve: true,
+    }),
+    null,
+  )
   assert.equal(classifyPumpLifecycle({ program: "non_launchpad" })?.status, "NON_LAUNCHPAD")
+})
+
+test("derives bonding progress from Pump curve reserves instead of market cap", () => {
+  assert.equal(
+    deriveBondingProgress({
+      complete: false,
+      real_token_reserves: 793_100_000_000_000,
+      total_supply: 1_000_000_000_000_000,
+    }),
+    0,
+  )
+  const partial = deriveBondingProgress({
+    complete: false,
+    real_token_reserves: 494_766_604_422_046,
+    total_supply: 1_000_000_000_000_000,
+  })
+  assert.ok(partial !== null && partial > 37 && partial < 38)
+  assert.equal(deriveBondingProgress({ complete: true }), 100)
 })
 
 test("completed lifecycle transitions cannot downgrade", () => {

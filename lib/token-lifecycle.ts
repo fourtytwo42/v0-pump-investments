@@ -16,6 +16,8 @@ export interface PumpLifecyclePayload {
   program?: unknown
   bonding_curve?: unknown
   associated_bonding_curve?: unknown
+  real_token_reserves?: unknown
+  total_supply?: unknown
 }
 
 export interface VerifiedLifecycle {
@@ -23,12 +25,57 @@ export interface VerifiedLifecycle {
   pumpSwapPool: string | null
   bondingCurve: string | null
   associatedBondingCurve: string | null
+  bondingProgress: number | null
 }
 
 const COMPLETED_STATES = new Set<TokenLifecycleStatus>(["CURVE_COMPLETE", "PUMPSWAP"])
+const INITIAL_REAL_TOKEN_RATIO = 0.7931
 
 function optionalString(value: unknown): string | null {
   return typeof value === "string" && value.trim() ? value : null
+}
+
+function optionalNumber(value: unknown): number | null {
+  if (value === null || value === undefined || value === "") return null
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : null
+}
+
+export function deriveBondingProgress(payload: PumpLifecyclePayload): number | null {
+  if (payload.complete === true || optionalString(payload.pump_swap_pool)) return 100
+
+  const realTokenReserves = optionalNumber(payload.real_token_reserves)
+  const totalSupply = optionalNumber(payload.total_supply)
+  if (
+    realTokenReserves === null ||
+    totalSupply === null ||
+    realTokenReserves < 0 ||
+    totalSupply <= 0
+  ) {
+    return null
+  }
+
+  const initialRealTokenReserves = totalSupply * INITIAL_REAL_TOKEN_RATIO
+  const progress = (1 - realTokenReserves / initialRealTokenReserves) * 100
+  return Math.min(100, Math.max(0, progress))
+}
+
+export function classifyPumpSwapTradeEvidence(payload: {
+  program?: unknown
+  poolAddress?: unknown
+  isBondingCurve?: unknown
+}): VerifiedLifecycle | null {
+  const program = optionalString(payload.program)?.toLowerCase()
+  const pumpSwapPool = optionalString(payload.poolAddress)
+  if (program !== "pump_amm" || !pumpSwapPool || payload.isBondingCurve === true) return null
+
+  return {
+    status: "PUMPSWAP",
+    pumpSwapPool,
+    bondingCurve: null,
+    associatedBondingCurve: null,
+    bondingProgress: 100,
+  }
 }
 
 export function isCompletedLifecycle(status: TokenLifecycleStatus): boolean {
@@ -51,6 +98,7 @@ export function classifyPumpLifecycle(payload: PumpLifecyclePayload): VerifiedLi
       pumpSwapPool,
       bondingCurve,
       associatedBondingCurve,
+      bondingProgress: 100,
     }
   }
 
@@ -60,6 +108,7 @@ export function classifyPumpLifecycle(payload: PumpLifecyclePayload): VerifiedLi
       pumpSwapPool: null,
       bondingCurve,
       associatedBondingCurve,
+      bondingProgress: null,
     }
   }
 
@@ -69,6 +118,7 @@ export function classifyPumpLifecycle(payload: PumpLifecyclePayload): VerifiedLi
       pumpSwapPool: null,
       bondingCurve,
       associatedBondingCurve,
+      bondingProgress: 100,
     }
   }
 
@@ -78,6 +128,7 @@ export function classifyPumpLifecycle(payload: PumpLifecyclePayload): VerifiedLi
       pumpSwapPool: null,
       bondingCurve,
       associatedBondingCurve,
+      bondingProgress: deriveBondingProgress(payload),
     }
   }
 

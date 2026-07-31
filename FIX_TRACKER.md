@@ -2,6 +2,16 @@
 
 This file is the durable work queue for repo maintenance and recovery. If chat context is lost, start here.
 
+### P0: Stale 99% bonding state
+
+#### T17. Promote confirmed PumpSwap trades to graduated
+- Status: `in_progress`
+- Goal:
+  - Remove stale Bonding states when the live feed proves a token is trading through a concrete PumpSwap pool.
+  - Preserve monotonic lifecycle behavior and never infer graduation from market cap.
+- Verification:
+  - Audit production mismatches, add transition tests, backfill confirmed mismatches, and verify public bonding/graduated responses after deployment.
+
 ### P0: Intermittent and incomplete live feed
 
 #### T16. Diagnose missing tokens and undercounted buyers/volume

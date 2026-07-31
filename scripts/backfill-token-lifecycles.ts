@@ -24,6 +24,7 @@ async function main(): Promise<void> {
       lifecycleStatus: true,
       graduatedAt: true,
       pumpSwapPool: true,
+      bondingProgress: true,
       bondingCurve: true,
       associatedBondingCurve: true,
     },
@@ -53,6 +54,9 @@ async function main(): Promise<void> {
       if (transition.conflict) conflicts.push(token.mintAddress)
       counts.set(transition.next, (counts.get(transition.next) ?? 0) + 1)
       const now = new Date()
+      const bondingProgress = isCompletedLifecycle(transition.next)
+        ? 100
+        : verified.bondingProgress ?? token.bondingProgress
       await prisma.token.update({
         where: { id: token.id },
         data: {
@@ -60,6 +64,7 @@ async function main(): Promise<void> {
           lifecycleVerifiedAt: now,
           completed: isCompletedLifecycle(transition.next),
           pumpSwapPool: verified.pumpSwapPool ?? token.pumpSwapPool,
+          bondingProgress,
           graduatedAt:
             isCompletedLifecycle(transition.next) && !token.graduatedAt
               ? now

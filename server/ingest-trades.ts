@@ -24,6 +24,7 @@ import {
 } from "@/lib/pump-lifecycle"
 import {
   classifyPumpLifecycle,
+  classifyPumpSwapTradeEvidence,
   isCompletedLifecycle,
   lifecycleRetryDelayMs,
   reduceLifecycle,
@@ -358,6 +359,9 @@ async function applyVerifiedLifecycle(
   const nextBondingCurve = verified.bondingCurve ?? check.token.bondingCurve
   const nextAssociatedCurve =
     verified.associatedBondingCurve ?? check.token.associatedBondingCurve
+  const nextBondingProgress = isCompletedLifecycle(transition.next)
+    ? 100
+    : verified.bondingProgress ?? check.token.bondingProgress
   const nextLaunchSource = verified.status === "NON_LAUNCHPAD" ? "EXTERNAL" : "PUMP"
   const nextTradeVenue =
     verified.status === "PUMPSWAP"
@@ -370,6 +374,7 @@ async function applyVerifiedLifecycle(
     nextPool !== check.token.pumpSwapPool ||
     nextBondingCurve !== check.token.bondingCurve ||
     nextAssociatedCurve !== check.token.associatedBondingCurve ||
+    nextBondingProgress !== check.token.bondingProgress ||
     nextLaunchSource !== check.token.launchSource ||
     nextTradeVenue !== check.token.tradeVenue ||
     (isCompletedLifecycle(transition.next) && !check.token.graduatedAt)
@@ -392,6 +397,7 @@ async function applyVerifiedLifecycle(
       data: {
         lifecycleStatus: transition.next,
         lifecycleVerifiedAt: now,
+        bondingProgress: nextBondingProgress,
         completed: isCompletedLifecycle(transition.next),
         pumpSwapPool: nextPool,
         graduatedAt:
@@ -423,6 +429,7 @@ async function getLifecycleChecks() {
         select: {
           mintAddress: true,
           lifecycleStatus: true,
+          bondingProgress: true,
           pumpSwapPool: true,
           graduatedAt: true,
           bondingCurve: true,
@@ -799,6 +806,61 @@ async function persistTradesAtomic(trades: PreparedTrade[]): Promise<void> {
           OR (tokens.launch_source = 'UNKNOWN' AND EXCLUDED.launch_source <> 'UNKNOWN')
           THEN NOW() ELSE tokens.updated_at END
     `)
+
+    const pumpSwapEvidenceByMint = new Map<
+      string,
+      {
+        trade: PreparedTrade
+        verified: NonNullable<ReturnType<typeof classifyPumpSwapTradeEvidence>>
+      }
+    >()
+    for (const trade of trades) {
+      const verified = classifyPumpSwapTradeEvidence({
+          program: trade.program,
+          poolAddress: trade.poolAddress,
+          isBondingCurve: trade.isBondingCurve,
+      })
+      if (!verified) continue
+      const existing = pumpSwapEvidenceByMint.get(trade.mint)
+      if (!existing || trade.timestampMs > existing.trade.timestampMs) {
+        pumpSwapEvidenceByMint.set(trade.mint, { trade, verified })
+      }
+    }
+    const pumpSwapEvidence = [...pumpSwapEvidenceByMint.values()]
+
+    if (pumpSwapEvidence.length > 0) {
+      const evidenceValues = pumpSwapEvidence
+        .map(
+          ({ trade, verified }) =>
+            `(${escapeSQL(trade.mint)},${escapeSQL(verified.pumpSwapPool)},${trade.timestampMs})`,
+        )
+        .join(",")
+      await tx.$executeRawUnsafe(`
+        UPDATE tokens AS token
+        SET lifecycle_status = 'PUMPSWAP',
+            lifecycle_verified_at = NOW(),
+            bonding_progress = 100,
+            completed = TRUE,
+            pump_swap_pool = COALESCE(token.pump_swap_pool, evidence.pool_address),
+            graduated_at = COALESCE(token.graduated_at, to_timestamp(evidence.trade_timestamp_ms / 1000.0)),
+            updated_at = NOW()
+        FROM (VALUES ${evidenceValues}) AS evidence(mint_address,pool_address,trade_timestamp_ms)
+        WHERE token.mint_address = evidence.mint_address
+          AND (
+            token.lifecycle_status <> 'PUMPSWAP'
+            OR token.completed = FALSE
+            OR token.pump_swap_pool IS NULL
+            OR token.bonding_progress IS DISTINCT FROM 100
+          )
+      `)
+      await tx.$executeRawUnsafe(`
+        DELETE FROM token_lifecycle_checks
+        WHERE token_id IN (
+          SELECT id FROM tokens
+          WHERE mint_address IN (${pumpSwapEvidence.map(({ trade }) => escapeSQL(trade.mint)).join(",")})
+        )
+      `)
+    }
 
     const tokenRows = await tx.token.findMany({
       where: { mintAddress: { in: uniqueTokens.map((trade) => trade.mint) } },

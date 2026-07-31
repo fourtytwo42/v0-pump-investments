@@ -82,6 +82,7 @@ export interface TokenData {
   lifecycle_status: TokenLifecycleStatus
   lifecycle_verified_at?: string | null
   pump_swap_pool?: string | null
+  bonding_progress?: number | null
   bonding_curve?: string | null
   associated_bonding_curve?: string | null
   is_bonding_curve?: boolean | null
