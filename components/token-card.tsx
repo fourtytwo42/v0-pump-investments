@@ -447,7 +447,7 @@ function TokenCard({ mint, size = "medium", showAlertSettings = false, showBonkB
 
           {/* Middle section - financial data */}
           <div className="p-3 flex-1 overflow-visible relative">
-            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1">
               <div>
                 <p className="text-xs text-foreground/70">Market Cap</p>
                 <p className="font-medium tabular-nums">{formatUSD(token.usd_market_cap)}</p>
@@ -500,7 +500,10 @@ function TokenCard({ mint, size = "medium", showAlertSettings = false, showBonkB
             data-token-footer
           >
             {showBondingProgress && (
-              <div className="relative w-full h-4 rounded-full bg-muted overflow-hidden">
+              <div
+                className="relative h-4 w-full overflow-hidden rounded-full bg-muted"
+                data-token-bonding-progress
+              >
                 <div
                   className="h-full bg-sky-500"
                   style={{ width: `${progressPercent}%` }}

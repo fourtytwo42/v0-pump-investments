@@ -61,8 +61,10 @@ test("token cards preserve bright borders and refined content fit", async ({ pag
   const cards = page.locator("[data-token-card]")
   await expect(cards.first()).toBeVisible()
   expect(await cards.count()).toBeGreaterThan(0)
+  const bondingCards = page.locator("[data-token-card]:has([data-token-bonding-progress])")
+  await expect(bondingCards.first()).toBeVisible()
 
-  const cardChecks = await cards.first().evaluate((card) => {
+  const cardChecks = await bondingCards.first().evaluate((card) => {
     const imageSurface = card.querySelector<HTMLElement>("[data-token-image-surface]")
     const lastTrade = card.querySelector<HTMLElement>("[data-token-last-trade]")
     const footer = card.querySelector<HTMLElement>("[data-token-footer]")
