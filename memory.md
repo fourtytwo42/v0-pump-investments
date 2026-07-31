@@ -24,7 +24,7 @@ This file stores durable project memory for recovery after context compression o
   - `pump-investments-ingest`
 
 ## Current Operational State
-- Version 4.0.5 is deployed from `main` commit `681cc76` at both `http://192.168.50.237:3000` and `https://pump.investments`.
+- Version 4.0.6 is deployed from `main` commit `07759b0` at both `http://192.168.50.237:3000` and `https://pump.investments`.
 - Token lifecycle is verified without RPC from Pump frontend batch responses. A live `pump_amm` trade with a concrete pool address is also definitive, monotonic PumpSwap evidence; incomplete venue hints alone never graduate a token.
 - Nginx owns LAN port `3000` and proxies Next.js on `3001`; SSE buffering is disabled and successful token images are proxy-cached.
 - The token client uses a fetch-based SSE stream with SQL-backed snapshots instead of 500 ms full polling.
@@ -39,11 +39,14 @@ This file stores durable project memory for recovery after context compression o
 - The reconnect hardening commit was pushed to `main`.
 
 ## Important Recent Changes
+- V4.0.6 aligns the visible bonding bar with market cap using `market_cap_usd / (415 SOL * live SOL/USD)`, capped at 99 while still Bonding. Higher market cap at the same SOL price always displays higher progress.
+- Market-cap progress is visual-only. Pump completion and confirmed PumpSwap pool evidence remain the only graduation signals; market cap cannot mutate lifecycle.
+- Reserve-derived `Token.bondingProgress` remains persisted for verification and diagnostics but no longer drives the card bar. This avoids counterintuitive Mayhem-versus-standard-curve percentages.
 - V4.0.5 refines token cards without changing their data or bright border semantics: compact Last Trade values, tabular metrics, stronger secondary contrast, 80 px muted artwork surfaces, 24 px social targets, and a reduced-motion-safe 2 px hover lift.
 - Cards remain 342 px tall. Tighter metric row spacing keeps bonding footers fully contained with 15 px Token Age clearance; the four-column XL grid and green/red `border-2` thresholds are unchanged.
 - The header version badge now uses the latest changelog entry. Cross-browser verification passed all 15 Chromium, Firefox, and WebKit tests with light/dark screenshot attachments.
 - Bonding percentage labels use an enlarged 16 px bar with bold 11 px white tabular text on a 75% dark backing, preserving legibility over both filled and unfilled sections in light and dark themes.
-- V4.0.4 stores `Token.bondingProgress` from Pump's real token reserves and total supply. The card no longer estimates bonding progress from USD market cap or a fixed SOL threshold.
+- V4.0.4 introduced persisted reserve-derived `Token.bondingProgress`; v4.0.6 retains it as diagnostic lifecycle evidence rather than the user-visible percentage.
 - The atomic ingester immediately promotes concrete `pump_amm` pool trades to `PUMPSWAP`, sets completion/progress fields, and removes stale lifecycle checks. Queue deletion is idempotent because the verifier and trade transaction can race safely.
 - The 2026-07-31 production audit found two stale `BONDING + PUMPSWAP` records, Vludhood and Maybe. Both now return `pumpswap`, `is_completed=true`, and `bonding_progress=100`; the production mismatch count is zero.
 - High market cap is not graduation proof. Pump still reported several high-cap tokens as incomplete; after a priority refresh, all high-cap bonding records had reserve-derived progress and none remained null.

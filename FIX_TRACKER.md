@@ -5,11 +5,18 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 ### P1: Market-cap-aligned bonding display
 
 #### T21. Align card percentage with market cap
-- Status: `in_progress`
+- Status: `done`
 - Goal:
   - Make the displayed bonding percentage increase consistently with market cap while keeping verified lifecycle detection independent from price.
 - Verification:
   - Reproduce the Gary/Bushman inversion, add calculation tests, deploy, and verify live card ordering and lifecycle isolation.
+- Notes:
+  - Gary at about $17.2k was a paused Mayhem curve with 10.7% reserve depletion; Bushman at about $14.7k was a standard curve with 84.5% depletion. Reserve depletion was valid but did not match the requested market-cap meaning.
+  - Release v4.0.6 derives the visible bar from `market_cap_usd / (415 SOL * live SOL/USD)`, capped at 99 while lifecycle remains Bonding.
+  - Persisted reserve progress remains available for verification and diagnostics but no longer drives the card percentage.
+  - Graduation remains monotonic and evidence-based from Pump completion or a confirmed PumpSwap pool; market cap never writes lifecycle state.
+  - All 33 unit tests, TypeScript, ESLint, the production build, and all 15 Chromium/Firefox/WebKit browser tests passed.
+  - Live verification found 12 visible bonding cards with strictly market-cap-monotonic progress. Bushman displayed 48% at $14.7k, while tokens around $17.3k displayed about 56%.
 
 ### P2: Token card visual refinement
 
