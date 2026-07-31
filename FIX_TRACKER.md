@@ -2,6 +2,22 @@
 
 This file is the durable work queue for repo maintenance and recovery. If chat context is lost, start here.
 
+### P0: Intermittent and incomplete live feed
+
+#### T16. Diagnose missing tokens and undercounted buyers/volume
+- Status: `done`
+- Goal:
+  - Reproduce the reported intermittent feed and determine whether trades are lost upstream, during ingestion, in aggregation, or during SSE delivery.
+  - Correct and deploy any confirmed application defect without changing the visual design.
+- Verification:
+  - Compare retained trades with minute aggregates and API totals, inspect connection/spool health, and exercise live snapshot/SSE delivery.
+- Notes:
+  - Root cause: `unifiedTradeEvent.processed` is Pump's sampled market-wide ticker and supplied only about 52–56 events per minute during the reported period.
+  - Pump's frontend uses per-mint subjects. A live credential probe confirmed `unifiedTradeEvent.processed.*` supplies the complete processed stream without requiring an RPC node.
+  - Release v4.0.3 makes the subject configurable through `PUMP_NATS_SUBJECT` and defaults it to the complete per-mint wildcard.
+  - The first complete post-deployment minute persisted 6,952 trades across 460 tokens and 2,940 unique buyers, versus 130 trades in the preceding sampled minute.
+  - Post-deployment verification: zero complete-minute aggregate mismatches, zero pending/dead-letter spool files, no new ingestion errors, 1.351-second p50 and 2.001-second p95 write lag, 120.9 ms public snapshot p95, and working public SSE snapshots/patches.
+
 ### P0: Production lifecycle correction
 
 #### T15. Reverify Dre. MAGA graduation

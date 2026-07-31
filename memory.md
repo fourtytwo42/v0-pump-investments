@@ -24,7 +24,7 @@ This file stores durable project memory for recovery after context compression o
   - `pump-investments-ingest`
 
 ## Current Operational State
-- Version 4.0.2 is deployed from `main` commit `e1fa692` at both `http://192.168.50.237:3000` and `https://pump.investments`.
+- Version 4.0.3 is deployed from `main` commit `29e21b9` at both `http://192.168.50.237:3000` and `https://pump.investments`.
 - Token lifecycle is verified without RPC from Pump frontend batch responses; NATS `pump_amm` and bonding flags are hints only.
 - Nginx owns LAN port `3000` and proxies Next.js on `3001`; SSE buffering is disabled and successful token images are proxy-cached.
 - The token client uses a fetch-based SSE stream with SQL-backed snapshots instead of 500 ms full polling.
@@ -127,6 +127,12 @@ This file stores durable project memory for recovery after context compression o
 - Some third-party token metadata URLs return 403 or 404; the API continues serving token data and uses its existing fallback/cooldown behavior.
 - Next 16 emits a non-fatal output-file-tracing warning for the filesystem-backed token-image route during build; compilation, type validation, and runtime image tests pass.
 - Pump's lifecycle batch API can lag confirmed PumpSwap activity. On 2026-07-30 it still returned `complete=false` for Dr. MAGA after 120 stored `pump_amm` trades; the production token was manually promoted from that pool evidence and protected by the monotonic `PUMPSWAP` state.
+
+## 2026-07-31 Complete Pump trade feed
+- The unsuffixed NATS subject `unifiedTradeEvent.processed` is a sampled market ticker, not the complete feed; it produced only about 52–56 events per minute across the market.
+- Pump publishes complete processed events on per-mint subjects. Subscribe to `unifiedTradeEvent.processed.*`; do not add a paid Solana RPC node to solve this feed problem.
+- Release v4.0.3 adds `PUMP_NATS_SUBJECT` and deploys the complete per-mint wildcard.
+- The first complete production minute after cutover persisted 6,952 trades across 460 tokens and 2,940 unique buyers. Complete-minute aggregates matched retained trades, spool queues stayed empty, public snapshot p95 was 120.9 ms, and write lag measured 1.351 seconds p50 / 2.001 seconds p95.
 
 ## 2026-07-30 Dr. MAGA lifecycle correction
 - Dr. MAGA mint: `ADzmJCZfwf5vFQ6y9EysRS7xWqFgRc33QAAnj7Mipump`.
