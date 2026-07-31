@@ -31,6 +31,24 @@ interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: "4.0.5",
+    date: "July 31, 2026",
+    changes: [
+      {
+        type: "improved",
+        description: "Refined token cards with compact trade times, clearer secondary text, aligned numbers, consistent artwork and social controls, and more comfortable footer spacing.",
+      },
+      {
+        type: "improved",
+        description: "Added a subtle card lift and stronger hover shadow while preserving the bright green and red buy/sell borders.",
+      },
+      {
+        type: "fixed",
+        description: "Kept the header version badge synchronized with the latest in-app changelog release.",
+      },
+    ],
+  },
+  {
     version: "4.0.4",
     date: "July 31, 2026",
     changes: [

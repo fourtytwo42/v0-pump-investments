@@ -11,7 +11,7 @@ async function dismissOnboarding(page: import("@playwright/test").Page) {
 test("dashboard preserves controls and removes obsolete KOTH surfaces", async ({ page }) => {
   await page.goto("/")
   await dismissOnboarding(page)
-  await expect(page.getByText("v4.0.2")).toBeVisible()
+  await expect(page.getByText("v4.0.5")).toBeVisible()
   await expect(page.getByRole("button", { name: "Pause automatic token ordering" })).toBeVisible()
   await expect(page.getByRole("button", { name: "Open settings" })).toBeVisible()
   await expect(page.locator("[data-notification-region]")).toHaveCount(1)
@@ -51,6 +51,85 @@ test("browser uses same-origin pricing, images, and generated alert audio", asyn
   if (await images.count()) {
     await expect(images.first()).toBeVisible()
   }
+})
+
+test("token cards preserve bright borders and refined content fit", async ({ page }, testInfo) => {
+  await page.goto("/")
+  await dismissOnboarding(page)
+
+  const grid = page.locator("[data-token-card-grid]")
+  const cards = page.locator("[data-token-card]")
+  await expect(cards.first()).toBeVisible()
+  expect(await cards.count()).toBeGreaterThan(0)
+
+  const cardChecks = await cards.first().evaluate((card) => {
+    const imageSurface = card.querySelector<HTMLElement>("[data-token-image-surface]")
+    const lastTrade = card.querySelector<HTMLElement>("[data-token-last-trade]")
+    const footer = card.querySelector<HTMLElement>("[data-token-footer]")
+    const cardRect = card.getBoundingClientRect()
+    const imageRect = imageSurface?.getBoundingClientRect()
+    const footerRect = footer?.getBoundingClientRect()
+    const style = getComputedStyle(card)
+    return {
+      cardHeight: cardRect.height,
+      borderWidth: style.borderTopWidth,
+      borderClass: Array.from(card.classList).find((name) => name.startsWith("border-") && name !== "border-2"),
+      imageWidth: imageRect?.width,
+      imageHeight: imageRect?.height,
+      imageBackground: imageSurface ? getComputedStyle(imageSurface).backgroundColor : "",
+      lastTradeText: lastTrade?.textContent?.trim(),
+      lastTradeWhiteSpace: lastTrade ? getComputedStyle(lastTrade).whiteSpace : "",
+      footerInside: Boolean(footerRect && footerRect.bottom <= cardRect.bottom),
+      horizontalOverflow: card.scrollWidth > card.clientWidth,
+    }
+  })
+
+  expect(cardChecks).toMatchObject({
+    cardHeight: 342,
+    borderWidth: "2px",
+    imageWidth: 80,
+    imageHeight: 80,
+    lastTradeWhiteSpace: "nowrap",
+    footerInside: true,
+    horizontalOverflow: false,
+  })
+  expect(cardChecks.borderClass).toMatch(/^border-(green|red|gray)-/)
+  expect(cardChecks.imageBackground).not.toBe("rgba(0, 0, 0, 0)")
+  expect(cardChecks.lastTradeText).toMatch(/^(<1m|\d+[mhd]) ago$|^Unknown$/)
+
+  const socialLinks = page.locator("[data-token-social-links] a")
+  const socialCount = await socialLinks.count()
+  if (socialCount > 0) {
+    const socialChecks = await socialLinks.first().evaluate((link) => {
+      const rect = link.getBoundingClientRect()
+      return {
+        width: rect.width,
+        height: rect.height,
+        ariaLabel: link.getAttribute("aria-label"),
+        title: link.getAttribute("title"),
+      }
+    })
+    expect(socialChecks.width).toBe(24)
+    expect(socialChecks.height).toBe(24)
+    expect(socialChecks.ariaLabel).toBeTruthy()
+    expect(socialChecks.title).toBeTruthy()
+  }
+
+  await page.getByRole("button", { name: "Toggle theme" }).click()
+  await page.getByRole("menuitem", { name: "Dark" }).click()
+  await expect(page.locator("html")).toHaveClass(/dark/)
+  await testInfo.attach("token-cards-dark", {
+    body: await grid.screenshot(),
+    contentType: "image/png",
+  })
+
+  await page.getByRole("button", { name: "Toggle theme" }).click()
+  await page.getByRole("menuitem", { name: "Light" }).click()
+  await expect(page.locator("html")).not.toHaveClass(/dark/)
+  await testInfo.attach("token-cards-light", {
+    body: await grid.screenshot(),
+    contentType: "image/png",
+  })
 })
 
 test("alert settings load on demand", async ({ page }) => {

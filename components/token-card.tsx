@@ -13,6 +13,7 @@ import { alertStatusCache } from "@/lib/alert-status-cache"
 import type { TokenData } from "@/types/token-data"
 import { tokenImagePath } from "@/lib/token-image"
 import { useTokenStore } from "@/stores/token-store"
+import { formatCompactTimeAgo } from "@/lib/format-relative-time"
 
 // Update the TokenCardProps interface to include the description field and BonkBot setting
 interface TokenCardProps {
@@ -120,7 +121,7 @@ function TokenCard({ mint, size = "medium", showAlertSettings = false, showBonkB
   }, [])
 
   // Fixed card height
-  const cardHeight = "h-[338px]"
+  const cardHeight = "h-[342px]"
 
   // Fixed image size
   const imageSize = 80
@@ -146,8 +147,7 @@ function TokenCard({ mint, size = "medium", showAlertSettings = false, showBonkB
 
   // Memoize time calculations
   const timeInfo = useMemo(() => {
-    const lastTradeTime = new Date(token.last_trade_time * 1000)
-    const timeAgo = formatDistanceToNow(lastTradeTime, { addSuffix: true })
+    const timeAgo = formatCompactTimeAgo(token.last_trade_time)
 
     // Calculate token age if created_timestamp is available
     const tokenAge = token.created_timestamp
@@ -292,15 +292,18 @@ function TokenCard({ mint, size = "medium", showAlertSettings = false, showBonkB
   // Memoize social links to prevent re-renders
   const socialLinks = useMemo(() => {
     return (
-      <div className="flex gap-2 mt-1">
+      <div className="mt-1 flex gap-0.5" data-token-social-links>
         {token.website && (
           <Link
             href={token.website.startsWith("http") ? token.website : `https://${token.website}`}
             target="_blank"
             rel="noopener noreferrer"
             onClick={handleSocialLinkClick}
+            className="inline-flex h-6 w-6 items-center justify-center rounded-md text-foreground/70 transition-colors hover:bg-muted hover:text-primary"
+            aria-label="Open token website"
+            title="Website"
           >
-            <Globe className="h-3.5 w-3.5 text-muted-foreground hover:text-primary" />
+            <Globe className="h-3.5 w-3.5" />
           </Link>
         )}
         {token.twitter && (
@@ -309,8 +312,11 @@ function TokenCard({ mint, size = "medium", showAlertSettings = false, showBonkB
             target="_blank"
             rel="noopener noreferrer"
             onClick={handleSocialLinkClick}
+            className="inline-flex h-6 w-6 items-center justify-center rounded-md text-foreground/70 transition-colors hover:bg-muted hover:text-primary"
+            aria-label="Open token profile on X"
+            title="X"
           >
-            <Twitter className="h-3.5 w-3.5 text-muted-foreground hover:text-primary" />
+            <Twitter className="h-3.5 w-3.5" />
           </Link>
         )}
         {token.telegram && (
@@ -319,8 +325,11 @@ function TokenCard({ mint, size = "medium", showAlertSettings = false, showBonkB
             target="_blank"
             rel="noopener noreferrer"
             onClick={handleSocialLinkClick}
+            className="inline-flex h-6 w-6 items-center justify-center rounded-md text-foreground/70 transition-colors hover:bg-muted hover:text-primary"
+            aria-label="Open token Telegram"
+            title="Telegram"
           >
-            <MessageCircle className="h-3.5 w-3.5 text-muted-foreground hover:text-primary" />
+            <MessageCircle className="h-3.5 w-3.5" />
           </Link>
         )}
       </div>
@@ -371,8 +380,9 @@ function TokenCard({ mint, size = "medium", showAlertSettings = false, showBonkB
   return (
     <div className="relative">
       <Card
-        className={`${cardHeight} transition-all hover:shadow-md border-2 ${borderColor} ${backgroundColor} cursor-pointer relative overflow-hidden`}
+        className={`${cardHeight} relative cursor-pointer overflow-hidden border-2 transition-[transform,box-shadow] duration-150 ease-out motion-safe:hover:-translate-y-0.5 hover:shadow-lg ${borderColor} ${backgroundColor}`}
         onClick={handleCardClick}
+        data-token-card
       >
         <CardContent className="p-0 h-full flex flex-col relative">
           {/* BonkBot logo in top-left corner */}
@@ -386,7 +396,10 @@ function TokenCard({ mint, size = "medium", showAlertSettings = false, showBonkB
 
           {/* Top section with image and basic info - fixed height */}
           <div className="p-3 pb-2 flex items-center gap-3 h-[100px]">
-            <div className="relative flex-shrink-0 w-[80px] h-[80px] flex items-center justify-center">
+            <div
+              className="relative flex h-[80px] w-[80px] flex-shrink-0 items-center justify-center overflow-hidden rounded-md bg-muted/40 ring-1 ring-inset ring-border/50"
+              data-token-image-surface
+            >
               <NextImage
                 src={imageSrc}
                 alt={token.name}
@@ -400,11 +413,11 @@ function TokenCard({ mint, size = "medium", showAlertSettings = false, showBonkB
               <div className="flex items-center mb-0.5">
                 <h3 className="font-bold truncate">{token.name}</h3>
               </div>
-              <div className="flex items-center">
-                <p className="text-xs text-muted-foreground">
+              <div className="flex min-w-0 items-center gap-2">
+                <p className="min-w-0 truncate text-xs text-foreground/70">
                   by {token.creator_username || token.creator.slice(0, 6)}
                 </p>
-                <Badge variant="outline" className="ml-4 px-2 py-0 text-xs">
+                <Badge variant="outline" className="max-w-[88px] shrink-0 truncate px-2 py-0 text-xs">
                   {token.symbol}
                 </Badge>
               </div>
@@ -436,28 +449,30 @@ function TokenCard({ mint, size = "medium", showAlertSettings = false, showBonkB
           <div className="p-3 flex-1 overflow-visible relative">
             <div className="grid grid-cols-2 gap-x-4 gap-y-2">
               <div>
-                <p className="text-xs text-muted-foreground">Market Cap</p>
-                <p className="font-medium">{formatUSD(token.usd_market_cap)}</p>
+                <p className="text-xs text-foreground/70">Market Cap</p>
+                <p className="font-medium tabular-nums">{formatUSD(token.usd_market_cap)}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Volume (USD)</p>
-                <p className="font-medium">{formatUSD(volumeInfo.totalVolumeUSD)}</p>
+                <p className="text-xs text-foreground/70">Volume (USD)</p>
+                <p className="font-medium tabular-nums">{formatUSD(volumeInfo.totalVolumeUSD)}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Buy Vol</p>
-                <p className="font-medium text-green-500">{formatUSD(volumeInfo.buyVolumeUSD)}</p>
+                <p className="text-xs text-foreground/70">Buy Vol</p>
+                <p className="font-medium tabular-nums text-green-500">{formatUSD(volumeInfo.buyVolumeUSD)}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Sell Vol</p>
-                <p className="font-medium text-red-500">{formatUSD(volumeInfo.sellVolumeUSD)}</p>
+                <p className="text-xs text-foreground/70">Sell Vol</p>
+                <p className="font-medium tabular-nums text-red-500">{formatUSD(volumeInfo.sellVolumeUSD)}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Unique Buyers</p>
-                <p className="font-medium">{token.unique_trader_count}</p>
+                <p className="text-xs text-foreground/70">Unique Buyers</p>
+                <p className="font-medium tabular-nums">{token.unique_trader_count}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Last Trade</p>
-                <p className="font-medium text-xs">{timeInfo.timeAgo}</p>
+                <p className="text-xs text-foreground/70">Last Trade</p>
+                <p className="whitespace-nowrap text-xs font-medium tabular-nums" data-token-last-trade>
+                  {timeInfo.timeAgo}
+                </p>
               </div>
             </div>
 
@@ -480,7 +495,10 @@ function TokenCard({ mint, size = "medium", showAlertSettings = false, showBonkB
           </div>
 
           {/* Bottom section with age info - now with fixed height */}
-          <div className="p-3 pt-2 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/30 mt-auto space-y-2">
+          <div
+            className="mt-auto space-y-2 border-t border-gray-100 bg-gray-50 p-3 pb-[15px] pt-2 dark:border-gray-800 dark:bg-gray-900/30"
+            data-token-footer
+          >
             {showBondingProgress && (
               <div className="relative w-full h-4 rounded-full bg-muted overflow-hidden">
                 <div
@@ -497,8 +515,8 @@ function TokenCard({ mint, size = "medium", showAlertSettings = false, showBonkB
 
             <div className="flex justify-between items-center">
               <div>
-                <p className="text-xs text-muted-foreground">Token Age</p>
-                <p className="font-medium">{timeInfo.tokenAge}</p>
+                <p className="text-xs text-foreground/70">Token Age</p>
+                <p className="font-medium tabular-nums">{timeInfo.tokenAge}</p>
               </div>
               {statusIcons}
             </div>

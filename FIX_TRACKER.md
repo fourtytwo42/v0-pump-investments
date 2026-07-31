@@ -2,6 +2,15 @@
 
 This file is the durable work queue for repo maintenance and recovery. If chat context is lost, start here.
 
+### P2: Token card visual refinement
+
+#### T20. Improve card scan speed and consistency
+- Status: `in_progress`
+- Goal:
+  - Compact relative trade times, improve secondary contrast and number alignment, normalize artwork/social controls, add restrained hover feedback, and preserve the bright buy/sell borders.
+- Verification:
+  - Unit, TypeScript, ESLint, production build, cross-browser card checks, live visual inspection, and public/LAN health verification.
+
 ### P2: Token card fit
 
 #### T19. Restore bottom-section clearance
