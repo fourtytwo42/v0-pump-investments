@@ -5,11 +5,18 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 ### P2: Token card visual refinement
 
 #### T20. Improve card scan speed and consistency
-- Status: `in_progress`
+- Status: `done`
 - Goal:
   - Compact relative trade times, improve secondary contrast and number alignment, normalize artwork/social controls, add restrained hover feedback, and preserve the bright buy/sell borders.
 - Verification:
   - Unit, TypeScript, ESLint, production build, cross-browser card checks, live visual inspection, and public/LAN health verification.
+- Notes:
+  - Release v4.0.5 adds compact Last Trade values, tabular metrics, higher-contrast secondary text, consistent 80 px artwork surfaces, 24 px social controls, and a reduced-motion-safe hover lift.
+  - Card height is 342 px with 15 px Token Age clearance. Metric row spacing was reduced by 4 px so the enlarged bonding footer remains fully inside without increasing grid height.
+  - Bright `border-2` green/red classes, buy/sell thresholds, background tints, responsive columns, card data, and bonding behavior remain unchanged.
+  - The header now derives v4.0.5 from the latest changelog instead of a stale hardcoded v4.0.2 value.
+  - All 30 unit tests, TypeScript, ESLint, and the production build passed. All 15 browser tests passed in Chromium, Firefox, and WebKit with light/dark card screenshots.
+  - Live inspection confirmed one-line trade time, 342 px height, a fully contained bonding footer, 15 px age clearance, and unchanged bright border classes.
 
 ### P2: Token card fit
 
