@@ -5,11 +5,15 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 ### P2: Token card fit
 
 #### T19. Restore bottom-section clearance
-- Status: `in_progress`
+- Status: `done`
 - Goal:
   - Increase the fixed token-card height only enough to accommodate the enlarged bonding bar without clipping Token Age.
 - Verification:
   - Confirm a live bonding card contains the full progress and age sections within its card bounds.
+- Notes:
+  - Increased fixed card height from 330 px to 338 px, exactly compensating for the progress bar's prior 8 px increase.
+  - Live browser measurement confirmed a 338 px card, the full Token Age value inside its bounds, and 3 px of bottom clearance.
+  - TypeScript, ESLint, and the production build passed. Deployed from `main` commit `cb8a6dd`; both PM2 services remain online.
 
 ### P2: Bonding progress readability
 

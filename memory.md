@@ -24,7 +24,7 @@ This file stores durable project memory for recovery after context compression o
   - `pump-investments-ingest`
 
 ## Current Operational State
-- Version 4.0.4 is deployed from `main` commit `5bbf3e8` at both `http://192.168.50.237:3000` and `https://pump.investments`.
+- Version 4.0.4 is deployed from `main` commit `cb8a6dd` at both `http://192.168.50.237:3000` and `https://pump.investments`.
 - Token lifecycle is verified without RPC from Pump frontend batch responses. A live `pump_amm` trade with a concrete pool address is also definitive, monotonic PumpSwap evidence; incomplete venue hints alone never graduate a token.
 - Nginx owns LAN port `3000` and proxies Next.js on `3001`; SSE buffering is disabled and successful token images are proxy-cached.
 - The token client uses a fetch-based SSE stream with SQL-backed snapshots instead of 500 ms full polling.
@@ -39,6 +39,7 @@ This file stores durable project memory for recovery after context compression o
 - The reconnect hardening commit was pushed to `main`.
 
 ## Important Recent Changes
+- Token cards are 338 px tall, up from 330 px, to compensate exactly for the enlarged bonding bar. Live measurement confirms Token Age remains fully inside with 3 px bottom clearance.
 - Bonding percentage labels use an enlarged 16 px bar with bold 11 px white tabular text on a 75% dark backing, preserving legibility over both filled and unfilled sections in light and dark themes.
 - V4.0.4 stores `Token.bondingProgress` from Pump's real token reserves and total supply. The card no longer estimates bonding progress from USD market cap or a fixed SOL threshold.
 - The atomic ingester immediately promotes concrete `pump_amm` pool trades to `PUMPSWAP`, sets completion/progress fields, and removes stale lifecycle checks. Queue deletion is idempotent because the verifier and trade transaction can race safely.
