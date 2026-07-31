@@ -482,13 +482,15 @@ function TokenCard({ mint, size = "medium", showAlertSettings = false, showBonkB
           {/* Bottom section with age info - now with fixed height */}
           <div className="p-3 pt-2 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/30 mt-auto space-y-2">
             {showBondingProgress && (
-              <div className="relative w-full h-2 rounded-full bg-muted overflow-hidden">
+              <div className="relative w-full h-4 rounded-full bg-muted overflow-hidden">
                 <div
                   className="h-full bg-sky-500"
                   style={{ width: `${progressPercent}%` }}
                 />
-                <span className="absolute inset-0 flex items-center justify-center text-[10px] font-medium text-muted-foreground">
-                  {Math.round(progressPercent)}%
+                <span className="absolute inset-0 flex items-center justify-center">
+                  <span className="rounded bg-gray-950/75 px-1.5 py-0.5 text-[11px] font-bold leading-none tabular-nums text-white shadow-sm">
+                    {Math.round(progressPercent)}%
+                  </span>
                 </span>
               </div>
             )}

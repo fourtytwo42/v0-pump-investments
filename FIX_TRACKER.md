@@ -2,6 +2,15 @@
 
 This file is the durable work queue for repo maintenance and recovery. If chat context is lost, start here.
 
+### P2: Bonding progress readability
+
+#### T18. Improve bonding percentage contrast
+- Status: `in_progress`
+- Goal:
+  - Make the percentage readable across light and dark themes without changing the card layout or bonding behavior.
+- Verification:
+  - Run TypeScript, ESLint, and production build; verify the deployed card and public health endpoint.
+
 ### P0: Stale 99% bonding state
 
 #### T17. Promote confirmed PumpSwap trades to graduated

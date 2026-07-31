@@ -42,6 +42,10 @@ export const changelogData: ChangelogEntry[] = [
         type: "fixed",
         description: "Bonding progress now follows Pump's remaining curve reserves instead of estimating graduation from market cap.",
       },
+      {
+        type: "improved",
+        description: "Made the bonding percentage larger and easier to read in light and dark themes.",
+      },
     ],
   },
   {
