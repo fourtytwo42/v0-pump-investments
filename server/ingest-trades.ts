@@ -76,6 +76,9 @@ let logBatchCount = 0
 
 // NATS connection
 const NATS_URL = process.env.PUMP_NATS_URL ?? "wss://unified-prod.nats.realtime.pump.fun/"
+// The unsuffixed processed subject is a sampled market-wide ticker. Pump publishes the
+// complete processed stream on one subject per mint, which NATS exposes through `*`.
+const NATS_SUBJECT = process.env.PUMP_NATS_SUBJECT ?? "unifiedTradeEvent.processed.*"
 const NATS_HEADERS = {
   Origin: "https://pump.fun",
   "User-Agent": "pump-investments-ingester/1.0",
@@ -2501,8 +2504,8 @@ function startConnectionAttempt(trigger: string, scheduledDelayMs = 0): void {
       socket.send(`CONNECT ${JSON.stringify(NATS_CONNECT_PAYLOAD)}\r\n`)
       socket.send("PING\r\n")
       lastPingSentAt = Date.now()
-      socket.send("SUB unifiedTradeEvent.processed sub0\r\n")
-      console.log(`[ingest] event=subscription_sent connection_id=${connectionId} subject=unifiedTradeEvent.processed`)
+      socket.send(`SUB ${NATS_SUBJECT} sub0\r\n`)
+      console.log(`[ingest] event=subscription_sent connection_id=${connectionId} subject=${NATS_SUBJECT}`)
     } catch (error) {
       console.error(
         `[ingest] event=socket_error connection_id=${connectionId} stage=handshake message=${JSON.stringify((error as Error).message)}`

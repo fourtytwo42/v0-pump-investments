@@ -31,6 +31,16 @@ interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: "4.0.3",
+    date: "July 31, 2026",
+    changes: [
+      {
+        type: "fixed",
+        description: "Switched the live ingester from Pump's sampled market ticker to the complete per-token trade stream, restoring accurate token discovery, unique-buyer counts, and buy/sell volume.",
+      },
+    ],
+  },
+  {
     version: "4.0.2",
     date: "July 30, 2026",
     changes: [
