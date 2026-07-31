@@ -5,11 +5,15 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 ### P2: Bonding progress readability
 
 #### T18. Improve bonding percentage contrast
-- Status: `in_progress`
+- Status: `done`
 - Goal:
   - Make the percentage readable across light and dark themes without changing the card layout or bonding behavior.
 - Verification:
   - Run TypeScript, ESLint, and production build; verify the deployed card and public health endpoint.
+- Notes:
+  - Increased the bar from 8 px to 16 px and placed bold 11 px white tabular numerals on a translucent dark backing.
+  - Verified live percentage labels render at 15 px high with white text and a 75% dark background; tested values from 0% through 94% were visible.
+  - TypeScript, ESLint, and the production build passed. Deployed from `main` commit `5bbf3e8`; both PM2 services remain online.
 
 ### P0: Stale 99% bonding state
 
