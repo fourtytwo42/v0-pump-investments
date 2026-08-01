@@ -133,6 +133,15 @@ test("token cards preserve bright borders and refined content fit", async ({ pag
   expect(cardChecks.imageBackground).not.toBe("rgba(0, 0, 0, 0)")
   expect(cardChecks.lastTradeText).toMatch(/^(<1m|\d+[mhd]) ago$|^Unknown$/)
 
+  const overflowingMints = await bondingCards.evaluateAll((cards) => cards.flatMap((card) => {
+    const footer = card.querySelector<HTMLElement>("[data-token-footer]")
+    const footerRect = footer?.getBoundingClientRect()
+    return footerRect && footerRect.bottom > card.getBoundingClientRect().bottom
+      ? [card.getAttribute("data-token-mint")]
+      : []
+  }))
+  expect(overflowingMints).toEqual([])
+
   const socialLinks = page.locator("[data-token-social-links] a")
   const socialCount = await socialLinks.count()
   if (socialCount > 0) {
