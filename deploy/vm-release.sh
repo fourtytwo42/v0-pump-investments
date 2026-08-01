@@ -30,6 +30,12 @@ cleanup_sudo_keepalive() {
   fi
 }
 
+restart_release() {
+  local release_dir="$1"
+  pm2 delete pump-investments-web pump-investments-ingest >/dev/null 2>&1 || true
+  PUMP_LOG_DIR="$SHARED_ROOT/logs" pm2 start "$release_dir/ecosystem.config.cjs"
+}
+
 rollback() {
   local exit_code=$?
   cleanup_candidate
@@ -39,7 +45,7 @@ rollback() {
     ln -sfn "$PREVIOUS_RELEASE" "${CURRENT_LINK}.rollback"
     mv -Tf "${CURRENT_LINK}.rollback" "$CURRENT_LINK"
     PUMP_LOG_DIR="$SHARED_ROOT/logs" APP_VERSION="$(node -p "require('$PREVIOUS_RELEASE/package.json').version")" \
-      pm2 startOrReload "$PREVIOUS_RELEASE/ecosystem.config.cjs" --update-env || true
+      restart_release "$PREVIOUS_RELEASE" || true
     sudo cp "$PREVIOUS_RELEASE/deploy/nginx/security-enforced.conf" /etc/nginx/snippets/pump-investments-security.conf || true
     sudo nginx -t && sudo systemctl reload nginx || true
   fi
@@ -123,7 +129,7 @@ sudo nginx -t
 if [[ -L "$CURRENT_LINK" ]]; then PREVIOUS_RELEASE="$(readlink -f "$CURRENT_LINK")"; fi
 ln -sfn "$RELEASE_DIR" "${CURRENT_LINK}.next"
 mv -Tf "${CURRENT_LINK}.next" "$CURRENT_LINK"
-PUMP_LOG_DIR="$SHARED_ROOT/logs" APP_VERSION="$VERSION" pm2 startOrReload "$CURRENT_LINK/ecosystem.config.cjs" --update-env
+restart_release "$CURRENT_LINK"
 pm2 save
 sudo systemctl reload nginx
 CUTOVER_COMPLETE=1

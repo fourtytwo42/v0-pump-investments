@@ -36,6 +36,13 @@ test("VM release stays manual and creates neither backups nor GitHub Actions", a
   assert.doesNotMatch(script, /pg_dump|github\/workflows|gh workflow/)
 })
 
+test("VM cutover recreates PM2 processes so immutable release paths take effect", async () => {
+  const script = await readFile(new URL("../deploy/vm-release.sh", import.meta.url), "utf8")
+  assert.match(script, /pm2 delete pump-investments-web pump-investments-ingest/)
+  assert.match(script, /pm2 start \"\$release_dir\/ecosystem\.config\.cjs\"/)
+  assert.doesNotMatch(script, /pm2 startOrReload/)
+})
+
 test("image cache verification removes temporary and orphan metadata files", async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), "pump-image-cache-"))
   try {
