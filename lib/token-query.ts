@@ -349,12 +349,20 @@ export async function getTokenDataRevision(): Promise<bigint> {
 export async function getTokenRevisionChanges(
   afterRevision: bigint,
   throughRevision: bigint,
-): Promise<Array<{ mintAddress: string; changeKind: string }>> {
-  return prisma.tokenRevisionJournal.findMany({
+): Promise<{ changes: Array<{ mintAddress: string; changeKind: string }>; hasGap: boolean }> {
+  const [oldest, rows] = await Promise.all([
+    prisma.tokenDirtyMint.findFirst({ orderBy: { revision: "asc" }, select: { revision: true } }),
+    prisma.tokenDirtyMint.findMany({
     where: {
       revision: { gt: afterRevision, lte: throughRevision },
     },
-    select: { mintAddress: true, changeKind: true },
-    distinct: ["mintAddress", "changeKind"],
-  })
+      select: { mintAddress: true, changeKinds: true },
+    }),
+  ])
+  return {
+    changes: rows.flatMap((row) =>
+      row.changeKinds.map((changeKind) => ({ mintAddress: row.mintAddress, changeKind })),
+    ),
+    hasGap: oldest === null || afterRevision < oldest.revision - BigInt(1),
+  }
 }

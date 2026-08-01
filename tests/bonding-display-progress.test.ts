@@ -1,28 +1,21 @@
 import assert from "node:assert/strict"
 import test from "node:test"
 
-import {
-  BONDING_TARGET_SOL,
-  deriveMarketCapBondingProgress,
-} from "@/lib/bonding-display-progress"
+import { deriveVerifiedBondingProgress } from "@/lib/bonding-display-progress"
 
-test("higher market cap always produces higher display progress at the same SOL price", () => {
-  const lower = deriveMarketCapBondingProgress(14_700, 74)
-  const higher = deriveMarketCapBondingProgress(17_200, 74)
-
-  assert.ok(higher > lower)
-  assert.ok(lower > 47 && lower < 49)
-  assert.ok(higher > 55 && higher < 57)
+test("display progress follows Pump curve reserves rather than market cap", () => {
+  assert.equal(deriveVerifiedBondingProgress(0.748), 0.748)
+  assert.equal(deriveVerifiedBondingProgress(71.9), 71.9)
+  assert.equal(deriveVerifiedBondingProgress(94.45), 94.45)
 })
 
-test("display progress caps at 99 until lifecycle verification graduates the token", () => {
-  const targetUsd = BONDING_TARGET_SOL * 74
-  assert.equal(deriveMarketCapBondingProgress(targetUsd, 74), 99)
-  assert.equal(deriveMarketCapBondingProgress(targetUsd * 2, 74), 99)
+test("verified bonding progress caps at 99 until graduation", () => {
+  assert.equal(deriveVerifiedBondingProgress(99), 99)
+  assert.equal(deriveVerifiedBondingProgress(100), 99)
 })
 
-test("invalid market cap or SOL prices produce zero display progress", () => {
-  assert.equal(deriveMarketCapBondingProgress(Number.NaN, 74), 0)
-  assert.equal(deriveMarketCapBondingProgress(10_000, 0), 0)
-  assert.equal(deriveMarketCapBondingProgress(-1, 74), 0)
+test("missing or invalid verified progress produces zero", () => {
+  assert.equal(deriveVerifiedBondingProgress(Number.NaN), 0)
+  assert.equal(deriveVerifiedBondingProgress(null), 0)
+  assert.equal(deriveVerifiedBondingProgress(-1), 0)
 })

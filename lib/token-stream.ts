@@ -109,7 +109,7 @@ async function pollRevision(): Promise<void> {
       (minimum, group) => group.appliedRevision < minimum ? group.appliedRevision : minimum,
       revision,
     )
-    const changes = await getTokenRevisionChanges(minimumAppliedRevision, revision)
+    const { changes, hasGap } = await getTokenRevisionChanges(minimumAppliedRevision, revision)
     lastObservedRevision = revision
     const now = Date.now()
     await Promise.all(
@@ -117,6 +117,7 @@ async function pollRevision(): Promise<void> {
         .filter((group) => now - group.lastRunAt >= 1_000)
         .filter((group) => group.appliedRevision !== revision)
         .filter((group) => {
+          if (hasGap) return true
           if (changes.length === 0) return true
           if (changes.some((change) => change.changeKind !== "metadata")) return true
           const visible = new Set(group.snapshot.tokens.map((token) => token.mint))

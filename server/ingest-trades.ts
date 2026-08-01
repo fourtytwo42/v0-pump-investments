@@ -24,12 +24,14 @@ import {
   PumpLifecycleRequestError,
 } from "@/lib/pump-lifecycle"
 import {
+  classifyLegacyRaydiumMigrationEvidence,
   classifyPumpLifecycle,
   classifyPumpSwapTradeEvidence,
   isCompletedLifecycle,
-  lifecycleRetryDelayMs,
+  lifecycleRetrySchedule,
   reduceLifecycle,
 } from "@/lib/token-lifecycle"
+import { normalizeRetentionHours, normalizeRetentionMinutes } from "@/lib/data-retention"
 import { reduceTokenProvenance } from "@/lib/token-provenance"
 import { ingestRetryDelayMs } from "@/lib/ingest-retry"
 
@@ -57,11 +59,14 @@ const METADATA_FETCH_MAX_ATTEMPTS = 3
 const METADATA_MIN_INTERVAL_MS = 150
 
 // Cleanup configuration
-const TRADE_RETENTION_HOURS = process.env.TRADE_RETENTION_HOURS
-  ? parseInt(process.env.TRADE_RETENTION_HOURS, 10)
-  : 0
-const CLEANUP_INTERVAL_MS = 60 * 60 * 1000
-const CLEANUP_BATCH_SIZE = 1000
+const TRADE_RETENTION_HOURS = normalizeRetentionHours(process.env.TRADE_RETENTION_HOURS, 2)
+const AGGREGATE_RETENTION_HOURS = normalizeRetentionHours(process.env.AGGREGATE_RETENTION_HOURS, 2)
+const REVISION_STATE_RETENTION_MINUTES = normalizeRetentionMinutes(
+  process.env.REVISION_STATE_RETENTION_MINUTES,
+  15,
+)
+const CLEANUP_INTERVAL_MS = 10 * 60 * 1000
+const CLEANUP_BATCH_SIZE = 10_000
 
 // Candle generation configuration
 const ENABLE_CANDLE_GENERATION = process.env.ENABLE_CANDLE_GENERATION === "true"
@@ -139,6 +144,12 @@ const LIFECYCLE_VERIFIER_ENABLED = process.env.LIFECYCLE_VERIFIER_ENABLED !== "f
 const LIFECYCLE_BATCH_SIZE = parseEnvNumber("LIFECYCLE_BATCH_SIZE", DEFAULT_LIFECYCLE_BATCH_SIZE)
 const LIFECYCLE_ACTIVE_RECHECK_MS = parseEnvNumber("LIFECYCLE_ACTIVE_RECHECK_MS", 60_000)
 const LIFECYCLE_FULL_RECHECK_MS = parseEnvNumber("LIFECYCLE_FULL_RECHECK_MS", 15 * 60_000)
+const LIFECYCLE_RECHECK_WINDOW_MS = parseEnvNumber("LIFECYCLE_RECHECK_WINDOW_MS", 2 * 60 * 60 * 1000)
+const LIFECYCLE_MAX_ATTEMPTS = parseEnvNumber("LIFECYCLE_MAX_ATTEMPTS", 10)
+const LIFECYCLE_UNRESOLVED_COOLDOWN_MS = parseEnvNumber(
+  "LIFECYCLE_UNRESOLVED_COOLDOWN_MS",
+  6 * 60 * 60 * 1000,
+)
 
 // =============================================================================
 // Database Setup
@@ -283,7 +294,11 @@ async function enqueueLifecycleChecks(requests: LifecycleCheckRequest[]): Promis
     VALUES ${values}
     ON CONFLICT (token_id) DO UPDATE SET
       requested_at = NOW(),
-      next_attempt_at = LEAST(token_lifecycle_checks.next_attempt_at, NOW()),
+      next_attempt_at = CASE
+        WHEN EXCLUDED.priority >= 90 OR token_lifecycle_checks.attempts < ${LIFECYCLE_MAX_ATTEMPTS}
+          THEN LEAST(token_lifecycle_checks.next_attempt_at, NOW())
+        ELSE token_lifecycle_checks.next_attempt_at
+      END,
       priority = GREATEST(token_lifecycle_checks.priority, EXCLUDED.priority),
       reason = EXCLUDED.reason,
       updated_at = NOW()
@@ -292,18 +307,20 @@ async function enqueueLifecycleChecks(requests: LifecycleCheckRequest[]): Promis
 
 async function enqueueLifecycleChecksByQuery(mode: "all" | "active"): Promise<void> {
   if (!LIFECYCLE_VERIFIER_ENABLED) return
-  const activeCutoff = BigInt(Date.now() - 60 * 60 * 1000)
+  const activeCutoff = BigInt(Date.now() - LIFECYCLE_RECHECK_WINDOW_MS)
   if (mode === "active") {
     await prisma.$executeRawUnsafe(`
       INSERT INTO token_lifecycle_checks
         (token_id,requested_at,next_attempt_at,attempts,priority,reason,updated_at)
-      SELECT DISTINCT t.id,NOW(),NOW(),0,40,'active_recheck',NOW()
+      SELECT t.id,NOW(),NOW(),0,40,'active_recheck',NOW()
       FROM tokens t
-      JOIN trades tr ON tr.token_id=t.id AND tr.timestamp >= ${activeCutoff}
+      JOIN token_prices tp ON tp.token_id=t.id AND tp.last_trade_timestamp >= ${activeCutoff}
       WHERE t.lifecycle_status IN ('UNKNOWN','BONDING')
       ON CONFLICT (token_id) DO UPDATE SET
         requested_at=NOW(),
-        next_attempt_at=LEAST(token_lifecycle_checks.next_attempt_at,NOW()),
+        next_attempt_at=CASE WHEN token_lifecycle_checks.attempts < ${LIFECYCLE_MAX_ATTEMPTS}
+          THEN LEAST(token_lifecycle_checks.next_attempt_at,NOW())
+          ELSE token_lifecycle_checks.next_attempt_at END,
         priority=GREATEST(token_lifecycle_checks.priority,40),
         reason='active_recheck',
         updated_at=NOW()
@@ -316,10 +333,13 @@ async function enqueueLifecycleChecksByQuery(mode: "all" | "active"): Promise<vo
       (token_id,requested_at,next_attempt_at,attempts,priority,reason,updated_at)
     SELECT t.id,NOW(),NOW(),0,10,'full_recheck',NOW()
     FROM tokens t
+    JOIN token_prices tp ON tp.token_id=t.id AND tp.last_trade_timestamp >= ${activeCutoff}
     WHERE t.lifecycle_status IN ('UNKNOWN','BONDING','CURVE_COMPLETE')
     ON CONFLICT (token_id) DO UPDATE SET
       requested_at=NOW(),
-      next_attempt_at=LEAST(token_lifecycle_checks.next_attempt_at,NOW()),
+      next_attempt_at=CASE WHEN token_lifecycle_checks.attempts < ${LIFECYCLE_MAX_ATTEMPTS}
+        THEN LEAST(token_lifecycle_checks.next_attempt_at,NOW())
+        ELSE token_lifecycle_checks.next_attempt_at END,
       priority=GREATEST(token_lifecycle_checks.priority,10),
       reason='full_recheck',
       updated_at=NOW()
@@ -332,16 +352,36 @@ async function rescheduleLifecycleCheck(
   error: string,
   explicitDelayMs?: number | null,
 ): Promise<void> {
-  const delayMs = explicitDelayMs ?? lifecycleRetryDelayMs(attempts)
+  const schedule = lifecycleRetrySchedule(
+    attempts,
+    LIFECYCLE_MAX_ATTEMPTS,
+    LIFECYCLE_UNRESOLVED_COOLDOWN_MS,
+    explicitDelayMs,
+  )
   await prisma.tokenLifecycleCheck.update({
     where: { tokenId },
     data: {
       attempts,
       lastError: error.slice(0, 500),
-      nextAttemptAt: new Date(Date.now() + delayMs),
-      priority: Math.max(0, 100 - attempts),
+      nextAttemptAt: new Date(Date.now() + schedule.delayMs),
+      priority: schedule.priority,
     },
   })
+}
+
+async function reconcileStoredRaydiumMigrations(): Promise<void> {
+  const migrated = await prisma.$queryRawUnsafe<Array<{ mint_address: string }>>(`
+    UPDATE tokens
+    SET lifecycle_status='CURVE_COMPLETE', lifecycle_verified_at=NOW(), bonding_progress=100,
+        completed=TRUE, graduated_at=COALESCE(graduated_at,trade_venue_updated_at,NOW()), updated_at=NOW()
+    WHERE launch_source='PUMP'
+      AND trade_venue='RAYDIUM_V4'
+      AND lifecycle_status IN ('UNKNOWN','BONDING')
+    RETURNING mint_address
+  `)
+  if (migrated.length === 0) return
+  await recordDirtyMints(migrated.map((row) => row.mint_address), ["lifecycle"])
+  console.log(`[lifecycle] Reconciled ${migrated.length} Pump-to-Raydium migrations`)
 }
 
 async function applyVerifiedLifecycle(
@@ -527,22 +567,16 @@ async function recordDirtyMints(mints: string[], changeKinds: string[]): Promise
       update: { revision: { increment: BigInt(1) } },
       select: { revision: true },
     })
-    await Promise.all(uniqueMints.map((mintAddress) =>
-      tx.tokenDirtyMint.upsert({
-        where: { mintAddress },
-        create: { mintAddress, changeKinds, revision: revision.revision },
-        update: { changeKinds, revision: revision.revision },
-      }),
-    ))
-    await tx.tokenRevisionJournal.createMany({
-      data: uniqueMints.flatMap((mintAddress) =>
-        changeKinds.map((changeKind) => ({
-          revision: revision.revision,
-          mintAddress,
-          changeKind,
-        })),
-      ),
-    })
+    const dirtyValues = uniqueMints.map((mintAddress) =>
+      `(${escapeSQL(mintAddress)},ARRAY[${changeKinds.map(escapeSQL).join(",")}]::text[],${revision.revision},NOW())`,
+    ).join(",")
+    await tx.$executeRawUnsafe(`
+      INSERT INTO token_dirty_mints (mint_address,change_kinds,revision,updated_at)
+      VALUES ${dirtyValues}
+      ON CONFLICT (mint_address) DO UPDATE SET
+        change_kinds=(SELECT ARRAY(SELECT DISTINCT unnest(token_dirty_mints.change_kinds || EXCLUDED.change_kinds))),
+        revision=EXCLUDED.revision,updated_at=NOW()
+    `)
   })
 }
 
@@ -869,9 +903,49 @@ async function persistTradesAtomic(trades: PreparedTrade[]): Promise<void> {
       `)
     }
 
+    const raydiumEvidenceByMint = new Map<string, PreparedTrade>()
+    for (const trade of trades) {
+      const verified = classifyLegacyRaydiumMigrationEvidence({
+        program: trade.program,
+        poolAddress: trade.poolAddress,
+        isBondingCurve: trade.isBondingCurve,
+      })
+      if (!verified) continue
+      const existing = raydiumEvidenceByMint.get(trade.mint)
+      if (!existing || trade.timestampMs > existing.timestampMs) raydiumEvidenceByMint.set(trade.mint, trade)
+    }
+    const raydiumEvidence = [...raydiumEvidenceByMint.values()]
+    if (raydiumEvidence.length > 0) {
+      const evidenceValues = raydiumEvidence
+        .map((trade) => `(${escapeSQL(trade.mint)},${trade.timestampMs})`)
+        .join(",")
+      await tx.$executeRawUnsafe(`
+        UPDATE tokens AS token
+        SET lifecycle_status = 'CURVE_COMPLETE',
+            lifecycle_verified_at = NOW(),
+            bonding_progress = 100,
+            completed = TRUE,
+            graduated_at = COALESCE(token.graduated_at, to_timestamp(evidence.trade_timestamp_ms / 1000.0)),
+            updated_at = NOW()
+        FROM (VALUES ${evidenceValues}) AS evidence(mint_address,trade_timestamp_ms)
+        WHERE token.mint_address = evidence.mint_address
+          AND token.launch_source = 'PUMP'
+          AND token.lifecycle_status IN ('UNKNOWN','BONDING')
+      `)
+      await tx.$executeRawUnsafe(`
+        DELETE FROM token_lifecycle_checks
+        WHERE token_id IN (
+          SELECT id FROM tokens
+          WHERE launch_source = 'PUMP'
+            AND lifecycle_status = 'CURVE_COMPLETE'
+            AND mint_address IN (${raydiumEvidence.map((trade) => escapeSQL(trade.mint)).join(",")})
+        )
+      `)
+    }
+
     const tokenRows = await tx.token.findMany({
       where: { mintAddress: { in: uniqueTokens.map((trade) => trade.mint) } },
-      select: { id: true, mintAddress: true, metadataUri: true, imageUri: true },
+      select: { id: true, mintAddress: true, metadataUri: true, imageUri: true, name: true, symbol: true },
     })
     const ids = new Map(tokenRows.map((row) => [row.mintAddress, row.id]))
     const validTrades = trades.filter((trade) => ids.has(trade.mint))
@@ -970,13 +1044,6 @@ async function persistTradesAtomic(trades: PreparedTrade[]): Promise<void> {
             change_kinds=(SELECT ARRAY(SELECT DISTINCT unnest(token_dirty_mints.change_kinds || EXCLUDED.change_kinds))),
             revision=EXCLUDED.revision,updated_at=NOW()
         `)
-        const journalValues = changedMints.flatMap((mint) => ["price", "trade"].map((kind) =>
-          `(${revision},${escapeSQL(mint)},${escapeSQL(kind)},NOW())`,
-        )).join(",")
-        await tx.$executeRawUnsafe(`
-          INSERT INTO token_revision_journal (revision,mint_address,change_kind,created_at)
-          VALUES ${journalValues}
-        `)
       }
     }
 
@@ -985,7 +1052,9 @@ async function persistTradesAtomic(trades: PreparedTrade[]): Promise<void> {
 
   for (const row of result.tokenRows) {
     tokenIdCache.set(row.mintAddress, row.id)
-    if (!row.metadataUri || !row.imageUri) scheduleMetadataRetry(row.mintAddress)
+    if (!row.metadataUri || !row.imageUri || !row.name?.trim() || !row.symbol?.trim()) {
+      scheduleMetadataRetry(row.mintAddress)
+    }
   }
   if (result.inserted.length > 0) {
     latestTradePersistedTimestampMs = Math.max(
@@ -1627,7 +1696,8 @@ async function refreshTokenMetadata(mint: string): Promise<MetadataRefreshResult
 
     if (!token) return "success"
 
-    const shouldFetchMetadata = !token.metadataUri || !token.imageUri
+    const shouldFetchMetadata =
+      !token.metadataUri || !token.imageUri || !token.name?.trim() || !token.symbol?.trim()
 
     if (!shouldFetchMetadata) {
       return "success"
@@ -1685,10 +1755,10 @@ async function refreshTokenMetadata(mint: string): Promise<MetadataRefreshResult
 
     const updates: Record<string, unknown> = {}
 
-    if (metadata.name && token.name?.match(/^[A-Z0-9]{1,6}$/)) {
+    if (metadata.name && (!token.name?.trim() || token.name.match(/^[A-Z0-9]{1,6}$/))) {
       updates.name = metadata.name
     }
-    if (metadata.symbol && token.symbol?.match(/^[A-Z0-9]{1,6}$/)) {
+    if (metadata.symbol && (!token.symbol?.trim() || token.symbol.match(/^[A-Z0-9]{1,6}$/))) {
       updates.symbol = metadata.symbol
     }
     if (metadataUri && !token.metadataUri) {
@@ -1740,9 +1810,14 @@ async function refreshTokenMetadata(mint: string): Promise<MetadataRefreshResult
     // This prevents re-seeding tokens that legitimately don't have metadata available
     const updatedToken = await prisma.token.findUnique({
       where: { id: token.id },
-      select: { metadataUri: true, imageUri: true },
+      select: { metadataUri: true, imageUri: true, name: true, symbol: true },
     })
-    if (updatedToken && updatedToken.metadataUri && updatedToken.imageUri) {
+    if (
+      updatedToken?.metadataUri &&
+      updatedToken.imageUri &&
+      updatedToken.name?.trim() &&
+      updatedToken.symbol?.trim()
+    ) {
       return "success"
     }
 
@@ -1900,51 +1975,69 @@ if (metadataRetryQueue.size > 0) {
 // Cleanup Old Trades
 // =============================================================================
 
-async function cleanupOldTrades(): Promise<void> {
-  if (TRADE_RETENTION_HOURS <= 0) return
+async function deleteRetentionBatches(label: string, table: string, predicate: string): Promise<number> {
+  let totalDeleted = 0
+  let batchDeleted = 0
+  do {
+    batchDeleted = Number(await prisma.$executeRawUnsafe(`
+      DELETE FROM ${table}
+      WHERE ctid IN (
+        SELECT ctid FROM ${table}
+        WHERE ${predicate}
+        LIMIT ${CLEANUP_BATCH_SIZE}
+      )
+    `))
+    totalDeleted += batchDeleted
+    if (batchDeleted > 0) await delay(50)
+  } while (batchDeleted === CLEANUP_BATCH_SIZE)
+  if (totalDeleted > 0) console.log(`[cleanup] ${label}: deleted ${totalDeleted}`)
+  return totalDeleted
+}
 
+async function cleanupExpiredData(): Promise<void> {
   try {
-    const cutoff = BigInt(Date.now() - TRADE_RETENTION_HOURS * 60 * 60 * 1000)
-    console.log(`[cleanup] Cleaning trades older than ${TRADE_RETENTION_HOURS}h`)
-
-    let totalDeleted = 0
-    let batchDeleted = 0
-
-    do {
-      const result = await prisma.$executeRawUnsafe(`
-        DELETE FROM trades
-        WHERE id IN (
-          SELECT id FROM trades
-          WHERE timestamp < ${cutoff}
-          LIMIT ${CLEANUP_BATCH_SIZE}
-        )
-      `)
-      batchDeleted = Number(result)
-      totalDeleted += batchDeleted
-
-      if (batchDeleted > 0) {
-        console.log(`[cleanup] Deleted ${batchDeleted} (${totalDeleted} total)`)
-        await delay(100)
-      }
-    } while (batchDeleted === CLEANUP_BATCH_SIZE)
-
-    console.log(`[cleanup] ✅ Done: ${totalDeleted} trades deleted`)
-    } catch (error) {
-    console.error("[cleanup] ❌ Failed:", (error as Error).message)
+    const now = Date.now()
+    const tradeCutoff = BigInt(now - TRADE_RETENTION_HOURS * 60 * 60 * 1000)
+    const aggregateCutoff = new Date(now - AGGREGATE_RETENTION_HOURS * 60 * 60 * 1000).toISOString()
+    const revisionCutoff = new Date(now - REVISION_STATE_RETENTION_MINUTES * 60 * 1000).toISOString()
+    await deleteRetentionBatches("trades", "trades", `timestamp < ${tradeCutoff}`)
+    await deleteRetentionBatches(
+      "token minute aggregates",
+      "token_minute_aggregates",
+      `minute < ${escapeSQL(aggregateCutoff)}::timestamptz`,
+    )
+    await deleteRetentionBatches(
+      "buyer minute aggregates",
+      "token_buyer_minute_aggregates",
+      `minute < ${escapeSQL(aggregateCutoff)}::timestamptz`,
+    )
+    await deleteRetentionBatches(
+      "legacy revision journal",
+      "token_revision_journal",
+      `created_at < ${escapeSQL(revisionCutoff)}::timestamptz`,
+    )
+    await deleteRetentionBatches(
+      "dirty mint state",
+      "token_dirty_mints",
+      `updated_at < ${escapeSQL(revisionCutoff)}::timestamptz`,
+    )
+  } catch (error) {
+    console.error("[cleanup] Failed:", (error as Error).message)
   }
 }
 
-if (TRADE_RETENTION_HOURS > 0) {
-  console.log(`[cleanup] Retention: ${TRADE_RETENTION_HOURS}h`)
-  setTimeout(() => void cleanupOldTrades(), 5 * 60 * 1000)
-  setInterval(() => void cleanupOldTrades(), CLEANUP_INTERVAL_MS)
-}
+console.log(
+  `[cleanup] Retention: trades=${TRADE_RETENTION_HOURS}h aggregates=${AGGREGATE_RETENTION_HOURS}h realtime=${REVISION_STATE_RETENTION_MINUTES}m`,
+)
+setTimeout(() => void cleanupExpiredData(), 60_000)
+setInterval(() => void cleanupExpiredData(), CLEANUP_INTERVAL_MS)
 
 setInterval(() => void flushTokenRevision(), 1_000)
 
 if (LIFECYCLE_VERIFIER_ENABLED) {
   setTimeout(() => {
-    void enqueueLifecycleChecksByQuery("all")
+    void reconcileStoredRaydiumMigrations()
+      .then(() => enqueueLifecycleChecksByQuery("all"))
       .then(() => processLifecycleChecks())
       .catch((error) => console.warn("[lifecycle] Initial backfill enqueue failed:", (error as Error).message))
   }, 2_000)
@@ -1980,6 +2073,8 @@ async function seedMetadataRetryQueue(): Promise<void> {
           { metadataUri: null, imageUri: null },
           { metadataUri: null },
           { imageUri: null },
+          { name: "" },
+          { symbol: "" },
         ],
       },
     })
@@ -1991,6 +2086,8 @@ async function seedMetadataRetryQueue(): Promise<void> {
           { metadataUri: null, imageUri: null },
           { metadataUri: null },
           { imageUri: null },
+          { name: "" },
+          { symbol: "" },
         ],
         price: {
           lastTradeTimestamp: {
@@ -2016,6 +2113,8 @@ async function seedMetadataRetryQueue(): Promise<void> {
             { metadataUri: null, imageUri: null },
             { metadataUri: null },
             { imageUri: null },
+            { name: "" },
+            { symbol: "" },
           ],
           price: {
             lastTradeTimestamp: {

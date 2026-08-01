@@ -1,0 +1,10 @@
+/home/hendo420/pumpInvestments/v0-pump-investments/logs/*.log {
+  daily
+  size 25M
+  rotate 7
+  compress
+  missingok
+  notifempty
+  copytruncate
+  su hendo420 hendo420
+}

@@ -2,6 +2,19 @@
 
 This file is the durable work queue for repo maintenance and recovery. If chat context is lost, start here.
 
+### P0: Retention, storage, and lifecycle recovery
+
+#### T32. Bound production growth and correct false 99% bonding cards
+- Status: `in_progress`
+- Goal:
+  - Keep enough data for the one-hour product window with a safety margin, stop unbounded realtime/aggregate growth, restore verified bonding progress, and promote legacy Pump tokens with definitive migration venue evidence.
+- Verification:
+  - Expand the VM filesystem, reconcile live 99% candidates against Pump, test retention/lifecycle reduction, deploy, compact ephemeral tables, and verify feed, SSE, lifecycle filters, latency, disk, and PM2 health.
+- Notes:
+  - The 64 GB virtual disk was present, but LVM exposed only 31 GB. The root logical volume and ext4 filesystem were expanded online to 61 GB usable, increasing free space from about 6.7 GB to 36 GB.
+  - Production had 17.8 million unbounded revision-journal rows (3.8 GB), 5.4 million buyer-minute rows (1.6 GB), and 67,000 overdue lifecycle checks.
+  - Pump verification showed five active market-cap-based 99% cards were actually 0.7%-94.5% through their curves. Autonome has separate Pump-launch plus Raydium-trading migration evidence.
+
 ### P1: Token feed availability
 
 #### T31. Recover and harden the live trade feed

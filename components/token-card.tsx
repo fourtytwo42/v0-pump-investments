@@ -14,7 +14,7 @@ import type { TokenData } from "@/types/token-data"
 import { tokenImagePath } from "@/lib/token-image"
 import { useTokenStore } from "@/stores/token-store"
 import { formatCompactTimeAgo } from "@/lib/format-relative-time"
-import { deriveMarketCapBondingProgress } from "@/lib/bonding-display-progress"
+import { deriveVerifiedBondingProgress } from "@/lib/bonding-display-progress"
 
 // Update the TokenCardProps interface to include the description field and BonkBot setting
 interface TokenCardProps {
@@ -56,11 +56,11 @@ FavoriteStarIcon.displayName = "FavoriteStarIcon"
 
 function TokenCard({ mint, size = "medium", showAlertSettings = false, showBonkBotLogo = false }: TokenCardProps) {
   const token = useTokenStore((state) => state.tokensByMint.get(mint)) as TokenData
-  const solPrice = useTokenStore((state) => state.solPrice)
   const isFavorite = useTokenStore((state) => state.favoriteMints.has(mint))
   const toggleFavorite = useTokenStore((state) => state.toggleFavorite)
+  const solPrice = useTokenStore((state) => state.solPrice)
   const lifecycleStatus = token.lifecycle_status ?? "unknown"
-  const progressPercent = deriveMarketCapBondingProgress(token.usd_market_cap, solPrice)
+  const progressPercent = deriveVerifiedBondingProgress(token.bonding_progress)
   const showBondingProgress =
     lifecycleStatus === "bonding" &&
     Number.isFinite(progressPercent) &&

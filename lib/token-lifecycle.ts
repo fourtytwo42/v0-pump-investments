@@ -78,6 +78,24 @@ export function classifyPumpSwapTradeEvidence(payload: {
   }
 }
 
+export function classifyLegacyRaydiumMigrationEvidence(payload: {
+  program?: unknown
+  poolAddress?: unknown
+  isBondingCurve?: unknown
+}): VerifiedLifecycle | null {
+  const program = optionalString(payload.program)?.toLowerCase()
+  const poolAddress = optionalString(payload.poolAddress)
+  if (program !== "raydium_v4_amm" || !poolAddress || payload.isBondingCurve === true) return null
+
+  return {
+    status: "CURVE_COMPLETE",
+    pumpSwapPool: null,
+    bondingCurve: null,
+    associatedBondingCurve: null,
+    bondingProgress: 100,
+  }
+}
+
 export function isCompletedLifecycle(status: TokenLifecycleStatus): boolean {
   return COMPLETED_STATES.has(status)
 }
@@ -164,4 +182,21 @@ export function lifecycleRetryDelayMs(attempts: number): number {
   const exponential = Math.min(300_000, 2_000 * 2 ** Math.max(0, attempts))
   const jitter = Math.floor(exponential * 0.2 * Math.random())
   return exponential + jitter
+}
+
+export function lifecycleRetrySchedule(
+  attempts: number,
+  maxAttempts: number,
+  unresolvedCooldownMs: number,
+  explicitDelayMs?: number | null,
+): { delayMs: number; priority: number; coolingDown: boolean } {
+  const coolingDown = attempts >= maxAttempts
+  const delayMs = coolingDown
+    ? Math.max(explicitDelayMs ?? 0, unresolvedCooldownMs)
+    : explicitDelayMs ?? lifecycleRetryDelayMs(attempts)
+  return {
+    delayMs,
+    priority: coolingDown ? 0 : Math.max(0, 100 - attempts),
+    coolingDown,
+  }
 }

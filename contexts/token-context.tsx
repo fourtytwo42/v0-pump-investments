@@ -162,7 +162,7 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
       totalPages: number
       total: number
       sol_price_usd?: number
-    }) => {
+    }, streamConnected = false) => {
       const tokenMap = new Map(payload.tokens.map((token) => [token.mint, token]))
       tokenMapRef.current = tokenMap
       setTokens(tokenMap)
@@ -185,7 +185,7 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
       setTotalPages(payload.totalPages)
       setTotalCount(payload.total)
       setIsLoading(false)
-      setIsConnected(true)
+      if (streamConnected) setIsConnected(true)
     }
 
     const applyPatch = (payload: {
@@ -271,7 +271,7 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
           const data = block.match(/^data:\s*(.+)$/m)?.[1]
           if (event && data && event !== "heartbeat") {
             const payload = JSON.parse(data)
-            if (event === "snapshot") applySnapshot(payload)
+            if (event === "snapshot") applySnapshot(payload, true)
             if (event === "patch") applyPatch(payload)
             consecutiveFailures = 0
             stopFallback()

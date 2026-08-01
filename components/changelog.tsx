@@ -31,6 +31,28 @@ interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: "4.0.8",
+    date: "August 1, 2026",
+    changes: [
+      {
+        type: "fixed",
+        description: "Bonding bars now use Pump's verified curve reserves, fixing unrelated market caps that were incorrectly displayed at 99%.",
+      },
+      {
+        type: "fixed",
+        description: "Recognize confirmed Pump-to-Raydium migrations as graduated while keeping market cap separate from lifecycle decisions.",
+      },
+      {
+        type: "improved",
+        description: "Bound trade, aggregate, realtime, and lifecycle queue retention to the one-hour token tracking window with a safe recovery margin.",
+      },
+      {
+        type: "fixed",
+        description: "Restored reliable public realtime streams by applying Cloudflare connection limits per actual visitor instead of per tunnel.",
+      },
+    ],
+  },
+  {
     version: "4.0.7",
     date: "August 1, 2026",
     changes: [

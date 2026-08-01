@@ -4,9 +4,11 @@ import test from "node:test"
 import {
   classifyPumpSwapTradeEvidence,
   classifyPumpLifecycle,
+  classifyLegacyRaydiumMigrationEvidence,
   deriveBondingProgress,
   isCompletedLifecycle,
   lifecycleRetryDelayMs,
+  lifecycleRetrySchedule,
   reduceLifecycle,
 } from "@/lib/token-lifecycle"
 
@@ -67,6 +69,21 @@ test("requires a concrete pool before PumpSwap trade evidence graduates a token"
   assert.equal(classifyPumpLifecycle({ program: "non_launchpad" })?.status, "NON_LAUNCHPAD")
 })
 
+test("recognizes a concrete legacy Raydium migration trade", () => {
+  assert.equal(
+    classifyLegacyRaydiumMigrationEvidence({
+      program: "raydium_v4_amm",
+      poolAddress: "67uQTTRtwEyXhRojpFY6gNdUZn8eZG5J3DFSCZvwsZXw",
+      isBondingCurve: false,
+    })?.status,
+    "CURVE_COMPLETE",
+  )
+  assert.equal(
+    classifyLegacyRaydiumMigrationEvidence({ program: "raydium_v4_amm", isBondingCurve: false }),
+    null,
+  )
+})
+
 test("derives bonding progress from Pump curve reserves instead of market cap", () => {
   assert.equal(
     deriveBondingProgress({
@@ -112,4 +129,16 @@ test("retry delay grows exponentially and caps at five minutes plus jitter", () 
   assert.ok(first >= 2_000 && first < 2_400)
   assert.ok(later >= 128_000 && later < 153_600)
   assert.ok(capped >= 300_000 && capped < 360_000)
+})
+
+test("unresolved lifecycle checks cool down after bounded attempts", () => {
+  const active = lifecycleRetrySchedule(4, 10, 6 * 60 * 60 * 1000, 30_000)
+  assert.deepEqual(active, { delayMs: 30_000, priority: 96, coolingDown: false })
+
+  const cooling = lifecycleRetrySchedule(10, 10, 6 * 60 * 60 * 1000, 30_000)
+  assert.deepEqual(cooling, {
+    delayMs: 6 * 60 * 60 * 1000,
+    priority: 0,
+    coolingDown: true,
+  })
 })

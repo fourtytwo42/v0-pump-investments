@@ -72,6 +72,7 @@ const connectionCounts = new Map<string, { count: number; touchedAt: number }>()
 
 export function acquireClientConnection(request: Request, limit = 5): () => void {
   const key =
+    request.headers.get("cf-connecting-ip") ||
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
     request.headers.get("x-real-ip") ||
     "direct"

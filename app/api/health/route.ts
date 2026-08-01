@@ -14,7 +14,7 @@ export async function GET(): Promise<Response> {
     const latestTradeTimestamp = latestTrade ? Number(latestTrade.timestamp) : 0
     const feedHealthy = latestTradeTimestamp > 0 && Date.now() - latestTradeTimestamp < 2 * 60_000
     return Response.json({
-      version: process.env.APP_VERSION ?? "4.0.7",
+      version: process.env.APP_VERSION ?? "4.0.8",
       status: solHealthy && feedHealthy ? "ok" : "degraded",
       dependencies: {
         database: { status: "ok", latency_ms: Date.now() - startedAt },
@@ -31,7 +31,7 @@ export async function GET(): Promise<Response> {
   } catch {
     return Response.json(
       {
-        version: process.env.APP_VERSION ?? "4.0.7",
+        version: process.env.APP_VERSION ?? "4.0.8",
         status: "unavailable",
         dependencies: { database: { status: "unavailable" } },
       },
