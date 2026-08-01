@@ -98,6 +98,7 @@ npm run lint
 npm run build
 npx prisma validate
 npm audit --omit=dev --audit-level=high
+npx playwright install --with-deps chromium firefox webkit
 
 say "Starting candidate on port $CANDIDATE_PORT"
 PORT="$CANDIDATE_PORT" APP_VERSION="$VERSION" npm start > "$SHARED_ROOT/logs/candidate-$COMMIT.log" 2>&1 &
