@@ -2,6 +2,18 @@
 
 This file is the durable work queue for repo maintenance and recovery. If chat context is lost, start here.
 
+### P1: Token feed availability
+
+#### T31. Recover and harden the live trade feed
+- Status: `in_progress`
+- Goal:
+  - Detect real-trade inactivity independently from NATS protocol heartbeats, self-recover the subscriber, and expose feed freshness through health checks.
+- Verification:
+  - Restore production traffic, unit-test stale-feed decisions, run release gates, deploy, and verify live DB/API/SSE freshness plus PM2 stability.
+- Notes:
+  - On 2026-08-01 the connection remained protocol-active while real trades stopped for roughly 12 minutes. The original watchdog refreshed `lastMessageAt` on PING/PONG traffic, so PM2 saw a live process and did not recover it.
+  - A manual ingester restart restored complete-feed traffic immediately; permanent recovery work is underway for v4.0.7.
+
 ### P1: Market-cap-aligned bonding display
 
 #### T21. Align card percentage with market cap

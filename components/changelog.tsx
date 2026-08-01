@@ -31,6 +31,20 @@ interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: "4.0.7",
+    date: "August 1, 2026",
+    changes: [
+      {
+        type: "fixed",
+        description: "Made the live token feed automatically reconnect when trade events stop even if the upstream connection still answers heartbeats.",
+      },
+      {
+        type: "improved",
+        description: "Added a second process-level recovery guard and live trade freshness reporting to prevent silent feed outages.",
+      },
+    ],
+  },
+  {
     version: "4.0.6",
     date: "July 31, 2026",
     changes: [

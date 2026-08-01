@@ -5,6 +5,7 @@ import { mkdir, readFile, readdir, rename, rm, writeFile } from "node:fs/promise
 import path from "node:path"
 import { randomUUID } from "node:crypto"
 import WebSocket from "ws"
+import { getFeedStaleReason, isFeedFatallyStale } from "@/lib/ingest-feed-health"
 import {
   decodePumpPayload,
   type PumpUnifiedTrade,
@@ -108,6 +109,8 @@ const INGEST_RECONNECT_MAX_MS = parseEnvNumber("INGEST_RECONNECT_MAX_MS", 60_000
 const INGEST_CONNECT_TIMEOUT_MS = parseEnvNumber("INGEST_CONNECT_TIMEOUT_MS", 10_000)
 const INGEST_PING_INTERVAL_MS = parseEnvNumber("INGEST_PING_INTERVAL_MS", 15_000)
 const INGEST_STALE_AFTER_MS = parseEnvNumber("INGEST_STALE_AFTER_MS", 45_000)
+const INGEST_TRADE_STALE_AFTER_MS = parseEnvNumber("INGEST_TRADE_STALE_AFTER_MS", 60_000)
+const INGEST_FATAL_TRADE_STALE_AFTER_MS = parseEnvNumber("INGEST_FATAL_TRADE_STALE_AFTER_MS", 5 * 60_000)
 const INGEST_BACKOFF_RESET_AFTER_MS = parseEnvNumber("INGEST_BACKOFF_RESET_AFTER_MS", 30_000)
 const INGEST_PING_TIMEOUT_MS = 20_000
 const INGEST_HEALTH_CHECK_INTERVAL_MS = Math.min(5_000, INGEST_PING_INTERVAL_MS)
@@ -176,9 +179,13 @@ let reconnectAttemptCount = 0
 let lastConnectStartedAt = 0
 let lastConnectedAt = 0
 let lastMessageAt = 0
+let lastTradeMessageAt = 0
+let lastTradeMessageAtForConnection = 0
 let lastPingSentAt = 0
 let lastPongAt = 0
 let lastDisconnectAt = 0
+const serviceStartedAt = Date.now()
+let fatalFeedRestartRequested = false
 
 // SOL price cache
 let solPriceCache = { value: 0, updatedAt: 0 }
@@ -2403,6 +2410,17 @@ function handleStaleConnection(reason: string, connectionId: number): void {
   scheduleReconnect(reason)
 }
 
+function triggerFatalFeedRestart(now: number): void {
+  if (fatalFeedRestartRequested || connectionState === "shutting_down") return
+  fatalFeedRestartRequested = true
+  const reference = lastTradeMessageAt || serviceStartedAt
+  console.error(
+    `[ingest] event=fatal_feed_stale since_last_trade_s=${Math.floor((now - reference) / 1000)} action=pm2_restart`,
+  )
+  void shutdown("fatal_feed_stale").finally(() => process.exit(1))
+  setTimeout(() => process.exit(1), 5_000)
+}
+
 function checkConnectionHealth(connectionId: number): void {
   if (!isActiveConnection(connectionId) || connectionState !== "connected") return
 
@@ -2413,8 +2431,21 @@ function checkConnectionHealth(connectionId: number): void {
   }
 
   const now = Date.now()
-  if (lastMessageAt > 0 && now - lastMessageAt >= INGEST_STALE_AFTER_MS) {
-    handleStaleConnection("inbound_idle_timeout", connectionId)
+  if (isFeedFatallyStale(now, serviceStartedAt, lastTradeMessageAt, INGEST_FATAL_TRADE_STALE_AFTER_MS)) {
+    triggerFatalFeedRestart(now)
+    return
+  }
+
+  const staleReason = getFeedStaleReason({
+    nowMs: now,
+    connectedAtMs: lastConnectedAt,
+    lastProtocolMessageAtMs: lastMessageAt,
+    lastTradeMessageAtMs: lastTradeMessageAtForConnection,
+    protocolStaleAfterMs: INGEST_STALE_AFTER_MS,
+    tradeStaleAfterMs: INGEST_TRADE_STALE_AFTER_MS,
+  })
+  if (staleReason) {
+    handleStaleConnection(staleReason, connectionId)
     return
   }
 
@@ -2501,6 +2532,8 @@ function handleMessageChunk(chunk: string, connectionId: number, socket: WebSock
 
     const trade = decodePumpPayload(payload)
     if (trade) {
+      lastTradeMessageAt = Date.now()
+      lastTradeMessageAtForConnection = lastTradeMessageAt
       if (tradeQueue.length >= MAX_MEMORY_QUEUE) {
         void spoolBatch([trade as PumpUnifiedTrade]).catch((error) => {
           console.error(`[spool] overflow write failed: ${(error as Error).message}`)
@@ -2553,6 +2586,7 @@ function startConnectionAttempt(trigger: string, scheduledDelayMs = 0): void {
     connectionState = "connected"
     lastConnectedAt = Date.now()
     lastMessageAt = lastConnectedAt
+    lastTradeMessageAtForConnection = 0
     lastPingSentAt = 0
     lastPongAt = lastConnectedAt
     messageBuffer = ""
@@ -2605,8 +2639,9 @@ function startConnectionAttempt(trigger: string, scheduledDelayMs = 0): void {
 function logConnectionHealth(): void {
   const now = Date.now()
   const secondsSinceLastMessage = lastMessageAt > 0 ? Math.floor((now - lastMessageAt) / 1000) : -1
+  const secondsSinceLastTrade = lastTradeMessageAt > 0 ? Math.floor((now - lastTradeMessageAt) / 1000) : -1
   console.log(
-    `[ingest] event=health state=${connectionState} connection_id=${activeConnectionId} reconnect_attempt=${reconnectAttemptCount} queue=${tradeQueue.length} processors=${activeProcessors} since_last_message_s=${secondsSinceLastMessage}`
+    `[ingest] event=health state=${connectionState} connection_id=${activeConnectionId} reconnect_attempt=${reconnectAttemptCount} queue=${tradeQueue.length} processors=${activeProcessors} since_last_message_s=${secondsSinceLastMessage} since_last_trade_s=${secondsSinceLastTrade}`
   )
 }
 
