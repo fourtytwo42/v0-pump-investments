@@ -40,7 +40,7 @@ export const changelogData: ChangelogEntry[] = [
       },
       {
         type: "fixed",
-        description: "Recognize confirmed Pump-to-Raydium migrations as graduated while keeping market cap separate from lifecycle decisions.",
+        description: "Recognize Pump's confirmed legacy Raydium pool migrations as graduated even when its old complete flag remains stale.",
       },
       {
         type: "improved",

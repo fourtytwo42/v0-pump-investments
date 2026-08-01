@@ -13,6 +13,8 @@ export interface PumpLifecyclePayload {
   mint?: unknown
   complete?: unknown
   pump_swap_pool?: unknown
+  raydium_pool?: unknown
+  pool_address?: unknown
   program?: unknown
   bonding_curve?: unknown
   associated_bonding_curve?: unknown
@@ -106,6 +108,7 @@ export function toPublicLifecycle(status: TokenLifecycleStatus): PublicTokenLife
 
 export function classifyPumpLifecycle(payload: PumpLifecyclePayload): VerifiedLifecycle | null {
   const pumpSwapPool = optionalString(payload.pump_swap_pool)
+  const raydiumPool = optionalString(payload.raydium_pool) ?? optionalString(payload.pool_address)
   const program = optionalString(payload.program)?.toLowerCase() ?? null
   const bondingCurve = optionalString(payload.bonding_curve)
   const associatedBondingCurve = optionalString(payload.associated_bonding_curve)
@@ -114,6 +117,18 @@ export function classifyPumpLifecycle(payload: PumpLifecyclePayload): VerifiedLi
     return {
       status: "PUMPSWAP",
       pumpSwapPool,
+      bondingCurve,
+      associatedBondingCurve,
+      bondingProgress: 100,
+    }
+  }
+
+  // Pump's legacy Raydium migrations can retain complete=false indefinitely,
+  // but the frontend response exposes the concrete migrated pool.
+  if (program === "pump" && raydiumPool) {
+    return {
+      status: "CURVE_COMPLETE",
+      pumpSwapPool: null,
       bondingCurve,
       associatedBondingCurve,
       bondingProgress: 100,

@@ -84,6 +84,22 @@ test("recognizes a concrete legacy Raydium migration trade", () => {
   )
 })
 
+test("recognizes Pump frontend legacy Raydium pool evidence even when complete is stale", () => {
+  assert.equal(
+    classifyPumpLifecycle({
+      program: "pump",
+      complete: false,
+      real_token_reserves: 0,
+      raydium_pool: "AdArbxuPGFh8sBwamiGcptCUx8b83tNu5eRhHmMybFN9",
+    })?.status,
+    "CURVE_COMPLETE",
+  )
+  assert.equal(
+    classifyPumpLifecycle({ program: "pump", complete: false, pool_address: "legacy-pool" })?.status,
+    "CURVE_COMPLETE",
+  )
+})
+
 test("derives bonding progress from Pump curve reserves instead of market cap", () => {
   assert.equal(
     deriveBondingProgress({
