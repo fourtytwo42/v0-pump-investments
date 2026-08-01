@@ -23,7 +23,7 @@ test("normalized query keys share equivalent favorite sets and filter order", ()
 
 test("Nginx rate limits use the trusted real-IP result and overwrite forwarded headers", async () => {
   const config = await readFile(new URL("../deploy/nginx/pump-investments.conf", import.meta.url), "utf8")
-  assert.match(config, /limit_req_zone \$binary_remote_addr zone=pump_snapshots:10m rate=5r\/s/)
+  assert.match(config, /limit_req_zone \$binary_remote_addr zone=pump_snapshots_v409:10m rate=5r\/s/)
   assert.doesNotMatch(config, /map \$http_cf_connecting_ip/)
   assert.match(config, /real_ip_header CF-Connecting-IP/)
   assert.match(config, /proxy_set_header CF-Connecting-IP \$remote_addr/)
