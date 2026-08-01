@@ -24,7 +24,11 @@ This file stores durable project memory for recovery after context compression o
   - `pump-investments-ingest`
 
 ## Current Operational State
-- Version 4.0.8 is deployed from `main` commit `ccf0de8` at both `http://192.168.50.237:3000` and `https://pump.investments`.
+- Version 4.0.9 is deployed from immutable `main` release `5e31f414275d0383959909eb3a6068d726fa8c26` at both `http://192.168.50.237:3000` and `https://pump.investments`.
+- `/home/hendo420/pumpInvestments/current` points to the immutable v4.0.9 release. Both PM2 services run from that directory, the three newest releases are retained, and shared environment/spool/image/log state remains under `/var/lib/pump-investments`.
+- V4.0.9 live query p95 was 60.2 ms LAN / 178.8 ms public for the common 10-minute snapshot and 286.0 ms LAN / 448.2 ms public for a 60-minute Unique Buyers query. All 20 requests in each sample returned 200.
+- The final five-minute CSP report-only soak produced zero violations after narrowly allowing the existing Cloudflare Web Analytics origins. CSP is enforced, HSTS is `max-age=31536000`, and the rate-limit zones are versioned so the trusted-real-IP key can reload without conflicting with legacy shared memory.
+- Final v4.0.9 health showed database/feed/SOL status `ok`, about 1.3 s persisted feed lag, connected ingestion, empty spool/dead-letter, a 27.5 MB image cache, and zero active `BONDING` tokens at 99% or higher. The protected health credential was rotated after deployment verification.
 - The VM root LV/filesystem now uses the full 64 GB virtual disk: 61 GB usable, about 45 GB free after v4.0.8 maintenance.
 - Token lifecycle is verified without RPC from Pump frontend batch responses. A live `pump_amm` trade with a concrete pool address is also definitive, monotonic PumpSwap evidence; incomplete venue hints alone never graduate a token.
 - Nginx owns LAN port `3000` and proxies Next.js on `3001`; SSE buffering is disabled and successful token images are proxy-cached.
@@ -46,6 +50,7 @@ This file stores durable project memory for recovery after context compression o
 - The filesystem image cache now maintains one process index, verifies at most every ten minutes, begins eviction at 480 MiB, evicts to 450 MiB, and removes expired negative, orphan metadata, and temporary files.
 - Protected health details now include query/cache latency, token and alert stream groups, lifecycle due/cooling age, active metadata gaps, database/table/disk metrics, image utilization, and the ingester runtime state persisted every five seconds.
 - V4.0.9 deployment is manually invoked with `npm run deploy:vm`. It builds immutable commit directories under `/home/hendo420/pumpInvestments/releases`, keeps environment/spool/images/logs in `/var/lib/pump-investments`, validates a port-3002 candidate, atomically switches `current`, rolls back the symlink/PM2 on failure, and retains three releases. It creates no database backup and uses no GitHub Actions.
+- Immutable cutover must recreate the two PM2 processes; `startOrReload` retains the previous working directory even when the ecosystem file points at a new release. The release script deletes/restarts only the two named services and uses the same path-safe behavior for rollback.
 - Nginx rate limits use only the real-IP module's trusted result, overwrites forwarded client headers, limits token snapshots to five requests/second/client, adds one-year HSTS, and stages CSP report-only before enforcement.
 - V4.0.8 retains raw trades and minute aggregates for two hours, safely covering the one-hour product window. Realtime dirty-mint state is retained 15 minutes; the append-only revision journal is no longer written.
 - V4.0.8 restored reserve-derived card progress. Market cap never determines either progress or lifecycle. Pump `pump_swap_pool`, `raydium_pool`, and `pool_address` fields plus concrete live migration trades are authoritative completion evidence.

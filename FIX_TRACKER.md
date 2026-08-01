@@ -5,7 +5,7 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 ### P0: v4.0.9 performance and VM operations release
 
 #### T33. Ship query, realtime, cache, security, accessibility, and immutable VM release improvements
-- Status: `in_progress`
+- Status: `done`
 - Goal:
   - Coalesce realtime revisions, make snapshots transactionally consistent and shared, accelerate buyer queries, share alert work, bound the image cache, expand operational health, harden proxy headers/CSP, preserve the visual design, and add an atomic VM-local release command.
 - Verification:
@@ -16,6 +16,12 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - Implementation started from production commit `3f39a21` / v4.0.8 after confirming the existing two-hour retention policy and current PM2/Nginx topology.
   - Local implementation gates pass: 46 unit tests with one intentionally VM-only PostgreSQL test skipped, TypeScript, ESLint, production build, and zero npm audit findings. Browser validation is intentionally deferred to the VM candidate because the Windows `.env` points PostgreSQL at VM-localhost.
   - The ingester now delegates revision publication, retention, and persisted runtime health to characterized modules; existing feed/lifecycle/metadata helpers remain the behavior boundaries and the legacy atomic-ingestion flag remains available for rollback during this release.
+  - Release v4.0.9 is live from immutable commit `5e31f414275d0383959909eb3a6068d726fa8c26`; `current` and both PM2 working directories resolve to that release, and exactly three release directories remain.
+  - VM gates passed: 50 unit tests plus one intentionally skipped VM-only case, the PostgreSQL integration characterization, TypeScript, ESLint, Prisma validation/deploy, production build, zero npm audit findings, and all 15 Chromium/Firefox/WebKit tests against both port 3002 and the public domain.
+  - The final 300-second CSP soak produced zero new reports. CSP is enforced with only the existing Cloudflare analytics script/telemetry origins allowed; HSTS is one year without preload/subdomains. Versioned Nginx zones avoid the legacy shared-memory key conflict and headers are verified after live reload.
+  - Common 10-minute p95: 60.2 ms LAN / 178.8 ms public. Complex 60-minute Unique Buyers p95: 286.0 ms LAN / 448.2 ms public. Every 20-request sample returned 200.
+  - Final health: database/feed/SOL `ok`, persisted lag 1.293 s, ingestion connected, spool/dead-letter empty, database about 878 MB, disk 35.4% used, image cache about 27.5 MB, and zero active Bonding tokens at 99% or higher. The protected health credential was rotated after verification.
+  - A non-fatal Next/Turbopack NFT warning remains for the filesystem-backed token-image route; the production build completes successfully and the image route/cache browser coverage passes.
 
 ### P0: Retention, storage, and lifecycle recovery
 
