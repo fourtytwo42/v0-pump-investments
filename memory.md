@@ -24,7 +24,7 @@ This file stores durable project memory for recovery after context compression o
   - `pump-investments-ingest`
 
 ## Current Operational State
-- Version 4.0.6 is deployed from `main` commit `07759b0` at both `http://192.168.50.237:3000` and `https://pump.investments`.
+- Version 4.0.7 is deployed from `main` commit `ecd72f6` at both `http://192.168.50.237:3000` and `https://pump.investments`.
 - Token lifecycle is verified without RPC from Pump frontend batch responses. A live `pump_amm` trade with a concrete pool address is also definitive, monotonic PumpSwap evidence; incomplete venue hints alone never graduate a token.
 - Nginx owns LAN port `3000` and proxies Next.js on `3001`; SSE buffering is disabled and successful token images are proxy-cached.
 - The token client uses a fetch-based SSE stream with SQL-backed snapshots instead of 500 ms full polling.
@@ -39,6 +39,8 @@ This file stores durable project memory for recovery after context compression o
 - The reconnect hardening commit was pushed to `main`.
 
 ## Important Recent Changes
+- V4.0.7 fixes a zombie NATS subscription failure where PING/PONG traffic continued after real trade events stopped. `server/ingest-trades.ts` now tracks decoded trades separately from protocol messages, reconnects after 60 seconds without a trade, and exits for PM2 recovery after five minutes without any real trade across reconnects.
+- Public `/api/health` now reports `dependencies.trade_feed` from the newest persisted trade. Production verification returned version 4.0.7/status ok, current SOL/trade timestamps, live SSE patches, and ingester telemetry with `since_last_trade_s=0`.
 - V4.0.6 aligns the visible bonding bar with market cap using `market_cap_usd / (415 SOL * live SOL/USD)`, capped at 99 while still Bonding. Higher market cap at the same SOL price always displays higher progress.
 - Market-cap progress is visual-only. Pump completion and confirmed PumpSwap pool evidence remain the only graduation signals; market cap cannot mutate lifecycle.
 - Reserve-derived `Token.bondingProgress` remains persisted for verification and diagnostics but no longer drives the card bar. This avoids counterintuitive Mayhem-versus-standard-curve percentages.

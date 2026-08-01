@@ -5,14 +5,17 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 ### P1: Token feed availability
 
 #### T31. Recover and harden the live trade feed
-- Status: `in_progress`
+- Status: `done`
 - Goal:
   - Detect real-trade inactivity independently from NATS protocol heartbeats, self-recover the subscriber, and expose feed freshness through health checks.
 - Verification:
   - Restore production traffic, unit-test stale-feed decisions, run release gates, deploy, and verify live DB/API/SSE freshness plus PM2 stability.
 - Notes:
   - On 2026-08-01 the connection remained protocol-active while real trades stopped for roughly 12 minutes. The original watchdog refreshed `lastMessageAt` on PING/PONG traffic, so PM2 saw a live process and did not recover it.
-  - A manual ingester restart restored complete-feed traffic immediately; permanent recovery work is underway for v4.0.7.
+  - A manual ingester restart restored complete-feed traffic immediately.
+  - V4.0.7 separates real decoded-trade activity from protocol activity, reconnects a zombie subscription after 60 seconds, and asks PM2 to restart the process after five minutes without a real trade across reconnects.
+  - Public health now reports persisted trade-feed freshness. The helper covers heartbeat-only zombies, startup grace, fully idle sockets, current trades, and the fatal threshold.
+  - All 38 unit tests, TypeScript, ESLint, and local/VM production builds passed. Public health returned v4.0.7/status ok with current trade and SOL timestamps; SSE delivered a snapshot and successive patches; both PM2 services remained online; ingester telemetry reported `since_last_trade_s=0`.
 
 ### P1: Market-cap-aligned bonding display
 
