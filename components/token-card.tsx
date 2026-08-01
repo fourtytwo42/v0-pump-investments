@@ -375,7 +375,7 @@ function TokenCard({ mint, size = "medium", showAlertSettings = false, showBonkB
         data-token-mint={token.mint}
         data-token-market-cap={token.usd_market_cap}
       >
-        <CardContent className="absolute inset-x-0 bottom-1 top-0 flex flex-col p-0">
+        <CardContent className="relative flex h-full flex-col p-0">
           {/* BonkBot logo in top-left corner */}
           {bonkBotLogo}
 
@@ -437,7 +437,7 @@ function TokenCard({ mint, size = "medium", showAlertSettings = false, showBonkB
           )}
 
           {/* Middle section - financial data */}
-          <div className="p-3 flex-1 overflow-visible relative">
+          <div className="relative min-h-0 flex-1 overflow-hidden p-3">
             <div className="grid grid-cols-2 gap-x-4 gap-y-1">
               <div>
                 <p className="text-xs text-foreground/70">Market Cap</p>
