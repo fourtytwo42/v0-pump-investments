@@ -141,6 +141,8 @@ for _ in {1..90}; do
 done
 curl -fsS http://127.0.0.1:3000/api/health | tee "$SHARED_ROOT/logs/release-health-$COMMIT.json"
 curl -fsS https://pump.investments/api/health >/dev/null
+curl -fsSI https://pump.investments/ | grep -qi '^content-security-policy-report-only:' || die "Report-only CSP header missing"
+curl -fsSI https://pump.investments/ | grep -qi '^strict-transport-security: max-age=31536000' || die "HSTS header missing or incorrect"
 timeout 20 curl -fsSN -X POST http://127.0.0.1:3000/api/tokens/stream \
   -H 'content-type: application/json' --data '{"page":1,"pageSize":12,"timeRangeMinutes":10}' \
   > "$SHARED_ROOT/logs/release-sse-$COMMIT.txt" || true

@@ -27,6 +27,7 @@ test("Nginx rate limits use the trusted real-IP result and overwrite forwarded h
   assert.doesNotMatch(config, /map \$http_cf_connecting_ip/)
   assert.match(config, /real_ip_header CF-Connecting-IP/)
   assert.match(config, /proxy_set_header CF-Connecting-IP \$remote_addr/)
+  assert.equal(config.match(/include \/etc\/nginx\/snippets\/pump-investments-security\.conf/g)?.length, 8)
 })
 
 test("VM release stays manual and creates neither backups nor GitHub Actions", async () => {
@@ -41,6 +42,8 @@ test("VM cutover recreates PM2 processes so immutable release paths take effect"
   assert.match(script, /pm2 delete pump-investments-web pump-investments-ingest/)
   assert.match(script, /pm2 start \"\$release_dir\/ecosystem\.config\.cjs\"/)
   assert.doesNotMatch(script, /pm2 startOrReload/)
+  assert.match(script, /Report-only CSP header missing/)
+  assert.match(script, /HSTS header missing or incorrect/)
 })
 
 test("image cache verification removes temporary and orphan metadata files", async () => {
