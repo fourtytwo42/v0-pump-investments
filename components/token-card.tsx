@@ -375,7 +375,7 @@ function TokenCard({ mint, size = "medium", showAlertSettings = false, showBonkB
         data-token-mint={token.mint}
         data-token-market-cap={token.usd_market_cap}
       >
-        <CardContent className="p-0 h-full flex flex-col relative">
+        <CardContent className="absolute inset-0 flex flex-col p-0">
           {/* BonkBot logo in top-left corner */}
           {bonkBotLogo}
 
