@@ -61,6 +61,32 @@ export interface TokenSnapshot {
   tokens: TokenData[]
 }
 
+export interface ConsistentTokenSnapshot extends TokenSnapshot {
+  revision: bigint
+}
+
+interface TokenQueryMetrics {
+  hits: number
+  misses: number
+  computations: number
+  failures: number
+  totalLatencyMs: number
+  lastLatencyMs: number
+}
+
+const queryMetrics: TokenQueryMetrics = {
+  hits: 0,
+  misses: 0,
+  computations: 0,
+  failures: 0,
+  totalLatencyMs: 0,
+  lastLatencyMs: 0,
+}
+const snapshotCache = new Map<string, { expiresAt: number; promise: Promise<ConsistentTokenSnapshot> }>()
+const SNAPSHOT_CACHE_MAX = 100
+const SNAPSHOT_CACHE_TTL_MS = 1_000
+let revisionReadCache: { expiresAt: number; promise: Promise<bigint> } | null = null
+
 function finiteNumber(value: unknown, fallback: number): number {
   const parsed = Number(value)
   return Number.isFinite(parsed) ? parsed : fallback
@@ -109,6 +135,15 @@ export function normalizeTokenQuery(body: Partial<TokenQueryRequest>): TokenQuer
       new Set((body.favoriteMints ?? []).filter((mint): mint is string => typeof mint === "string" && mint.length > 0)),
     ),
   }
+}
+
+export function normalizedTokenQueryKey(body: Partial<TokenQueryRequest>): string {
+  const query = normalizeTokenQuery(body)
+  return JSON.stringify({
+    ...query,
+    favoriteMints: [...query.favoriteMints].sort(),
+    filters: Object.fromEntries(Object.entries(query.filters).sort(([a], [b]) => a.localeCompare(b))),
+  })
 }
 
 const SORT_SQL: Record<TokenSortBy, Prisma.Sql> = {
@@ -183,7 +218,10 @@ function rowToToken(row: TokenQueryRow): TokenData {
   }
 }
 
-export async function queryTokenSnapshot(rawBody: Partial<TokenQueryRequest>): Promise<TokenSnapshot> {
+export async function queryTokenSnapshot(
+  rawBody: Partial<TokenQueryRequest>,
+  client: Prisma.TransactionClient | typeof prisma = prisma,
+): Promise<TokenSnapshot> {
   const request = normalizeTokenQuery(rawBody)
   const effectiveTimeRangeMinutes = request.timeRangeMinutes
   const cutoff = BigInt(Date.now() - effectiveTimeRangeMinutes * 60_000)
@@ -193,6 +231,8 @@ export async function queryTokenSnapshot(rawBody: Partial<TokenQueryRequest>): P
   const favorites = request.favoriteMints
   const minTradeAmount = nullableFinite(filters.minTradeAmount) ?? 0
   const maxTradeAmount = nullableFinite(filters.maxTradeAmount)
+  const hasTradeAmountFilter =
+    (nullableFinite(filters.minTradeAmount) ?? 0) > 0 || nullableFinite(filters.maxTradeAmount) !== null
   const offset = (request.page - 1) * request.pageSize
   const direction = request.sortOrder === "asc" ? Prisma.sql`ASC` : Prisma.sql`DESC`
   const tradeStatsSql =
@@ -250,17 +290,36 @@ export async function queryTokenSnapshot(rawBody: Partial<TokenQueryRequest>): P
           GROUP BY token_id
         `
 
-  const rows = await prisma.$queryRaw<TokenQueryRow[]>(Prisma.sql`
+  const buyerStatsSql =
+    process.env.TOKEN_BUYER_AGGREGATES_ENABLED !== "false" && !hasTradeAmountFilter
+      ? Prisma.sql`
+          SELECT token_id, COUNT(DISTINCT buyer_address)::bigint AS unique_trader_count
+          FROM (
+            SELECT token_id, buyer_address
+            FROM token_buyer_minute_aggregates
+            WHERE minute >= to_timestamp(${aggregateBoundary} / 1000.0)
+            UNION
+            SELECT token_id, user_address AS buyer_address
+            FROM trades
+            WHERE timestamp >= ${cutoff} AND timestamp < ${aggregateBoundary} AND is_buy
+          ) exact_buyers
+          GROUP BY token_id
+        `
+      : Prisma.sql`
+          SELECT token_id, COUNT(DISTINCT user_address)::bigint AS unique_trader_count
+          FROM trades
+          WHERE timestamp >= ${cutoff} AND is_buy
+            AND amount_usd >= ${minTradeAmount}
+            AND (${maxTradeAmount}::double precision IS NULL OR amount_usd <= ${maxTradeAmount})
+          GROUP BY token_id
+        `
+
+  const rows = await client.$queryRaw<TokenQueryRow[]>(Prisma.sql`
     WITH trade_stats AS (
       ${tradeStatsSql}
     ),
     buyer_stats AS (
-      SELECT token_id, COUNT(DISTINCT user_address)::bigint AS unique_trader_count
-      FROM trades
-      WHERE timestamp >= ${cutoff} AND is_buy
-        AND amount_usd >= ${minTradeAmount}
-        AND (${maxTradeAmount}::double precision IS NULL OR amount_usd <= ${maxTradeAmount})
-      GROUP BY token_id
+      ${buyerStatsSql}
     ),
     filtered AS (
       SELECT
@@ -328,7 +387,7 @@ export async function queryTokenSnapshot(rawBody: Partial<TokenQueryRequest>): P
   `)
 
   const total = rows.length ? Number(rows[0].total_count) : 0
-  const solPrice = await prisma.solPriceState.findUnique({ where: { key: "sol-usd" } })
+  const solPrice = await client.solPriceState.findUnique({ where: { key: "sol-usd" } })
   return {
     page: request.page,
     pageSize: request.pageSize,
@@ -341,9 +400,80 @@ export async function queryTokenSnapshot(rawBody: Partial<TokenQueryRequest>): P
   }
 }
 
-export async function getTokenDataRevision(): Promise<bigint> {
-  const revision = await prisma.tokenDataRevision.findUnique({ where: { key: "tokens" } })
-  return revision?.revision ?? BigInt(0)
+async function computeConsistentTokenSnapshot(
+  rawBody: Partial<TokenQueryRequest>,
+): Promise<ConsistentTokenSnapshot> {
+  const startedAt = Date.now()
+  queryMetrics.computations += 1
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const revisionRow = await tx.tokenDataRevision.findUnique({ where: { key: "tokens" } })
+      const snapshot = await queryTokenSnapshot(rawBody, tx)
+      return { ...snapshot, revision: revisionRow?.revision ?? BigInt(0) }
+    }, { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead, timeout: 5_000, maxWait: 5_000 })
+  } catch (error) {
+    queryMetrics.failures += 1
+    throw error
+  } finally {
+    const latency = Date.now() - startedAt
+    queryMetrics.lastLatencyMs = latency
+    queryMetrics.totalLatencyMs += latency
+  }
+}
+
+export async function getConsistentTokenSnapshot(
+  rawBody: Partial<TokenQueryRequest>,
+): Promise<ConsistentTokenSnapshot> {
+  if (process.env.TOKEN_QUERY_CACHE_ENABLED === "false") {
+    queryMetrics.misses += 1
+    return computeConsistentTokenSnapshot(rawBody)
+  }
+  const now = Date.now()
+  const observedRevision = await getTokenDataRevision()
+  const key = `${observedRevision}:${normalizedTokenQueryKey(rawBody)}`
+  const cached = snapshotCache.get(key)
+  if (cached && cached.expiresAt > now) {
+    queryMetrics.hits += 1
+    return cached.promise
+  }
+  if (cached) snapshotCache.delete(key)
+  queryMetrics.misses += 1
+  const promise = computeConsistentTokenSnapshot(rawBody).catch((error) => {
+    if (snapshotCache.get(key)?.promise === promise) snapshotCache.delete(key)
+    throw error
+  })
+  snapshotCache.set(key, { expiresAt: now + SNAPSHOT_CACHE_TTL_MS, promise })
+  while (snapshotCache.size > SNAPSHOT_CACHE_MAX) {
+    const oldest = snapshotCache.keys().next().value as string | undefined
+    if (!oldest) break
+    snapshotCache.delete(oldest)
+  }
+  return promise
+}
+
+export function getTokenQueryMetrics() {
+  const requests = queryMetrics.hits + queryMetrics.misses
+  return {
+    ...queryMetrics,
+    cacheEntries: snapshotCache.size,
+    hitRate: requests > 0 ? queryMetrics.hits / requests : 0,
+    averageLatencyMs: queryMetrics.computations > 0
+      ? queryMetrics.totalLatencyMs / queryMetrics.computations
+      : 0,
+  }
+}
+
+export function getTokenDataRevision(): Promise<bigint> {
+  const now = Date.now()
+  if (revisionReadCache && revisionReadCache.expiresAt > now) return revisionReadCache.promise
+  const promise = prisma.tokenDataRevision.findUnique({ where: { key: "tokens" } })
+    .then((revision) => revision?.revision ?? BigInt(0))
+    .catch((error) => {
+      if (revisionReadCache?.promise === promise) revisionReadCache = null
+      throw error
+    })
+  revisionReadCache = { expiresAt: now + 1_000, promise }
+  return promise
 }
 
 export async function getTokenRevisionChanges(

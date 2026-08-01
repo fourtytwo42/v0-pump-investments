@@ -2,6 +2,21 @@
 
 This file is the durable work queue for repo maintenance and recovery. If chat context is lost, start here.
 
+### P0: v4.0.9 performance and VM operations release
+
+#### T33. Ship query, realtime, cache, security, accessibility, and immutable VM release improvements
+- Status: `in_progress`
+- Goal:
+  - Coalesce realtime revisions, make snapshots transactionally consistent and shared, accelerate buyer queries, share alert work, bound the image cache, expand operational health, harden proxy headers/CSP, preserve the visual design, and add an atomic VM-local release command.
+- Verification:
+  - Unit and PostgreSQL integration tests, TypeScript, ESLint, production build, three-engine browser suite, migration dry run, dependency audit, candidate-port checks, atomic VM cutover/rollback validation, LAN/public health, SSE, feed-lag, query-latency, lifecycle, image-cache, CSP, and PM2 checks.
+- Constraints:
+  - No database backup workflow and no GitHub Actions. Deployment remains manually invoked on the VM, retains three immutable releases, and keeps the current LAN/public URLs.
+- Notes:
+  - Implementation started from production commit `3f39a21` / v4.0.8 after confirming the existing two-hour retention policy and current PM2/Nginx topology.
+  - Local implementation gates pass: 46 unit tests with one intentionally VM-only PostgreSQL test skipped, TypeScript, ESLint, production build, and zero npm audit findings. Browser validation is intentionally deferred to the VM candidate because the Windows `.env` points PostgreSQL at VM-localhost.
+  - The ingester now delegates revision publication, retention, and persisted runtime health to characterized modules; existing feed/lifecycle/metadata helpers remain the behavior boundaries and the legacy atomic-ingestion flag remains available for rollback during this release.
+
 ### P0: Retention, storage, and lifecycle recovery
 
 #### T32. Bound production growth and correct false 99% bonding cards

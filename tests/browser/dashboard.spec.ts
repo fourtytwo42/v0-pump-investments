@@ -1,4 +1,9 @@
 import { expect, test } from "@playwright/test"
+import { readFileSync } from "node:fs"
+
+const expectedVersion = JSON.parse(
+  readFileSync(new URL("../../package.json", import.meta.url), "utf8"),
+) as { version: string }
 
 async function dismissOnboarding(page: import("@playwright/test").Page) {
   const welcome = page.getByRole("heading", { name: "Welcome to Pump.Investments Lite!" })
@@ -11,7 +16,7 @@ async function dismissOnboarding(page: import("@playwright/test").Page) {
 test("dashboard preserves controls and removes obsolete KOTH surfaces", async ({ page }) => {
   await page.goto("/")
   await dismissOnboarding(page)
-  await expect(page.getByText("v4.0.6")).toBeVisible()
+  await expect(page.getByText(`v${expectedVersion.version}`)).toBeVisible()
   await expect(page.getByRole("button", { name: "Pause automatic token ordering" })).toBeVisible()
   await expect(page.getByRole("button", { name: "Open settings" })).toBeVisible()
   await expect(page.locator("[data-notification-region]")).toHaveCount(1)
@@ -66,20 +71,31 @@ test("token cards preserve bright borders and refined content fit", async ({ pag
   expect(await cards.count()).toBeGreaterThan(0)
   const bondingCards = page.locator("[data-token-card]:has([data-token-bonding-progress])")
   await expect(bondingCards.first()).toBeVisible()
-  const marketCapProgress = await bondingCards.evaluateAll((visibleCards) =>
-    visibleCards
-      .map((card) => ({
-        marketCap: Number(card.getAttribute("data-token-market-cap")),
-        progress: Number(
-          card.querySelector("[data-token-bonding-progress]")?.getAttribute("data-token-progress"),
-        ),
-      }))
-      .sort((a, b) => b.marketCap - a.marketCap),
+  const apiResponse = await page.request.post("/api/tokens", {
+    data: {
+      page: 1,
+      pageSize: 100,
+      timeRangeMinutes: 10,
+      filters: { graduationFilter: "bonding" },
+    },
+  })
+  expect(apiResponse.ok()).toBe(true)
+  const apiSnapshot = await apiResponse.json() as {
+    tokens: Array<{ mint: string; bonding_progress: number; lifecycle_status: string }>
+  }
+  const apiByMint = new Map(apiSnapshot.tokens.map((token) => [token.mint, token]))
+  const displayedProgress = await bondingCards.evaluateAll((visibleCards) =>
+    visibleCards.map((card) => ({
+      mint: card.getAttribute("data-token-mint") ?? "",
+      progress: Number(card.querySelector("[data-token-bonding-progress]")?.getAttribute("data-token-progress")),
+    })),
   )
-  for (let index = 1; index < marketCapProgress.length; index += 1) {
-    expect(marketCapProgress[index - 1].progress).toBeGreaterThanOrEqual(
-      marketCapProgress[index].progress,
-    )
+  for (const displayed of displayedProgress) {
+    const apiToken = apiByMint.get(displayed.mint)
+    expect(apiToken?.lifecycle_status).toBe("bonding")
+    expect(displayed.progress).toBeGreaterThanOrEqual(0)
+    expect(displayed.progress).toBeLessThanOrEqual(99)
+    expect(displayed.progress).toBeCloseTo(Math.min(99, Math.max(0, apiToken?.bonding_progress ?? 0)), 5)
   }
 
   const cardChecks = await bondingCards.first().evaluate((card) => {

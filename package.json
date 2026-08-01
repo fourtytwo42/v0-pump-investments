@@ -1,6 +1,6 @@
 {
   "name": "pump-investments",
-  "version": "4.0.8",
+  "version": "4.0.9",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,6 +9,7 @@
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit --project tsconfig.json",
     "test": "tsx --test tests/**/*.test.ts",
+    "test:integration": "tsx --test tests/postgres-v409.integration.test.ts",
     "test:browser": "playwright test",
     "start": "next start",
     "postinstall": "prisma generate",
@@ -22,7 +23,8 @@
     "pm2:ingest:restart": "pm2 restart pump-investments-ingest",
     "pm2:web:restart-env": "pm2 restart pump-investments-web --update-env",
     "pm2:ingest:restart-env": "pm2 restart pump-investments-ingest --update-env",
-    "pm2:restart-env": "pm2 restart pump-investments-web --update-env && pm2 restart pump-investments-ingest --update-env"
+    "pm2:restart-env": "pm2 restart pump-investments-web --update-env && pm2 restart pump-investments-ingest --update-env",
+    "deploy:vm": "bash deploy/vm-release.sh"
   },
   "dependencies": {
     "@prisma/adapter-pg": "7.9.1",
@@ -78,6 +80,8 @@
     "typescript": "5.9.3"
   },
   "overrides": {
+    "diff": "4.0.4",
+    "picomatch": "4.0.4",
     "postcss": "8.5.25",
     "next": {
       "sharp": "0.35.3"

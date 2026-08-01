@@ -40,6 +40,13 @@ This file stores durable project memory for recovery after context compression o
 - The reconnect hardening commit was pushed to `main`.
 
 ## Important Recent Changes
+- V4.0.9 coalesces public token revisions to one publication per second while dirty-mint rows retain every change kind. Snapshot reads now use one repeatable-read transaction and a bounded 100-entry, one-second single-flight cache keyed by normalized query plus observed revision.
+- Default Unique Buyers queries use buyer-minute aggregates plus the exact partial minute. Configured individual-buy thresholds continue to scan raw buy trades through the partial covering index `trades_recent_buy_filter_idx`.
+- Token and alert SSE work is shared per normalized query/mint set. The web process polls the public revision at most once per second, and failed token-group refreshes remain retryable at the same revision.
+- The filesystem image cache now maintains one process index, verifies at most every ten minutes, begins eviction at 480 MiB, evicts to 450 MiB, and removes expired negative, orphan metadata, and temporary files.
+- Protected health details now include query/cache latency, token and alert stream groups, lifecycle due/cooling age, active metadata gaps, database/table/disk metrics, image utilization, and the ingester runtime state persisted every five seconds.
+- V4.0.9 deployment is manually invoked with `npm run deploy:vm`. It builds immutable commit directories under `/home/hendo420/pumpInvestments/releases`, keeps environment/spool/images/logs in `/var/lib/pump-investments`, validates a port-3002 candidate, atomically switches `current`, rolls back the symlink/PM2 on failure, and retains three releases. It creates no database backup and uses no GitHub Actions.
+- Nginx rate limits use only the real-IP module's trusted result, overwrites forwarded client headers, limits token snapshots to five requests/second/client, adds one-year HSTS, and stages CSP report-only before enforcement.
 - V4.0.8 retains raw trades and minute aggregates for two hours, safely covering the one-hour product window. Realtime dirty-mint state is retained 15 minutes; the append-only revision journal is no longer written.
 - V4.0.8 restored reserve-derived card progress. Market cap never determines either progress or lifecycle. Pump `pump_swap_pool`, `raydium_pool`, and `pool_address` fields plus concrete live migration trades are authoritative completion evidence.
 - Pump legacy migrations can report `complete=false` after supplying a concrete Raydium pool. The verifier now promotes these to `CURVE_COMPLETE`; Autonome and GOBI were corrected, and production has zero active `BONDING` records at 99% or higher.

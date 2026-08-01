@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   poweredByHeader: false,
+  outputFileTracingExcludes: {
+    "/api/token-image/[mint]": ["./server/data/images/**/*"],
+  },
   images: {
     unoptimized: true,
     remotePatterns: [

@@ -1,6 +1,7 @@
 import { acquireClientConnection, alertStreamSchema, apiErrorResponse, readJsonBody } from "@/lib/api-request"
 import { getTokenDataRevision } from "@/lib/token-query"
 import { prisma } from "@/lib/prisma"
+import { subscribeAlertStream } from "@/lib/alert-stream"
 
 export const dynamic = "force-dynamic"
 export const runtime = "nodejs"
@@ -55,6 +56,7 @@ export async function POST(request: Request): Promise<Response> {
 
   let timer: ReturnType<typeof setInterval> | null = null
   let heartbeat: ReturnType<typeof setInterval> | null = null
+  let unsubscribeShared: (() => void) | null = null
   let lastRevision = BigInt(-1)
   let lastByMint = new Map<string, AlertRecord>()
 
@@ -67,9 +69,24 @@ export async function POST(request: Request): Promise<Response> {
         heartbeat = null
         release?.()
         release = null
+        unsubscribeShared?.()
+        unsubscribeShared = null
         try { controller.close() } catch {}
       }
       request.signal.addEventListener("abort", close, { once: true })
+      if (process.env.TOKEN_SHARED_ALERT_STREAM_ENABLED !== "false") {
+        try {
+          unsubscribeShared = await subscribeAlertStream(mints, (message) => {
+            controller.enqueue(event(message.event, message.data))
+          })
+          heartbeat = setInterval(() => controller.enqueue(event("heartbeat", Date.now())), 15_000)
+          return
+        } catch (error) {
+          console.error("[alerts/stream] shared subscription failed", error)
+          close()
+          return
+        }
+      }
       const refresh = async (initial = false) => {
         try {
           const revision = await getTokenDataRevision()
@@ -96,6 +113,8 @@ export async function POST(request: Request): Promise<Response> {
     cancel() {
       if (timer) clearInterval(timer)
       if (heartbeat) clearInterval(heartbeat)
+      unsubscribeShared?.()
+      unsubscribeShared = null
       release?.()
       release = null
     },

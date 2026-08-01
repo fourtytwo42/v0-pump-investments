@@ -24,8 +24,6 @@ interface TokenCardProps {
   showBonkBotLogo?: boolean // New prop for BonkBot logo
 }
 
-// Global state to track drawer states - this persists across re-renders
-const drawerStates = new Map<string, boolean>()
 const FALLBACK_IMAGE = "/digital-token.png"
 
 // Create a separate component for the bell icon to isolate its rendering
@@ -67,13 +65,7 @@ function TokenCard({ mint, size = "medium", showAlertSettings = false, showBonkB
     progressPercent >= 0 &&
     token.is_bonding_curve === true
 
-  // Use global state for drawer to persist across re-renders
-  const [isDrawerOpen, setIsDrawerOpen] = useState(() => drawerStates.get(token.mint) || false)
-
-  // Update global state when local state changes
-  useEffect(() => {
-    drawerStates.set(token.mint, isDrawerOpen)
-  }, [token.mint, isDrawerOpen])
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
   // Use state for alert status, but initialize it from cache if available
   const [hasActiveAlert, setHasActiveAlert] = useState(() => {
@@ -380,6 +372,7 @@ function TokenCard({ mint, size = "medium", showAlertSettings = false, showBonkB
         className={`${cardHeight} relative cursor-pointer overflow-hidden border-2 transition-[transform,box-shadow] duration-150 ease-out motion-safe:hover:-translate-y-0.5 hover:shadow-lg ${borderColor} ${backgroundColor}`}
         onClick={handleCardClick}
         data-token-card
+        data-token-mint={token.mint}
         data-token-market-cap={token.usd_market_cap}
       >
         <CardContent className="p-0 h-full flex flex-col relative">

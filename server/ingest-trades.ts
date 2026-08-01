@@ -1,6 +1,13 @@
 import "dotenv/config"
 import { Prisma, type TokenLifecycleStatus } from "@/generated/prisma/client"
-import { createPrismaClient } from "@/lib/prisma-client"
+import { prisma } from "@/lib/prisma-ingest"
+import {
+  markRevisionPending,
+  publishPendingRevision,
+  recordDirtyMints as recordRevisionDirtyMints,
+  recordDirtyMintsInTransaction,
+  revisionCoalescingEnabled,
+} from "@/server/ingest/revisions"
 import { mkdir, readFile, readdir, rename, rm, writeFile } from "node:fs/promises"
 import path from "node:path"
 import { randomUUID } from "node:crypto"
@@ -31,9 +38,10 @@ import {
   lifecycleRetrySchedule,
   reduceLifecycle,
 } from "@/lib/token-lifecycle"
-import { normalizeRetentionHours, normalizeRetentionMinutes } from "@/lib/data-retention"
 import { reduceTokenProvenance } from "@/lib/token-provenance"
 import { ingestRetryDelayMs } from "@/lib/ingest-retry"
+import { startRuntimeHealthPublisher } from "@/server/ingest/runtime-health"
+import { retentionConfig, startRetention } from "@/server/ingest/retention"
 
 // =============================================================================
 // Configuration
@@ -57,16 +65,6 @@ const METADATA_RETRY_TIMEOUT_MS = 6_000 // 6 second timeout per token
 const METADATA_RETRY_BATCH_SIZE = 25 // Process 25 tokens in parallel per batch
 const METADATA_FETCH_MAX_ATTEMPTS = 3
 const METADATA_MIN_INTERVAL_MS = 150
-
-// Cleanup configuration
-const TRADE_RETENTION_HOURS = normalizeRetentionHours(process.env.TRADE_RETENTION_HOURS, 2)
-const AGGREGATE_RETENTION_HOURS = normalizeRetentionHours(process.env.AGGREGATE_RETENTION_HOURS, 2)
-const REVISION_STATE_RETENTION_MINUTES = normalizeRetentionMinutes(
-  process.env.REVISION_STATE_RETENTION_MINUTES,
-  15,
-)
-const CLEANUP_INTERVAL_MS = 10 * 60 * 1000
-const CLEANUP_BATCH_SIZE = 10_000
 
 // Candle generation configuration
 const ENABLE_CANDLE_GENERATION = process.env.ENABLE_CANDLE_GENERATION === "true"
@@ -155,7 +153,6 @@ const LIFECYCLE_UNRESOLVED_COOLDOWN_MS = parseEnvNumber(
 // Database Setup
 // =============================================================================
 
-const prisma = createPrismaClient("ingester")
 
 // =============================================================================
 // Constants
@@ -212,6 +209,9 @@ let lastMetadataRequestAt = 0
 let metadataDynamicDelayMs = 0
 let latestTradeSeenTimestampMs = 0
 let latestTradePersistedTimestampMs = 0
+let lastRetentionRunAt: number | null = null
+let lastRetentionDurationMs: number | null = null
+let lastRetentionDeletedRows = 0
 let tokenRevisionDirty = false
 let lifecycleWorkerRunning = false
 const metadataStats = {
@@ -540,6 +540,14 @@ async function processLifecycleChecks(): Promise<void> {
 }
 
 async function flushTokenRevision(): Promise<void> {
+  if (revisionCoalescingEnabled()) {
+    try {
+      await publishPendingRevision()
+    } catch (error) {
+      console.warn("[revision] Failed to publish pending token revision:", (error as Error).message)
+    }
+    return
+  }
   if (!tokenRevisionDirty) return
   tokenRevisionDirty = false
   try {
@@ -556,28 +564,11 @@ async function flushTokenRevision(): Promise<void> {
 
 async function recordDirtyMints(mints: string[], changeKinds: string[]): Promise<void> {
   if (!CHANGED_JOURNAL_ENABLED || mints.length === 0 || changeKinds.length === 0) {
-    tokenRevisionDirty = true
+    if (revisionCoalescingEnabled()) await markRevisionPending()
+    else tokenRevisionDirty = true
     return
   }
-  const uniqueMints = [...new Set(mints)]
-  await prisma.$transaction(async (tx) => {
-    const revision = await tx.tokenDataRevision.upsert({
-      where: { key: "tokens" },
-      create: { key: "tokens", revision: BigInt(1) },
-      update: { revision: { increment: BigInt(1) } },
-      select: { revision: true },
-    })
-    const dirtyValues = uniqueMints.map((mintAddress) =>
-      `(${escapeSQL(mintAddress)},ARRAY[${changeKinds.map(escapeSQL).join(",")}]::text[],${revision.revision},NOW())`,
-    ).join(",")
-    await tx.$executeRawUnsafe(`
-      INSERT INTO token_dirty_mints (mint_address,change_kinds,revision,updated_at)
-      VALUES ${dirtyValues}
-      ON CONFLICT (mint_address) DO UPDATE SET
-        change_kinds=(SELECT ARRAY(SELECT DISTINCT unnest(token_dirty_mints.change_kinds || EXCLUDED.change_kinds))),
-        revision=EXCLUDED.revision,updated_at=NOW()
-    `)
-  })
+  await recordRevisionDirtyMints(mints, changeKinds, CHANGED_JOURNAL_ENABLED)
 }
 
 // =============================================================================
@@ -818,6 +809,7 @@ async function persistTradesAtomic(trades: PreparedTrade[]): Promise<void> {
   const uniqueTokens = [...latestByMint.values()]
 
   const result = await prisma.$transaction(async (tx) => {
+    const lifecycleChangedMints: string[] = []
     const tokenValues = uniqueTokens.map((trade) => {
       const { source, venue } = sourceAndVenue(trade)
       return `(${escapeSQL(generateCuid())},${escapeSQL(trade.mint)},${escapeSQL(trade.symbol.slice(0, 50))},${escapeSQL(trade.name.slice(0, 200))},${escapeSQL(trade.imageUri)},${escapeSQL(trade.metadataUri)},${escapeSQL(trade.twitter)},${escapeSQL(trade.telegram)},${escapeSQL(trade.website)},${escapeSQL(trade.description?.slice(0, 1000) ?? null)},${escapeSQL(trade.creatorAddress)},${trade.createdTs},false,'UNKNOWN',${escapeSQL(trade.bondingCurve)},${escapeSQL(trade.associatedBondingCurve)},'${source}','${venue}',${source === "UNKNOWN" ? "NULL" : "NOW()"},NOW(),'first_observed',NOW())`
@@ -876,7 +868,7 @@ async function persistTradesAtomic(trades: PreparedTrade[]): Promise<void> {
             `(${escapeSQL(trade.mint)},${escapeSQL(verified.pumpSwapPool)},${trade.timestampMs})`,
         )
         .join(",")
-      await tx.$executeRawUnsafe(`
+      const changed = await tx.$queryRawUnsafe<Array<{ mint_address: string }>>(`
         UPDATE tokens AS token
         SET lifecycle_status = 'PUMPSWAP',
             lifecycle_verified_at = NOW(),
@@ -893,7 +885,9 @@ async function persistTradesAtomic(trades: PreparedTrade[]): Promise<void> {
             OR token.pump_swap_pool IS NULL
             OR token.bonding_progress IS DISTINCT FROM 100
           )
+        RETURNING token.mint_address
       `)
+      lifecycleChangedMints.push(...changed.map((row) => row.mint_address))
       await tx.$executeRawUnsafe(`
         DELETE FROM token_lifecycle_checks
         WHERE token_id IN (
@@ -919,7 +913,7 @@ async function persistTradesAtomic(trades: PreparedTrade[]): Promise<void> {
       const evidenceValues = raydiumEvidence
         .map((trade) => `(${escapeSQL(trade.mint)},${trade.timestampMs})`)
         .join(",")
-      await tx.$executeRawUnsafe(`
+      const changed = await tx.$queryRawUnsafe<Array<{ mint_address: string }>>(`
         UPDATE tokens AS token
         SET lifecycle_status = 'CURVE_COMPLETE',
             lifecycle_verified_at = NOW(),
@@ -931,7 +925,9 @@ async function persistTradesAtomic(trades: PreparedTrade[]): Promise<void> {
         WHERE token.mint_address = evidence.mint_address
           AND token.launch_source = 'PUMP'
           AND token.lifecycle_status IN ('UNKNOWN','BONDING')
+        RETURNING token.mint_address
       `)
+      lifecycleChangedMints.push(...changed.map((row) => row.mint_address))
       await tx.$executeRawUnsafe(`
         DELETE FROM token_lifecycle_checks
         WHERE token_id IN (
@@ -1027,24 +1023,21 @@ async function persistTradesAtomic(trades: PreparedTrade[]): Promise<void> {
       const changedMints = [...new Set(validTrades
         .filter((trade) => inserted.some((row) => row.tx_signature === trade.tx))
         .map((trade) => trade.mint))]
-      const revisionRows = await tx.$queryRawUnsafe<Array<{ revision: bigint }>>(`
-        INSERT INTO token_data_revisions (key,revision,updated_at) VALUES ('tokens',1,NOW())
-        ON CONFLICT (key) DO UPDATE SET revision=token_data_revisions.revision+1,updated_at=NOW()
-        RETURNING revision
-      `)
-      const revision = revisionRows[0]?.revision ?? BigInt(0)
-      if (CHANGED_JOURNAL_ENABLED && changedMints.length > 0) {
-        const dirtyValues = changedMints.map((mint) =>
-          `(${escapeSQL(mint)},ARRAY['price','trade']::text[],${revision},NOW())`,
-        ).join(",")
-        await tx.$executeRawUnsafe(`
-          INSERT INTO token_dirty_mints (mint_address,change_kinds,revision,updated_at)
-          VALUES ${dirtyValues}
-          ON CONFLICT (mint_address) DO UPDATE SET
-            change_kinds=(SELECT ARRAY(SELECT DISTINCT unnest(token_dirty_mints.change_kinds || EXCLUDED.change_kinds))),
-            revision=EXCLUDED.revision,updated_at=NOW()
-        `)
-      }
+      await recordDirtyMintsInTransaction(
+        tx,
+        changedMints,
+        ["price", "trade"],
+        CHANGED_JOURNAL_ENABLED,
+      )
+    }
+
+    if (lifecycleChangedMints.length > 0) {
+      await recordDirtyMintsInTransaction(
+        tx,
+        lifecycleChangedMints,
+        ["lifecycle"],
+        CHANGED_JOURNAL_ENABLED,
+      )
     }
 
     return { inserted, tokenRows }
@@ -1327,7 +1320,8 @@ async function persistTradesBulkLegacy(trades: PreparedTrade[]): Promise<void> {
       await enqueueLifecycleChecks(lifecycleRequests)
     }
 
-    tokenRevisionDirty = true
+    if (revisionCoalescingEnabled()) await markRevisionPending()
+    else tokenRevisionDirty = true
 
     const duration = Date.now() - startTime
     const rate = trades.length / (duration / 1000)
@@ -1975,62 +1969,14 @@ if (metadataRetryQueue.size > 0) {
 // Cleanup Old Trades
 // =============================================================================
 
-async function deleteRetentionBatches(label: string, table: string, predicate: string): Promise<number> {
-  let totalDeleted = 0
-  let batchDeleted = 0
-  do {
-    batchDeleted = Number(await prisma.$executeRawUnsafe(`
-      DELETE FROM ${table}
-      WHERE ctid IN (
-        SELECT ctid FROM ${table}
-        WHERE ${predicate}
-        LIMIT ${CLEANUP_BATCH_SIZE}
-      )
-    `))
-    totalDeleted += batchDeleted
-    if (batchDeleted > 0) await delay(50)
-  } while (batchDeleted === CLEANUP_BATCH_SIZE)
-  if (totalDeleted > 0) console.log(`[cleanup] ${label}: deleted ${totalDeleted}`)
-  return totalDeleted
-}
-
-async function cleanupExpiredData(): Promise<void> {
-  try {
-    const now = Date.now()
-    const tradeCutoff = BigInt(now - TRADE_RETENTION_HOURS * 60 * 60 * 1000)
-    const aggregateCutoff = new Date(now - AGGREGATE_RETENTION_HOURS * 60 * 60 * 1000).toISOString()
-    const revisionCutoff = new Date(now - REVISION_STATE_RETENTION_MINUTES * 60 * 1000).toISOString()
-    await deleteRetentionBatches("trades", "trades", `timestamp < ${tradeCutoff}`)
-    await deleteRetentionBatches(
-      "token minute aggregates",
-      "token_minute_aggregates",
-      `minute < ${escapeSQL(aggregateCutoff)}::timestamptz`,
-    )
-    await deleteRetentionBatches(
-      "buyer minute aggregates",
-      "token_buyer_minute_aggregates",
-      `minute < ${escapeSQL(aggregateCutoff)}::timestamptz`,
-    )
-    await deleteRetentionBatches(
-      "legacy revision journal",
-      "token_revision_journal",
-      `created_at < ${escapeSQL(revisionCutoff)}::timestamptz`,
-    )
-    await deleteRetentionBatches(
-      "dirty mint state",
-      "token_dirty_mints",
-      `updated_at < ${escapeSQL(revisionCutoff)}::timestamptz`,
-    )
-  } catch (error) {
-    console.error("[cleanup] Failed:", (error as Error).message)
-  }
-}
-
 console.log(
-  `[cleanup] Retention: trades=${TRADE_RETENTION_HOURS}h aggregates=${AGGREGATE_RETENTION_HOURS}h realtime=${REVISION_STATE_RETENTION_MINUTES}m`,
+  `[cleanup] Retention: trades=${retentionConfig.tradeHours}h aggregates=${retentionConfig.aggregateHours}h realtime=${retentionConfig.revisionMinutes}m`,
 )
-setTimeout(() => void cleanupExpiredData(), 60_000)
-setInterval(() => void cleanupExpiredData(), CLEANUP_INTERVAL_MS)
+startRetention((result) => {
+  lastRetentionRunAt = result.runAt
+  lastRetentionDurationMs = result.durationMs
+  lastRetentionDeletedRows = result.deletedRows
+})
 
 setInterval(() => void flushTokenRevision(), 1_000)
 
@@ -2764,6 +2710,23 @@ console.log(`   Atomic: ${ATOMIC_PIPELINE_ENABLED} | Spool: ${SPOOL_ROOT}`)
 setInterval(() => {
   logConnectionHealth()
 }, INGEST_HEALTH_LOG_INTERVAL_MS)
+
+startRuntimeHealthPublisher(SPOOL_ROOT, () => ({
+  connection_state: connectionState,
+  queue_depth: tradeQueue.length,
+  active_processors: activeProcessors,
+  latest_trade_seen_ms: latestTradeSeenTimestampMs,
+  latest_trade_persisted_ms: latestTradePersistedTimestampMs,
+  last_trade_message_at: lastTradeMessageAt,
+  metadata: getMetadataQueueMetrics(),
+  retention: {
+    trade_hours: retentionConfig.tradeHours,
+    aggregate_hours: retentionConfig.aggregateHours,
+    last_run_at: lastRetentionRunAt,
+    last_duration_ms: lastRetentionDurationMs,
+    last_deleted_rows: lastRetentionDeletedRows,
+  },
+}))
 
 setInterval(() => void replayPendingSpool(), 2_000)
 void replayPendingSpool().finally(() => startConnectionAttempt("startup"))

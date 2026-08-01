@@ -1,8 +1,9 @@
 import {
   getTokenDataRevision,
   getTokenRevisionChanges,
+  getConsistentTokenSnapshot,
+  normalizedTokenQueryKey,
   normalizeTokenQuery,
-  queryTokenSnapshot,
   type TokenSnapshot,
 } from "@/lib/token-query"
 import type { TokenData, TokenQueryRequest } from "@/types/token-data"
@@ -39,29 +40,21 @@ const MAX_QUERY_GROUPS = Number.parseInt(process.env.TOKEN_SSE_MAX_QUERY_GROUPS 
 let pollTimer: ReturnType<typeof setInterval> | null = null
 let pollInFlight = false
 let lastObservedRevision = BigInt(-1)
-
-function stableStringify(value: unknown): string {
-  if (Array.isArray(value)) return `[${value.map(stableStringify).join(",")}]`
-  if (value && typeof value === "object") {
-    return `{${Object.entries(value as Record<string, unknown>)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([key, item]) => `${JSON.stringify(key)}:${stableStringify(item)}`)
-      .join(",")}}`
-  }
-  return JSON.stringify(value)
-}
+const streamMetrics = { polls: 0, recomputations: 0, patches: 0 }
 
 function tokenChanged(previous: TokenData | undefined, next: TokenData): boolean {
   return !previous || JSON.stringify(previous) !== JSON.stringify(next)
 }
 
 export function canSubscribeTokenStream(rawQuery: Partial<TokenQueryRequest>): boolean {
-  const key = stableStringify(normalizeTokenQuery(rawQuery))
+  const key = normalizedTokenQueryKey(rawQuery)
   return groups.has(key) || groups.size < MAX_QUERY_GROUPS
 }
 
-async function refreshGroup(group: StreamGroup, revision: bigint): Promise<void> {
-  const next = await queryTokenSnapshot(group.query)
+async function refreshGroup(group: StreamGroup, _revision: bigint): Promise<void> {
+  streamMetrics.recomputations += 1
+  const consistent = await getConsistentTokenSnapshot(group.query)
+  const { revision, ...next } = consistent
   const previous = group.snapshot
   const previousByMint = new Map(previous.tokens.map((token) => [token.mint, token]))
   const nextMints = new Set(next.tokens.map((token) => token.mint))
@@ -96,6 +89,7 @@ async function refreshGroup(group: StreamGroup, revision: bigint): Promise<void>
       sol_price_updated_at: next.sol_price_updated_at,
     },
   }
+  streamMetrics.patches += 1
   group.listeners.forEach((listener) => listener(event))
 }
 
@@ -103,8 +97,12 @@ async function pollRevision(): Promise<void> {
   if (pollInFlight || groups.size === 0) return
   pollInFlight = true
   try {
+    streamMetrics.polls += 1
     const revision = await getTokenDataRevision()
-    if (revision === lastObservedRevision) return
+    if (
+      revision === lastObservedRevision &&
+      Array.from(groups.values()).every((group) => group.appliedRevision === revision)
+    ) return
     const minimumAppliedRevision = Array.from(groups.values()).reduce(
       (minimum, group) => group.appliedRevision < minimum ? group.appliedRevision : minimum,
       revision,
@@ -138,7 +136,7 @@ async function pollRevision(): Promise<void> {
 
 function ensurePolling(): void {
   if (pollTimer) return
-  pollTimer = setInterval(() => void pollRevision(), 250)
+  pollTimer = setInterval(() => void pollRevision(), 1_000)
 }
 
 function stopPollingIfIdle(): void {
@@ -153,27 +151,21 @@ export async function subscribeTokenStream(
   listener: Listener,
 ): Promise<() => void> {
   const query = normalizeTokenQuery(rawQuery)
-  const key = stableStringify(query)
+  const key = normalizedTokenQueryKey(query)
   if (!groups.has(key) && groups.size >= MAX_QUERY_GROUPS) {
     throw new Error("Token stream query-group capacity reached")
   }
   let group = groups.get(key)
 
   if (!group) {
-    let snapshot: TokenSnapshot
-    let revisionBefore: bigint
-    let revisionAfter: bigint
-    do {
-      revisionBefore = await getTokenDataRevision()
-      snapshot = await queryTokenSnapshot(query)
-      revisionAfter = await getTokenDataRevision()
-    } while (revisionBefore !== revisionAfter)
+    const consistent = await getConsistentTokenSnapshot(query)
+    const { revision, ...snapshot } = consistent
     group = {
       query,
       listeners: new Set(),
       snapshot,
       lastRunAt: Date.now(),
-      appliedRevision: revisionAfter,
+      appliedRevision: revision,
     }
     groups.set(key, group)
   }
@@ -191,5 +183,13 @@ export async function subscribeTokenStream(
     active.listeners.delete(listener)
     if (active.listeners.size === 0) groups.delete(key)
     stopPollingIfIdle()
+  }
+}
+
+export function getTokenStreamMetrics() {
+  return {
+    groups: groups.size,
+    listeners: Array.from(groups.values()).reduce((total, group) => total + group.listeners.size, 0),
+    ...streamMetrics,
   }
 }

@@ -212,7 +212,7 @@ export default function Dashboard() {
   const tokenCards = useMemo(() => {
     return visibleTokens.map((token, index) => (
       <div
-        key={`${token.mint}-${index}`}
+        key={token.mint}
         data-onboarding={index === 4 ? "token-card" : undefined}
         id={index === 4 ? "featured-token-card" : undefined}
       >
@@ -251,7 +251,7 @@ export default function Dashboard() {
         <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
           <div className="flex items-center gap-4 w-full md:w-auto">
             <Select value={timeRange} onValueChange={setTimeRange}>
-              <SelectTrigger className="w-[120px]" data-onboarding="time-range">
+              <SelectTrigger aria-label="Time range" className="w-[120px]" data-onboarding="time-range">
                 <SelectValue placeholder="Time Range" />
               </SelectTrigger>
               <SelectContent>
@@ -266,7 +266,7 @@ export default function Dashboard() {
             </Select>
 
             <Select value={sortBy} onValueChange={(value) => setSortBy(value as TokenSortBy)}>
-              <SelectTrigger className="w-[150px]" data-onboarding="sort-by">
+              <SelectTrigger aria-label="Sort tokens by" className="w-[150px]" data-onboarding="sort-by">
                 <SelectValue placeholder="Sort By" />
               </SelectTrigger>
               <SelectContent>
@@ -284,7 +284,7 @@ export default function Dashboard() {
               value={settings.graduationFilter}
               onValueChange={(value) => updateSettings("graduationFilter", value as "all" | "bonding" | "graduated")}
             >
-              <SelectTrigger className="w-[140px]" data-onboarding="graduation-filter">
+              <SelectTrigger aria-label="Lifecycle status" className="w-[140px]" data-onboarding="graduation-filter">
                 <SelectValue placeholder="Bonding Status" />
               </SelectTrigger>
               <SelectContent>
@@ -384,6 +384,7 @@ export default function Dashboard() {
                   onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                   className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
                   aria-disabled={currentPage === 1}
+                  disabled={currentPage === 1}
                   tabIndex={currentPage === 1 ? -1 : 0}
                 />
               </PaginationItem>
@@ -447,6 +448,7 @@ export default function Dashboard() {
                   onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                   className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
                   aria-disabled={currentPage === totalPages}
+                  disabled={currentPage === totalPages}
                   tabIndex={currentPage === totalPages ? -1 : 0}
                 />
               </PaginationItem>

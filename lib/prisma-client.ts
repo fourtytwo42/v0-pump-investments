@@ -26,6 +26,10 @@ export function createPrismaClient(profile: ClientProfile = "web"): PrismaClient
     10,
   )
   const idleTimeoutMillis = Number.parseInt(process.env.DATABASE_IDLE_TIMEOUT_MS ?? "30000", 10)
+  const statementTimeout = Number.parseInt(
+    process.env[`DATABASE_${prefix}_STATEMENT_TIMEOUT_MS`] ?? (profile === "web" ? "5000" : "30000"),
+    10,
+  )
 
   const parsed = new URL(connectionString)
   const adapter = new PrismaPg({
@@ -37,6 +41,7 @@ export function createPrismaClient(profile: ClientProfile = "web"): PrismaClient
     max: Number.isFinite(max) ? max : PROFILE_LIMITS[profile],
     connectionTimeoutMillis,
     idleTimeoutMillis,
+    statement_timeout: Number.isFinite(statementTimeout) ? statementTimeout : 5000,
     allowExitOnIdle: profile !== "web",
   }, {
     onPoolError: (error) => console.error(`[database:${profile}] idle pool error`, error),

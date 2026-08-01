@@ -1,20 +1,25 @@
-import { mkdir, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises"
-import path from "node:path"
+import { mkdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises"
+import os from "node:os"
 import { prisma } from "@/lib/prisma"
 import { getIpfsGatewayUrls } from "@/lib/pump-trades"
 import { isAllowedMetadataUrl, isHttpUrl } from "@/lib/token-image"
 import { normalizeTokenMetadata } from "@/lib/token-metadata"
 import { safeFetch } from "@/lib/safe-upstream"
+import {
+  noteImageCacheHit,
+  registerImageCacheWrite,
+  scheduleImageCacheMaintenance,
+} from "@/lib/image-cache-manager"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
 const TIMEOUT_MS = 5_000
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024
-const MAX_CACHE_BYTES = 512 * 1024 * 1024
 const NEGATIVE_TTL_MS = 5 * 60_000
 const CACHE_ENABLED = process.env.TOKEN_IMAGE_CACHE_ENABLED !== "false"
-const CACHE_ROOT = process.env.TOKEN_IMAGE_CACHE_DIR ?? "server/data/images"
+const CACHE_ROOT = process.env.TOKEN_IMAGE_CACHE_DIR ??
+  `${os.tmpdir()}${process.platform === "win32" ? "\\" : "/"}pump-investments${process.platform === "win32" ? "\\" : "/"}images`
 
 interface RouteParams {
   params: Promise<{ mint: string }>
@@ -27,10 +32,12 @@ interface CacheMeta {
 }
 
 function pathsForMint(mint: string) {
+  const separator = process.platform === "win32" ? "\\" : "/"
+  const prefix = `${CACHE_ROOT}${separator}${mint}`
   return {
-    body: path.join(CACHE_ROOT, `${mint}.bin`),
-    meta: path.join(CACHE_ROOT, `${mint}.json`),
-    negative: path.join(CACHE_ROOT, `${mint}.negative`),
+    body: `${prefix}.bin`,
+    meta: `${prefix}.json`,
+    negative: `${prefix}.negative`,
   }
 }
 
@@ -88,25 +95,6 @@ async function readLimitedImage(response: Response): Promise<Uint8Array | null> 
   return body
 }
 
-async function cleanupCache(): Promise<void> {
-  const entries = (await readdir(CACHE_ROOT, { withFileTypes: true }))
-    .filter((entry) => entry.isFile() && entry.name.endsWith(".bin"))
-  const files = await Promise.all(entries.map(async (entry) => {
-    const file = path.join(CACHE_ROOT, entry.name)
-    const info = await stat(file)
-    return { file, size: info.size, mtime: info.mtimeMs }
-  }))
-  let total = files.reduce((sum, file) => sum + file.size, 0)
-  for (const file of files.sort((a, b) => a.mtime - b.mtime)) {
-    if (total <= MAX_CACHE_BYTES) break
-    total -= file.size
-    await Promise.all([
-      rm(file.file, { force: true }),
-      rm(file.file.replace(/\.bin$/, ".json"), { force: true }),
-    ])
-  }
-}
-
 function imageResponse(body: Uint8Array, meta: CacheMeta): Response {
   const payload = body.buffer.slice(body.byteOffset, body.byteOffset + body.byteLength) as ArrayBuffer
   return new Response(payload, {
@@ -126,10 +114,15 @@ export async function GET(_request: Request, { params }: RouteParams): Promise<R
     return Response.json({ error: "Invalid mint address" }, { status: 400 })
   }
   if (CACHE_ENABLED) await mkdir(CACHE_ROOT, { recursive: true })
+  if (CACHE_ENABLED) scheduleImageCacheMaintenance(CACHE_ROOT)
   const cache = pathsForMint(mint)
   if (CACHE_ENABLED) {
     try {
-      const [body, rawMeta] = await Promise.all([readFile(cache.body), readFile(cache.meta, "utf8")])
+      const [body, rawMeta] = await Promise.all([
+        readFile(/* turbopackIgnore: true */ cache.body),
+        readFile(/* turbopackIgnore: true */ cache.meta, "utf8"),
+      ])
+      noteImageCacheHit(cache.body)
       return imageResponse(body, JSON.parse(rawMeta) as CacheMeta)
     } catch {}
     try {
@@ -164,11 +157,12 @@ export async function GET(_request: Request, { params }: RouteParams): Promise<R
   const metaTemp = `${cache.meta}.tmp`
   await Promise.all([writeFile(bodyTemp, image), writeFile(metaTemp, JSON.stringify(meta), "utf8")])
   await Promise.all([rename(bodyTemp, cache.body), rename(metaTemp, cache.meta), rm(cache.negative, { force: true })])
+  registerImageCacheWrite(cache.body, image.byteLength)
   await prisma.tokenImageStatus.upsert({
     where: { tokenId: token.id },
     create: { tokenId: token.id, resolvedUrl: imageUri, contentType, byteSize: image.byteLength, cachePath: cache.body, status: "cached", checkedAt: new Date() },
     update: { resolvedUrl: imageUri, contentType, byteSize: image.byteLength, cachePath: cache.body, status: "cached", checkedAt: new Date(), lastError: null },
   }).catch(() => undefined)
-  void cleanupCache().catch((error) => console.warn("[token-image] cache cleanup failed", error))
+  scheduleImageCacheMaintenance(CACHE_ROOT)
   return imageResponse(image, meta)
 }

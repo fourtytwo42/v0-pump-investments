@@ -181,6 +181,14 @@ model TokenDataRevision {
   @@map("token_data_revisions")
 }
 
+model RuntimeHealthState {
+  key       String   @id
+  payload   Json
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("runtime_health_state")
+}
+
 model TokenPrice {
   tokenId            String   @id @map("token_id")
   priceSol           Decimal  @map("price_sol")

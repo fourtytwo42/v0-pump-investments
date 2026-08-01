@@ -31,6 +31,28 @@ interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: "4.0.9",
+    date: "August 1, 2026",
+    changes: [
+      {
+        type: "improved",
+        description: "Made token snapshots, realtime updates, buyer counts, and alert streams faster while reducing repeated database work.",
+      },
+      {
+        type: "improved",
+        description: "Added deeper feed, lifecycle, database, disk, query, stream, and image-cache health reporting for faster recovery.",
+      },
+      {
+        type: "fixed",
+        description: "Bound image-cache cleanup and improved keyboard and screen-reader behavior without changing the card design.",
+      },
+      {
+        type: "improved",
+        description: "Hardened public proxy security and added a validated, rollback-safe VM release process.",
+      },
+    ],
+  },
+  {
     version: "4.0.8",
     date: "August 1, 2026",
     changes: [

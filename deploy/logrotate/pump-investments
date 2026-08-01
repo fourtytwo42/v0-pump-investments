@@ -1,4 +1,4 @@
-/home/hendo420/pumpInvestments/v0-pump-investments/logs/*.log {
+/var/lib/pump-investments/logs/*.log {
   daily
   size 25M
   rotate 7

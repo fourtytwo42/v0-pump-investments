@@ -59,3 +59,22 @@ npm run pm2:web:restart-env
 npm run pm2:ingest:restart-env
 npm run pm2:restart-env
 ```
+
+## VM Release Runbook
+
+Production is deployed manually on the VM; GitHub is source control only. No GitHub Actions workflow or deployment-time database backup is used.
+
+From the control checkout, deploy the selected `main` commit with:
+
+```bash
+cd /home/hendo420/pumpInvestments/v0-pump-investments
+npm run deploy:vm
+```
+
+To deploy an explicit fetched commit, pass it after `--`:
+
+```bash
+npm run deploy:vm -- <commit-sha>
+```
+
+The command creates an immutable release under `/home/hendo420/pumpInvestments/releases/<commit>`, uses shared state under `/var/lib/pump-investments`, validates the candidate on port `3002`, applies additive migrations, atomically switches `/home/hendo420/pumpInvestments/current`, verifies LAN/public traffic, stages then enforces CSP, and retains the three newest releases. A failed post-cutover check restores the previous release symlink and PM2 processes.

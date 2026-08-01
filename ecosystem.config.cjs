@@ -1,7 +1,8 @@
 const path = require("path")
 
 const appCwd = __dirname
-const logDir = path.join(appCwd, "logs")
+const packageJson = require(path.join(appCwd, "package.json"))
+const logDir = process.env.PUMP_LOG_DIR || "/var/lib/pump-investments/logs"
 // PM2 keeps the previous process environment on a plain restart.
 // If .env-backed values change, restart with --update-env.
 
@@ -17,6 +18,7 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PORT: 3001,
+        APP_VERSION: packageJson.version,
       },
       error_file: path.join(logDir, 'web-error.log'),
       out_file: path.join(logDir, 'web-out.log'),
@@ -40,6 +42,7 @@ module.exports = {
       exec_mode: 'fork',
       env: {
         NODE_ENV: 'production',
+        APP_VERSION: packageJson.version,
       },
       error_file: path.join(logDir, 'ingest-error.log'),
       out_file: path.join(logDir, 'ingest-out.log'),
