@@ -11,6 +11,7 @@ CANDIDATE_PORT=3002
 CUTOVER_COMPLETE=0
 PREVIOUS_RELEASE="$CONTROL_REPO"
 CANDIDATE_PID=""
+SUDO_KEEPALIVE_PID=""
 
 say() { printf '\n[v409-release] %s\n' "$*"; }
 die() { printf '\n[v409-release] ERROR: %s\n' "$*" >&2; exit 1; }
@@ -22,9 +23,17 @@ cleanup_candidate() {
   fi
 }
 
+cleanup_sudo_keepalive() {
+  if [[ -n "$SUDO_KEEPALIVE_PID" ]]; then
+    kill "$SUDO_KEEPALIVE_PID" 2>/dev/null || true
+    wait "$SUDO_KEEPALIVE_PID" 2>/dev/null || true
+  fi
+}
+
 rollback() {
   local exit_code=$?
   cleanup_candidate
+  cleanup_sudo_keepalive
   if [[ $exit_code -ne 0 && $CUTOVER_COMPLETE -eq 1 && -n "$PREVIOUS_RELEASE" && -d "$PREVIOUS_RELEASE" ]]; then
     say "Post-cutover verification failed; restoring $PREVIOUS_RELEASE"
     ln -sfn "$PREVIOUS_RELEASE" "${CURRENT_LINK}.rollback"
@@ -40,6 +49,8 @@ trap rollback EXIT
 
 [[ -d "$CONTROL_REPO/.git" ]] || die "Control repository not found: $CONTROL_REPO"
 sudo -v
+(while sleep 60; do sudo -n true || exit; done) &
+SUDO_KEEPALIVE_PID=$!
 git -C "$CONTROL_REPO" fetch --prune origin main
 COMMIT="$(git -C "$CONTROL_REPO" rev-parse "$TARGET_REF^{commit}")"
 RELEASE_DIR="$RELEASE_ROOT/$COMMIT"
@@ -153,4 +164,5 @@ fi
 
 pm2 status
 say "Release v$VERSION ($COMMIT) is live on LAN and pump.investments"
+cleanup_sudo_keepalive
 trap - EXIT
