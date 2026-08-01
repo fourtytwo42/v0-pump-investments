@@ -46,6 +46,14 @@ test("VM cutover recreates PM2 processes so immutable release paths take effect"
   assert.match(script, /HSTS header missing or incorrect/)
 })
 
+test("CSP permits only the existing Cloudflare analytics origins", async () => {
+  for (const file of ["security-report-only.conf", "security-enforced.conf"]) {
+    const policy = await readFile(new URL(`../deploy/nginx/${file}`, import.meta.url), "utf8")
+    assert.match(policy, /script-src[^;]+https:\/\/static\.cloudflareinsights\.com/)
+    assert.match(policy, /connect-src[^;]+https:\/\/cloudflareinsights\.com/)
+  }
+})
+
 test("image cache verification removes temporary and orphan metadata files", async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), "pump-image-cache-"))
   try {
