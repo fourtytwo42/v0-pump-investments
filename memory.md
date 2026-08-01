@@ -24,7 +24,8 @@ This file stores durable project memory for recovery after context compression o
   - `pump-investments-ingest`
 
 ## Current Operational State
-- Version 4.0.7 is deployed from `main` commit `ecd72f6` at both `http://192.168.50.237:3000` and `https://pump.investments`.
+- Version 4.0.8 is deployed from `main` commit `ccf0de8` at both `http://192.168.50.237:3000` and `https://pump.investments`.
+- The VM root LV/filesystem now uses the full 64 GB virtual disk: 61 GB usable, about 45 GB free after v4.0.8 maintenance.
 - Token lifecycle is verified without RPC from Pump frontend batch responses. A live `pump_amm` trade with a concrete pool address is also definitive, monotonic PumpSwap evidence; incomplete venue hints alone never graduate a token.
 - Nginx owns LAN port `3000` and proxies Next.js on `3001`; SSE buffering is disabled and successful token images are proxy-cached.
 - The token client uses a fetch-based SSE stream with SQL-backed snapshots instead of 500 ms full polling.
@@ -39,11 +40,15 @@ This file stores durable project memory for recovery after context compression o
 - The reconnect hardening commit was pushed to `main`.
 
 ## Important Recent Changes
+- V4.0.8 retains raw trades and minute aggregates for two hours, safely covering the one-hour product window. Realtime dirty-mint state is retained 15 minutes; the append-only revision journal is no longer written.
+- V4.0.8 restored reserve-derived card progress. Market cap never determines either progress or lifecycle. Pump `pump_swap_pool`, `raydium_pool`, and `pool_address` fields plus concrete live migration trades are authoritative completion evidence.
+- Pump legacy migrations can report `complete=false` after supplying a concrete Raydium pool. The verifier now promotes these to `CURVE_COMPLETE`; Autonome and GOBI were corrected, and production has zero active `BONDING` records at 99% or higher.
+- Lifecycle reconciliation is limited to tokens active within two hours. Failed checks cool down for six hours after ten attempts and periodic enqueue no longer defeats backoff. The deployment reduced the queue from about 67,000 overdue checks to a bounded active set.
+- Production database maintenance reduced PostgreSQL from about 11 GB to 553 MB by removing data outside the two-hour retention window and compacting affected tables. Pre-maintenance backup: `/home/hendo420/backups/pre-v4.0.8.dump`, SHA-256 `858aca6d4825b0acadfe9972e6ad421bc96b755f207d571c0e4a3f2b1cb8b22f`.
+- Active Nginx config is `/etc/nginx/conf.d/pump-investments.conf` (not `sites-available`). Cloudflare/LAN rate and connection limits use `CF-Connecting-IP` with remote-address fallback; public verification logged the actual client address instead of `127.0.0.1`.
 - V4.0.7 fixes a zombie NATS subscription failure where PING/PONG traffic continued after real trade events stopped. `server/ingest-trades.ts` now tracks decoded trades separately from protocol messages, reconnects after 60 seconds without a trade, and exits for PM2 recovery after five minutes without any real trade across reconnects.
 - Public `/api/health` now reports `dependencies.trade_feed` from the newest persisted trade. Production verification returned version 4.0.7/status ok, current SOL/trade timestamps, live SSE patches, and ingester telemetry with `since_last_trade_s=0`.
-- V4.0.6 aligns the visible bonding bar with market cap using `market_cap_usd / (415 SOL * live SOL/USD)`, capped at 99 while still Bonding. Higher market cap at the same SOL price always displays higher progress.
-- Market-cap progress is visual-only. Pump completion and confirmed PumpSwap pool evidence remain the only graduation signals; market cap cannot mutate lifecycle.
-- Reserve-derived `Token.bondingProgress` remains persisted for verification and diagnostics but no longer drives the card bar. This avoids counterintuitive Mayhem-versus-standard-curve percentages.
+- V4.0.6 briefly aligned the visible bar to market cap; v4.0.8 supersedes that behavior because different curve types made market-cap percentages misleading and caused false 99% cards.
 - V4.0.5 refines token cards without changing their data or bright border semantics: compact Last Trade values, tabular metrics, stronger secondary contrast, 80 px muted artwork surfaces, 24 px social targets, and a reduced-motion-safe 2 px hover lift.
 - Cards remain 342 px tall. Tighter metric row spacing keeps bonding footers fully contained with 15 px Token Age clearance; the four-column XL grid and green/red `border-2` thresholds are unchanged.
 - The header version badge now uses the latest changelog entry. Cross-browser verification passed all 15 Chromium, Firefox, and WebKit tests with light/dark screenshot attachments.

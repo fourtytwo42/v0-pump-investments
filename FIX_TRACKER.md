@@ -5,7 +5,7 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 ### P0: Retention, storage, and lifecycle recovery
 
 #### T32. Bound production growth and correct false 99% bonding cards
-- Status: `in_progress`
+- Status: `done`
 - Goal:
   - Keep enough data for the one-hour product window with a safety margin, stop unbounded realtime/aggregate growth, restore verified bonding progress, and promote legacy Pump tokens with definitive migration venue evidence.
 - Verification:
@@ -14,6 +14,12 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - The 64 GB virtual disk was present, but LVM exposed only 31 GB. The root logical volume and ext4 filesystem were expanded online to 61 GB usable, increasing free space from about 6.7 GB to 36 GB.
   - Production had 17.8 million unbounded revision-journal rows (3.8 GB), 5.4 million buyer-minute rows (1.6 GB), and 67,000 overdue lifecycle checks.
   - Pump verification showed five active market-cap-based 99% cards were actually 0.7%-94.5% through their curves. Autonome has separate Pump-launch plus Raydium-trading migration evidence.
+  - V4.0.8 uses Pump reserve progress on cards, recognizes Pump `raydium_pool`/`pool_address` legacy migration evidence, and bounds lifecycle retries to active tokens with a ten-attempt/six-hour cooldown.
+  - Production retention is two hours for trades and aggregates plus 15 minutes for realtime dirty state. The append-only revision journal is no longer written.
+  - Pre-maintenance backup `/home/hendo420/backups/pre-v4.0.8.dump` has SHA-256 `858aca6d4825b0acadfe9972e6ad421bc96b755f207d571c0e4a3f2b1cb8b22f`.
+  - Removed 7,302,995 expired trades and 6,459,872 expired aggregate rows, truncated ephemeral queues/journal state, and vacuumed the retained tables. PostgreSQL fell from about 11 GB to 553 MB; root disk usage fell to 24% with about 45 GB free.
+  - Autonome and GOBI are `CURVE_COMPLETE`; zero active Bonding tokens remain at 99% or higher. LAN/public health report v4.0.8/status ok, public SSE returns 200 snapshots, Nginx keys Cloudflare limits to the actual visitor IP, both PM2 services are online, and `npm audit --omit=dev` reports zero vulnerabilities.
+  - Release gates passed: 43 unit tests, TypeScript, ESLint, local and VM production builds.
 
 ### P1: Token feed availability
 
@@ -43,6 +49,7 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - Release v4.0.6 derives the visible bar from `market_cap_usd / (415 SOL * live SOL/USD)`, capped at 99 while lifecycle remains Bonding.
   - Persisted reserve progress remains available for verification and diagnostics but no longer drives the card percentage.
   - Graduation remains monotonic and evidence-based from Pump completion or a confirmed PumpSwap pool; market cap never writes lifecycle state.
+  - Superseded by v4.0.8: the card bar again uses Pump reserve progress because market-cap display caused false 99% cards across different curve types.
   - All 33 unit tests, TypeScript, ESLint, the production build, and all 15 Chromium/Firefox/WebKit browser tests passed.
   - Live verification found 12 visible bonding cards with strictly market-cap-monotonic progress. Bushman displayed 48% at $14.7k, while tokens around $17.3k displayed about 56%.
 
