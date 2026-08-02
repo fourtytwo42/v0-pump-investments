@@ -110,11 +110,16 @@ export function SupportTicketSection() {
 
   useEffect(() => {
     const siteKey = process.env.NEXT_PUBLIC_SUPPORT_TURNSTILE_SITE_KEY
-    if (!createOpen || !turnstileRequired || !siteKey || !turnstileHost.current) return
+    if (!createOpen || !turnstileRequired || !siteKey) return
     let cancelled = false
+    let retryTimer: number | undefined
     const render = () => {
       const api = (window as Window & { turnstile?: { render: (element: HTMLElement, options: Record<string, unknown>) => string; remove: (id: string) => void } }).turnstile
-      if (!api || !turnstileHost.current || cancelled || turnstileWidget.current) return
+      if (cancelled || turnstileWidget.current) return
+      if (!api || !turnstileHost.current) {
+        retryTimer = window.setTimeout(render, 100)
+        return
+      }
       turnstileWidget.current = api.render(turnstileHost.current, { sitekey: siteKey, size: "flexible", callback: (token: string) => setTurnstileToken(token), "expired-callback": () => setTurnstileToken("") })
     }
     const existing = document.querySelector<HTMLScriptElement>('script[data-pump-turnstile]')
@@ -130,6 +135,7 @@ export function SupportTicketSection() {
     }
     return () => {
       cancelled = true
+      if (retryTimer !== undefined) window.clearTimeout(retryTimer)
       const api = (window as Window & { turnstile?: { remove: (id: string) => void } }).turnstile
       if (api && turnstileWidget.current) api.remove(turnstileWidget.current)
       turnstileWidget.current = null

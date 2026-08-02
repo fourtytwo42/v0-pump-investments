@@ -25,6 +25,7 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - The first keyed candidate correctly failed closed because `127.0.0.1:3002` is not an allowed Turnstile hostname. The client now requests Turnstile only on `pump.investments`; LAN relies on Nginx's server-set trusted marker, and the isolated candidate receives a dedicated bypass that is honored only for loopback request hostnames.
   - All 18 candidate browser tests pass with the isolated loopback bypass. The public soak skips only the synthetic support mutation in each engine because managed Turnstile intentionally withholds tokens from headless automation; the other 15 public tests still run, and interactive public Turnstile is verified separately.
   - A successful public soak then hit a transient CSP header race immediately after Nginx reload. The release safely rolled back; enforced CSP was visible on the next check, so the final header gate now retries for up to 30 seconds.
+  - Interactive public verification found an empty Turnstile host: the effect could run before the nested dialog portal mounted its ref and return permanently. The loader now retries until both the Cloudflare API and host element are ready, with cleanup canceling the retry timer.
 
 ### P0: False graduation classification
 
