@@ -100,12 +100,17 @@ export function SupportTicketSection() {
   const [attachDiagnostics, setAttachDiagnostics] = useState(false)
   const [busy, setBusy] = useState(false)
   const [turnstileToken, setTurnstileToken] = useState("")
+  const [turnstileRequired, setTurnstileRequired] = useState(false)
   const turnstileHost = useRef<HTMLDivElement>(null)
   const turnstileWidget = useRef<string | null>(null)
 
   useEffect(() => {
+    setTurnstileRequired(Boolean(process.env.NEXT_PUBLIC_SUPPORT_TURNSTILE_SITE_KEY) && window.location.hostname === "pump.investments")
+  }, [])
+
+  useEffect(() => {
     const siteKey = process.env.NEXT_PUBLIC_SUPPORT_TURNSTILE_SITE_KEY
-    if (!createOpen || !siteKey || !turnstileHost.current) return
+    if (!createOpen || !turnstileRequired || !siteKey || !turnstileHost.current) return
     let cancelled = false
     const render = () => {
       const api = (window as Window & { turnstile?: { render: (element: HTMLElement, options: Record<string, unknown>) => string; remove: (id: string) => void } }).turnstile
@@ -130,7 +135,7 @@ export function SupportTicketSection() {
       turnstileWidget.current = null
       setTurnstileToken("")
     }
-  }, [createOpen])
+  }, [createOpen, turnstileRequired])
 
   const refresh = useCallback(async () => {
     try {
@@ -245,10 +250,10 @@ export function SupportTicketSection() {
         <div className="space-y-1"><Label>Area</Label><Select value={category} onValueChange={(value) => setCategory(value as Category)}><SelectTrigger aria-label="Problem area"><SelectValue /></SelectTrigger><SelectContent>{Object.entries(categoryLabels).map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}</SelectContent></Select></div>
         <div className="space-y-1"><Label htmlFor="problem-description">What happened?</Label><Textarea id="problem-description" rows={6} maxLength={5000} value={body} onChange={(event) => setBody(event.target.value)} placeholder="Tell us what you expected and what actually happened..." /></div>
         <ImagePicker files={images} onChange={setImages} />
-        {process.env.NEXT_PUBLIC_SUPPORT_TURNSTILE_SITE_KEY && <div ref={turnstileHost} aria-label="Human verification" />}
+        {turnstileRequired && <div ref={turnstileHost} aria-label="Human verification" />}
         <details className="text-xs text-muted-foreground"><summary className="cursor-pointer font-medium text-foreground">Diagnostics included</summary><p className="mt-1">App version, current filters, feed connection, browser/device class, service health, and recent sanitized errors. Never includes favorites, token lists, chat, wallet data, cookies, storage contents, or your full IP address.</p></details>
       </div>
-      <DialogFooter><Button disabled={busy || body.trim().length < 10 || (Boolean(process.env.NEXT_PUBLIC_SUPPORT_TURNSTILE_SITE_KEY) && !turnstileToken)} onClick={() => void submit()}>{busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Submit report</Button></DialogFooter>
+      <DialogFooter><Button disabled={busy || body.trim().length < 10 || (turnstileRequired && !turnstileToken)} onClick={() => void submit()}>{busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Submit report</Button></DialogFooter>
     </DialogContent></Dialog>
 
     <Dialog open={Boolean(active)} onOpenChange={(open) => !open && setActive(null)}><DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">

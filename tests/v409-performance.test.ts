@@ -35,6 +35,7 @@ test("VM release stays manual and creates neither backups nor GitHub Actions", a
   const script = await readFile(new URL("../deploy/vm-release.sh", import.meta.url), "utf8")
   assert.match(script, /git -C "\$CONTROL_REPO" fetch --prune origin main/)
   assert.match(script, /CANDIDATE_PORT=3002/)
+  assert.match(script, /SUPPORT_TURNSTILE_SECRET_KEY="" npm start/)
   assert.doesNotMatch(script, /pg_dump|github\/workflows|gh workflow/)
 })
 
