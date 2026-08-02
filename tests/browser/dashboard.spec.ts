@@ -74,10 +74,9 @@ test("problem reports persist a conversation and can be permanently deleted", as
   await page.getByPlaceholder("Add more information...").fill("A follow-up from the browser test.")
   await page.getByRole("button", { name: "Send", exact: true }).click()
   await expect(page.getByText("A follow-up from the browser test.")).toBeVisible()
-  await page.getByRole("button", { name: "Close ticket" }).click()
   page.once("dialog", (dialog) => dialog.accept())
-  await page.getByRole("button", { name: `Delete ${ticketNumber}` }).click()
-  await expect(page.getByRole("button", { name: `Delete ${ticketNumber}` })).toHaveCount(0)
+  await page.getByRole("button", { name: "Delete ticket" }).click()
+  await expect(ticketHeading).toHaveCount(0)
 })
 
 test("token cards preserve bright borders and refined content fit", async ({ page }, testInfo) => {
