@@ -2022,9 +2022,11 @@ if (LIFECYCLE_VERIFIER_ENABLED) {
   setInterval(() => void processLifecycleChecks(), 2_200)
   setInterval(
     () =>
-      void enqueueLifecycleChecksByQuery("active").catch((error) =>
-        console.warn("[lifecycle] Active reconciliation enqueue failed:", (error as Error).message),
-      ),
+      void enqueueFalsePoolAddressRepairs()
+        .then(() => enqueueLifecycleChecksByQuery("active"))
+        .catch((error) =>
+          console.warn("[lifecycle] Active reconciliation enqueue failed:", (error as Error).message),
+        ),
     LIFECYCLE_ACTIVE_RECHECK_MS,
   )
   setInterval(

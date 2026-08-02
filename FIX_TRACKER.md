@@ -16,6 +16,7 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - All ten sampled `CURVE_COMPLETE + PUMP_BONDING` records were confirmed false graduates by Pump's single-token endpoint. With the current saved/default UI filters, 71 records were in that suspect group versus only 27 correctly visible Bonding records.
   - `classifyPumpLifecycle()` currently aliases `pool_address` to legacy Raydium evidence. This is the false-graduation cause and must be narrowed to definitive migration fields/evidence.
   - The three tokens observed transitioning during the initial T34 audit were also falsely promoted from generic `pool_address`; they were not confirmed migrations.
+  - The repair candidate enqueue runs at startup and with each active reconciliation so previously false-graduated tokens that become active later are also reverified promptly.
 
 ### P0: Lifecycle verifier throughput
 
