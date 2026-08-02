@@ -5,7 +5,7 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 ### P1: In-app problem reporting
 
 #### T36. Add anonymous support tickets with diagnostics and screenshots
-- Status: `in_progress`
+- Status: `done`
 - Goal:
   - Let users create, revisit, reply to, and permanently delete problem reports from Settings while attaching safe frontend/backend diagnostics and validated screenshots.
 - Verification:
@@ -26,6 +26,8 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - All 18 candidate browser tests pass with the isolated loopback bypass. The public soak skips only the synthetic support mutation in each engine because managed Turnstile intentionally withholds tokens from headless automation; the other 15 public tests still run, and interactive public Turnstile is verified separately.
   - A successful public soak then hit a transient CSP header race immediately after Nginx reload. The release safely rolled back; enforced CSP was visible on the next check, so the final header gate now retries for up to 30 seconds.
   - Interactive public verification found an empty Turnstile host: the effect could run before the nested dialog portal mounted its ref and return permanently. The loader now retries until both the Cloudflare API and host element are ready, with cleanup canceling the retry timer.
+  - Final immutable release `a82936b969a742544549c115d9d38ef157972dc7` is live on LAN and public. Candidate browser tests passed 18/18; public non-mutating coverage passed 15/15 with three intentional managed-Turnstile skips. Interactive public Turnstile displayed `Success!`, enabled submission after text entry, and was closed without creating a ticket.
+  - Final health is `ok`, both PM2 services are online, CSP is enforced, both Turnstile keys are configured only in the shared VM environment, exactly three releases remain, and zero synthetic `Browser test support report` tickets remain.
 
 ### P0: False graduation classification
 

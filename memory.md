@@ -24,9 +24,9 @@ This file stores durable project memory for recovery after context compression o
   - `pump-investments-ingest`
 
 ## Current Operational State
-- Version 4.0.10 is deployed from immutable `main` release `f7266aced8cb92e2943ee784adb5f78fa84b324a`. Pump's generic bonding `pool_address` no longer counts as graduation evidence, and a prioritized verified repair pass corrected active false graduates.
-- The previous v4.0.9 immutable release was `5e31f414275d0383959909eb3a6068d726fa8c26`.
-- `/home/hendo420/pumpInvestments/current` points to the immutable v4.0.9 release. Both PM2 services run from that directory, the three newest releases are retained, and shared environment/spool/image/log state remains under `/var/lib/pump-investments`.
+- Version 4.0.11 is deployed from immutable `main` release `a82936b969a742544549c115d9d38ef157972dc7`. Anonymous support tickets, protected images, diagnostics, replies, deletion, VM-local administration, and Cloudflare Turnstile are live.
+- The previous lifecycle-correction v4.0.10 release was `f7266aced8cb92e2943ee784adb5f78fa84b324a`.
+- `/home/hendo420/pumpInvestments/current` points to the immutable v4.0.11 release. Both PM2 services are online from that directory, exactly three releases are retained, and shared environment/spool/image/support/log state remains under `/var/lib/pump-investments`.
 - V4.0.9 live query p95 was 60.2 ms LAN / 178.8 ms public for the common 10-minute snapshot and 286.0 ms LAN / 448.2 ms public for a 60-minute Unique Buyers query. All 20 requests in each sample returned 200.
 - The final five-minute CSP report-only soak produced zero violations after narrowly allowing the existing Cloudflare Web Analytics origins. CSP is enforced, HSTS is `max-age=31536000`, and the rate-limit zones are versioned so the trusted-real-IP key can reload without conflicting with legacy shared memory.
 - Final v4.0.9 health showed database/feed/SOL status `ok`, about 1.3 s persisted feed lag, connected ingestion, empty spool/dead-letter, a 27.5 MB image cache, and zero active `BONDING` tokens at 99% or higher. The protected health credential was rotated after deployment verification.
