@@ -59,6 +59,7 @@ test("browser uses same-origin pricing, images, and generated alert audio", asyn
 })
 
 test("problem reports persist a conversation and can be permanently deleted", async ({ page }) => {
+  test.skip(process.env.PLAYWRIGHT_SKIP_SUPPORT_MUTATION === "true", "Public Turnstile intentionally rejects headless automation")
   test.setTimeout(60_000)
   await page.goto("/")
   await dismissOnboarding(page)

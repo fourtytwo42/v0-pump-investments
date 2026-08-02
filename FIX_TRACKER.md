@@ -23,6 +23,7 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - Ticket detail now includes its own confirmed destructive delete action in addition to the compact list X, avoiding nested-dialog dismissal timing during deletion.
   - Cloudflare Turnstile widget `Pump.Investments Support` is provisioned for `pump.investments`; its site and secret keys are stored only in the shared VM environment. A fresh immutable build is required so the public site key is embedded in the client.
   - The first keyed candidate correctly failed closed because `127.0.0.1:3002` is not an allowed Turnstile hostname. The client now requests Turnstile only on `pump.investments`; LAN relies on Nginx's server-set trusted marker, and the isolated candidate receives a dedicated bypass that is honored only for loopback request hostnames.
+  - All 18 candidate browser tests pass with the isolated loopback bypass. The public soak skips only the synthetic support mutation in each engine because managed Turnstile intentionally withholds tokens from headless automation; the other 15 public tests still run, and interactive public Turnstile is verified separately.
 
 ### P0: False graduation classification
 

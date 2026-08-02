@@ -37,6 +37,7 @@ test("VM release stays manual and creates neither backups nor GitHub Actions", a
   assert.match(script, /git -C "\$CONTROL_REPO" fetch --prune origin main/)
   assert.match(script, /CANDIDATE_PORT=3002/)
   assert.match(script, /SUPPORT_TURNSTILE_LOOPBACK_TEST_BYPASS="1" npm start/)
+  assert.match(script, /PLAYWRIGHT_SKIP_SUPPORT_MUTATION="true" PLAYWRIGHT_BASE_URL="https:\/\/pump\.investments"/)
   assert.match(support, /SUPPORT_TURNSTILE_LOOPBACK_TEST_BYPASS === "1"/)
   assert.match(support, /\["127\.0\.0\.1", "localhost", "::1"\]\.includes\(requestHostname\)/)
   assert.doesNotMatch(script, /pg_dump|github\/workflows|gh workflow/)

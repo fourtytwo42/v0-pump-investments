@@ -164,7 +164,10 @@ grep -q '^event: snapshot$' "$SHARED_ROOT/logs/release-sse-$COMMIT.txt" || die "
 CSP_LOG="$SHARED_ROOT/logs/web-error.log"
 CSP_BEFORE="$(grep -c '\[csp-report\]' "$CSP_LOG" 2>/dev/null || true)"
 say "CSP report-only soak for ${CSP_SOAK_SECONDS}s"
-PLAYWRIGHT_BASE_URL="https://pump.investments" npm run test:browser
+# The complete support mutation flow already passed on the isolated candidate.
+# Managed Turnstile intentionally withholds tokens from headless public browsers,
+# so the public soak retains every non-mutating test in all three engines.
+PLAYWRIGHT_SKIP_SUPPORT_MUTATION="true" PLAYWRIGHT_BASE_URL="https://pump.investments" npm run test:browser
 sleep "$CSP_SOAK_SECONDS"
 CSP_AFTER="$(grep -c '\[csp-report\]' "$CSP_LOG" 2>/dev/null || true)"
 [[ "$CSP_AFTER" == "$CSP_BEFORE" ]] || die "CSP violations were reported; policy remains report-only"
