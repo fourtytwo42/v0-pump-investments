@@ -27,6 +27,7 @@ test("Nginx rate limits use the trusted real-IP result and overwrite forwarded h
   assert.doesNotMatch(config, /map \$http_cf_connecting_ip/)
   assert.match(config, /real_ip_header CF-Connecting-IP/)
   assert.match(config, /proxy_set_header CF-Connecting-IP \$remote_addr/)
+  assert.match(config, /zone=pump_support_v411:10m rate=60r\/m/)
   assert.equal(config.match(/include \/etc\/nginx\/snippets\/pump-investments-security\.conf/g)?.length, 9)
 })
 

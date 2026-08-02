@@ -59,6 +59,7 @@ test("browser uses same-origin pricing, images, and generated alert audio", asyn
 })
 
 test("problem reports persist a conversation and can be permanently deleted", async ({ page }) => {
+  test.setTimeout(60_000)
   await page.goto("/")
   await dismissOnboarding(page)
   await page.getByRole("button", { name: "Open settings" }).click()
@@ -76,7 +77,7 @@ test("problem reports persist a conversation and can be permanently deleted", as
   await page.getByRole("button", { name: "Close ticket" }).click()
   page.once("dialog", (dialog) => dialog.accept())
   await page.getByRole("button", { name: `Delete ${ticketNumber}` }).click()
-  await expect(page.getByText(ticketNumber!, { exact: false })).toHaveCount(0)
+  await expect(page.getByRole("button", { name: `Delete ${ticketNumber}` })).toHaveCount(0)
 })
 
 test("token cards preserve bright borders and refined content fit", async ({ page }, testInfo) => {

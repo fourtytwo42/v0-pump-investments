@@ -150,12 +150,19 @@ export function SupportTicketSection() {
   useEffect(() => {
     if (!active) return
     const ticketNumber = active.ticketNumber
+    let cancelled = false
+    let controller: AbortController | null = null
     const timer = window.setInterval(async () => {
       if (document.visibilityState !== "visible") return
-      const response = await fetch(`/api/support/tickets/${ticketNumber}`, { cache: "no-store" }).catch(() => null)
-      if (response?.ok) setActive(((await response.json()) as { ticket: Ticket }).ticket)
+      controller = new AbortController()
+      const response = await fetch(`/api/support/tickets/${ticketNumber}`, { cache: "no-store", signal: controller.signal }).catch(() => null)
+      if (response?.ok && !cancelled) setActive(((await response.json()) as { ticket: Ticket }).ticket)
     }, 30_000)
-    return () => window.clearInterval(timer)
+    return () => {
+      cancelled = true
+      controller?.abort()
+      window.clearInterval(timer)
+    }
   }, [active?.ticketNumber])
 
   useEffect(() => {

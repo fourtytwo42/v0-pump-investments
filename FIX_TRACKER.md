@@ -18,6 +18,8 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - Screenshots are validated, metadata-stripped, resized WebP files under the shared VM support directory. Quotas, low-disk rejection, Turnstile support, daily orphan cleanup, and protected health counts are included.
   - Local verification passes 55 unit tests with two VM-only PostgreSQL tests skipped, TypeScript, ESLint, Prisma validation, production build, and zero production audit findings. VM migration, PostgreSQL support integration, three-engine browser flow, and live isolation checks remain.
   - The first public soak exposed an ambiguous nested-dialog close selector after ticket create/reply; the ticket detail now has an explicit `Close ticket` action so Settings remains open for deletion.
+  - Public latency exposed a 30-second detail-poll race that could reopen a ticket immediately after closing it; closing now aborts any in-flight detail refresh and the end-to-end flow has a 60-second public allowance.
+  - The initial 10-request/minute support proxy limit throttled a legitimate full conversation flow and cross-engine release tests. Support reads now have 60 requests/minute with a 30-request burst; durable per-client limits still enforce three creations/hour, ten/day, five unresolved, and thirty comments/hour.
 
 ### P0: False graduation classification
 
