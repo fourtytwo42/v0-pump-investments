@@ -50,6 +50,8 @@ test("VM cutover recreates PM2 processes so immutable release paths take effect"
   assert.doesNotMatch(script, /pm2 startOrReload/)
   assert.match(script, /Report-only CSP header missing/)
   assert.match(script, /HSTS header missing or incorrect/)
+  assert.match(script, /CSP_ENFORCED=0/)
+  assert.match(script, /for _ in \{1\.\.30\}/)
 })
 
 test("CSP permits Cloudflare analytics and the support Turnstile challenge", async () => {

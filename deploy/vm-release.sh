@@ -174,7 +174,15 @@ CSP_AFTER="$(grep -c '\[csp-report\]' "$CSP_LOG" 2>/dev/null || true)"
 sudo install -m 644 deploy/nginx/security-enforced.conf /etc/nginx/snippets/pump-investments-security.conf
 sudo nginx -t
 sudo systemctl reload nginx
-curl -fsSI https://pump.investments/ | grep -qi '^content-security-policy:' || die "Enforced CSP header missing"
+CSP_ENFORCED=0
+for _ in {1..30}; do
+  if curl -fsSI https://pump.investments/ | grep -qi '^content-security-policy:'; then
+    CSP_ENFORCED=1
+    break
+  fi
+  sleep 1
+done
+[[ "$CSP_ENFORCED" == "1" ]] || die "Enforced CSP header missing"
 
 say "Retaining the three newest immutable releases"
 mapfile -t RELEASES < <(find "$RELEASE_ROOT" -mindepth 1 -maxdepth 1 -type d -printf '%T@ %p\n' | sort -rn | cut -d' ' -f2-)
