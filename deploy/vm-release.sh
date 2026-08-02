@@ -64,6 +64,7 @@ RELEASE_DIR="$RELEASE_ROOT/$COMMIT"
 
 mkdir -p "$RELEASE_ROOT" "$SHARED_ROOT/logs" "$SHARED_ROOT/spool/pending" \
   "$SHARED_ROOT/spool/dead-letter" "$SHARED_ROOT/images"
+sudo install -d -o hendo420 -g hendo420 -m 750 "$SHARED_ROOT/support-attachments"
 if [[ ! -f "$SHARED_ROOT/app.env" ]]; then
   [[ -f "$CONTROL_REPO/.env" ]] || die "No source .env exists for first immutable release"
   install -m 600 "$CONTROL_REPO/.env" "$SHARED_ROOT/app.env"
@@ -79,6 +80,13 @@ upsert_env() {
 }
 upsert_env INGEST_SPOOL_DIR "$SHARED_ROOT/spool"
 upsert_env TOKEN_IMAGE_CACHE_DIR "$SHARED_ROOT/images"
+upsert_env SUPPORT_ATTACHMENT_DIR "$SHARED_ROOT/support-attachments"
+if ! grep -q '^SUPPORT_ADMIN_TOKEN=.' "$SHARED_ROOT/app.env"; then
+  upsert_env SUPPORT_ADMIN_TOKEN "$(openssl rand -hex 32)"
+fi
+if ! grep -q '^SUPPORT_NETWORK_HASH_KEY=.' "$SHARED_ROOT/app.env"; then
+  upsert_env SUPPORT_NETWORK_HASH_KEY "$(openssl rand -hex 32)"
+fi
 upsert_env DATABASE_WEB_STATEMENT_TIMEOUT_MS "5000"
 upsert_env TOKEN_REVISION_COALESCING_ENABLED "true"
 upsert_env TOKEN_QUERY_CACHE_ENABLED "true"
@@ -104,6 +112,8 @@ npm run lint
 npm run build
 npx prisma validate
 npm audit --omit=dev --audit-level=high
+npm run db:migrate
+RUN_POSTGRES_INTEGRATION_TESTS=true npm run test:support-integration
 npx playwright install --with-deps chromium firefox webkit
 
 say "Starting candidate on port $CANDIDATE_PORT"
@@ -118,12 +128,12 @@ PLAYWRIGHT_BASE_URL="http://127.0.0.1:$CANDIDATE_PORT" npm run test:browser
 cleanup_candidate
 CANDIDATE_PID=""
 
-say "Applying additive migrations and validated host configuration"
-npm run db:migrate
+say "Installing validated host configuration"
 sudo install -d -m 755 /etc/nginx/snippets
 sudo install -m 644 deploy/nginx/security-report-only.conf /etc/nginx/snippets/pump-investments-security.conf
 sudo install -m 644 deploy/nginx/pump-investments.conf /etc/nginx/conf.d/pump-investments.conf
 sudo install -m 644 deploy/logrotate/pump-investments /etc/logrotate.d/pump-investments
+sudo install -m 644 deploy/cron/pump-investments-support /etc/cron.d/pump-investments-support
 sudo nginx -t
 
 if [[ -L "$CURRENT_LINK" ]]; then PREVIOUS_RELEASE="$(readlink -f "$CURRENT_LINK")"; fi

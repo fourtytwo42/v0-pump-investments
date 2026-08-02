@@ -31,6 +31,24 @@ interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: "4.0.11",
+    date: "August 1, 2026",
+    changes: [
+      {
+        type: "new",
+        description: "Added compact problem reporting in Settings with ticket conversations, safe diagnostics, and screenshot uploads.",
+      },
+      {
+        type: "new",
+        description: "Problem reports can now receive support replies, request more information, reopen after resolution, and be permanently deleted by the user.",
+      },
+      {
+        type: "improved",
+        description: "Added protected VM-local ticket management and backend health snapshots to make feed and lifecycle problems easier to diagnose.",
+      },
+    ],
+  },
+  {
     version: "4.0.10",
     date: "August 1, 2026",
     changes: [

@@ -27,7 +27,7 @@ test("Nginx rate limits use the trusted real-IP result and overwrite forwarded h
   assert.doesNotMatch(config, /map \$http_cf_connecting_ip/)
   assert.match(config, /real_ip_header CF-Connecting-IP/)
   assert.match(config, /proxy_set_header CF-Connecting-IP \$remote_addr/)
-  assert.equal(config.match(/include \/etc\/nginx\/snippets\/pump-investments-security\.conf/g)?.length, 8)
+  assert.equal(config.match(/include \/etc\/nginx\/snippets\/pump-investments-security\.conf/g)?.length, 9)
 })
 
 test("VM release stays manual and creates neither backups nor GitHub Actions", async () => {
@@ -46,11 +46,12 @@ test("VM cutover recreates PM2 processes so immutable release paths take effect"
   assert.match(script, /HSTS header missing or incorrect/)
 })
 
-test("CSP permits only the existing Cloudflare analytics origins", async () => {
+test("CSP permits Cloudflare analytics and the support Turnstile challenge", async () => {
   for (const file of ["security-report-only.conf", "security-enforced.conf"]) {
     const policy = await readFile(new URL(`../deploy/nginx/${file}`, import.meta.url), "utf8")
     assert.match(policy, /script-src[^;]+https:\/\/static\.cloudflareinsights\.com/)
     assert.match(policy, /connect-src[^;]+https:\/\/cloudflareinsights\.com/)
+    assert.match(policy, /frame-src[^;]+https:\/\/challenges\.cloudflare\.com/)
   }
 })
 

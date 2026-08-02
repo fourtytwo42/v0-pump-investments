@@ -61,6 +61,8 @@ export async function GET(request: Request): Promise<Response> {
     tableHealth,
     retainedAges,
     disk,
+    supportCounts,
+    supportAttachments,
   ] = await Promise.all([
     prisma.trade.findFirst({
       orderBy: { createdAt: "desc" },
@@ -100,6 +102,8 @@ export async function GET(request: Request): Promise<Response> {
       SELECT MIN(timestamp)::bigint AS oldest_trade_ms,MAX(timestamp)::bigint AS newest_trade_ms FROM trades
     `,
     diskMetrics(process.cwd()),
+    prisma.supportTicket.groupBy({ by: ["status"], _count: true }),
+    prisma.supportAttachment.aggregate({ _count: true, _sum: { byteSize: true } }),
   ])
   const latestTimestamp = Number(latestTrade?.timestamp ?? 0)
   const persistedLagMs =
@@ -152,6 +156,11 @@ export async function GET(request: Request): Promise<Response> {
     sol_price: {
       value_usd: sol ? Number(sol.priceUsd) : null,
       updated_at: sol?.updatedAt.toISOString() ?? null,
+    },
+    support: {
+      tickets: Object.fromEntries(supportCounts.map((row) => [row.status.toLowerCase(), row._count])),
+      attachments: Number(supportAttachments._count),
+      attachment_bytes: Number(supportAttachments._sum.byteSize ?? 0),
     },
   })
 }

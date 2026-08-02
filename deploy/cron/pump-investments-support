@@ -1,0 +1,1 @@
+17 3 * * * hendo420 cd /home/hendo420/pumpInvestments/current && /usr/bin/npm run support:cleanup >> /var/lib/pump-investments/logs/support-cleanup.log 2>&1

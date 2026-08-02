@@ -58,6 +58,27 @@ test("browser uses same-origin pricing, images, and generated alert audio", asyn
   }
 })
 
+test("problem reports persist a conversation and can be permanently deleted", async ({ page }) => {
+  await page.goto("/")
+  await dismissOnboarding(page)
+  await page.getByRole("button", { name: "Open settings" }).click()
+  await expect(page.getByRole("heading", { name: "Report a Problem" })).toBeVisible()
+  await page.getByRole("button", { name: "Report", exact: true }).click()
+  await page.getByLabel("What happened?").fill("Browser test support report\nThis ticket verifies the conversation flow.")
+  await page.getByRole("button", { name: "Submit report" }).click()
+  const ticketHeading = page.getByRole("heading", { name: /^PI-\d+$/ })
+  await expect(ticketHeading).toBeVisible()
+  const ticketNumber = await ticketHeading.textContent()
+  expect(ticketNumber).toBeTruthy()
+  await page.getByPlaceholder("Add more information...").fill("A follow-up from the browser test.")
+  await page.getByRole("button", { name: "Send", exact: true }).click()
+  await expect(page.getByText("A follow-up from the browser test.")).toBeVisible()
+  await page.getByRole("button", { name: "Close" }).last().click()
+  page.once("dialog", (dialog) => dialog.accept())
+  await page.getByRole("button", { name: `Delete ${ticketNumber}` }).click()
+  await expect(page.getByText(ticketNumber!, { exact: false })).toHaveCount(0)
+})
+
 test("token cards preserve bright borders and refined content fit", async ({ page }, testInfo) => {
   await page.goto("/")
   await dismissOnboarding(page)

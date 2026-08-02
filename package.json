@@ -1,6 +1,6 @@
 {
   "name": "pump-investments",
-  "version": "4.0.10",
+  "version": "4.0.11",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit --project tsconfig.json",
     "test": "tsx --test tests/**/*.test.ts",
     "test:integration": "tsx --test tests/postgres-v409.integration.test.ts",
+    "test:support-integration": "tsx --test tests/postgres-support.integration.test.ts",
     "test:browser": "playwright test",
     "start": "next start",
     "postinstall": "prisma generate",
@@ -19,6 +20,7 @@
     "backfill:aggregates": "tsx --tsconfig tsconfig.json scripts/backfill-token-aggregates.ts",
     "backfill:lifecycle": "tsx --tsconfig tsconfig.json scripts/backfill-token-lifecycles.ts",
     "smoke:pi-bot": "tsx --tsconfig tsconfig.json scripts/smoke-pi-bot.ts",
+    "support:cleanup": "tsx --tsconfig tsconfig.json scripts/cleanup-support-attachments.ts",
     "pm2:web:restart": "pm2 restart pump-investments-web",
     "pm2:ingest:restart": "pm2 restart pump-investments-ingest",
     "pm2:web:restart-env": "pm2 restart pump-investments-web --update-env",
@@ -55,6 +57,7 @@
     "pg": "8.22.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "sharp": "0.35.3",
     "tailwind-merge": "2.6.0",
     "tailwindcss-animate": "1.0.7",
     "ws": "8.21.1",

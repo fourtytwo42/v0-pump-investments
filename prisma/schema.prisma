@@ -30,6 +30,40 @@ enum TokenLifecycleStatus {
   NON_LAUNCHPAD
 }
 
+enum SupportTicketStatus {
+  WAITING_FOR_SUPPORT
+  WAITING_FOR_USER
+  RESOLVED
+}
+
+enum SupportTicketCategory {
+  FEED
+  BONDING_GRADUATION
+  TOKEN_DATA
+  IMAGES
+  SETTINGS_UI
+  PI_BOT
+  OTHER
+}
+
+enum SupportTicketPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum SupportMessageAuthor {
+  USER
+  SUPPORT
+  SYSTEM
+}
+
+enum SupportMessageVisibility {
+  PUBLIC
+  INTERNAL
+}
+
 model Token {
   id                         String               @id @default(cuid())
   mintAddress                String               @unique @map("mint_address")
@@ -187,6 +221,88 @@ model RuntimeHealthState {
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("runtime_health_state")
+}
+
+model SupportClient {
+  id               String          @id @default(cuid())
+  publicId         String          @unique @map("public_id")
+  sessionTokenHash String          @unique @map("session_token_hash")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  lastSeenAt       DateTime        @default(now()) @map("last_seen_at")
+  expiresAt        DateTime        @map("expires_at")
+  tickets          SupportTicket[]
+
+  @@index([expiresAt])
+  @@map("support_clients")
+}
+
+model SupportTicket {
+  id             String                @id @default(cuid())
+  ticketNumber   BigInt                @unique @default(autoincrement()) @map("ticket_number")
+  clientId       String                @map("client_id")
+  category       SupportTicketCategory
+  status         SupportTicketStatus   @default(WAITING_FOR_SUPPORT)
+  priority       SupportTicketPriority @default(NORMAL)
+  summary        String
+  revision       Int                   @default(1)
+  userLastReadAt DateTime?              @map("user_last_read_at")
+  resolvedAt     DateTime?              @map("resolved_at")
+  createdAt      DateTime               @default(now()) @map("created_at")
+  updatedAt      DateTime               @default(now()) @updatedAt @map("updated_at")
+  client         SupportClient          @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  messages       SupportMessage[]
+  diagnostics    SupportDiagnosticSnapshot[]
+
+  @@index([clientId, updatedAt])
+  @@index([status, updatedAt])
+  @@map("support_tickets")
+}
+
+model SupportMessage {
+  id          String                   @id @default(cuid())
+  ticketId    String                   @map("ticket_id")
+  author      SupportMessageAuthor
+  visibility  SupportMessageVisibility @default(PUBLIC)
+  body        String
+  createdAt   DateTime                 @default(now()) @map("created_at")
+  ticket      SupportTicket            @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  attachments SupportAttachment[]
+  diagnostics SupportDiagnosticSnapshot[]
+
+  @@index([ticketId, createdAt])
+  @@map("support_messages")
+}
+
+model SupportAttachment {
+  id           String         @id @default(cuid())
+  messageId    String         @map("message_id")
+  storageKey   String         @unique @map("storage_key")
+  originalName String         @map("original_name")
+  mimeType     String         @map("mime_type")
+  byteSize     Int            @map("byte_size")
+  sha256       String
+  width        Int
+  height       Int
+  createdAt    DateTime       @default(now()) @map("created_at")
+  message      SupportMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([messageId])
+  @@map("support_attachments")
+}
+
+model SupportDiagnosticSnapshot {
+  id            String          @id @default(cuid())
+  ticketId      String          @map("ticket_id")
+  messageId     String?         @map("message_id")
+  schemaVersion Int             @default(1) @map("schema_version")
+  frontend      Json?
+  backend       Json?
+  createdAt     DateTime        @default(now()) @map("created_at")
+  ticket        SupportTicket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  message       SupportMessage? @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId, createdAt])
+  @@map("support_diagnostic_snapshots")
 }
 
 model TokenPrice {

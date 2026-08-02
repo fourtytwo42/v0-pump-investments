@@ -2,6 +2,22 @@
 
 This file is the durable work queue for repo maintenance and recovery. If chat context is lost, start here.
 
+### P1: In-app problem reporting
+
+#### T36. Add anonymous support tickets with diagnostics and screenshots
+- Status: `in_progress`
+- Goal:
+  - Let users create, revisit, reply to, and permanently delete problem reports from Settings while attaching safe frontend/backend diagnostics and validated screenshots.
+- Verification:
+  - Unit, TypeScript, ESLint, production build, PostgreSQL/API integration, three-engine browser coverage, Nginx/internal-admin isolation, and VM release validation.
+- Constraints:
+  - Browser-only anonymous identity, no account recovery, VM-local bearer-protected administration, no GitHub Actions or database-backup workflow.
+- Notes:
+  - V4.0.11 implementation adds a compact Settings ticket list/dialog, public conversation replies, authenticated screenshots, safe diagnostic snapshots, permanent deletion, and 30-second visible-only refresh.
+  - Browser ownership uses an opaque HttpOnly cookie plus a non-secret local installation ID. Support administration is bearer-protected on Next port 3001 and Nginx returns 404 for the admin route externally.
+  - Screenshots are validated, metadata-stripped, resized WebP files under the shared VM support directory. Quotas, low-disk rejection, Turnstile support, daily orphan cleanup, and protected health counts are included.
+  - Local verification passes 55 unit tests with two VM-only PostgreSQL tests skipped, TypeScript, ESLint, Prisma validation, production build, and zero production audit findings. VM migration, PostgreSQL support integration, three-engine browser flow, and live isolation checks remain.
+
 ### P0: False graduation classification
 
 #### T35. Stop treating Pump `pool_address` as migration evidence

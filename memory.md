@@ -45,6 +45,9 @@ This file stores durable project memory for recovery after context compression o
 - The reconnect hardening commit was pushed to `main`.
 
 ## Important Recent Changes
+- V4.0.11 adds anonymous in-app problem reports under Settings. Browser-scoped support sessions can create, revisit, reply to, reopen, and permanently delete tickets with safe frontend/backend diagnostics and authenticated screenshot attachments.
+- Support administration is available only on the VM-local Next port through bearer-protected `/api/admin/support/tickets` routes; Nginx returns 404 externally. Admin mutations require the current ticket revision to prevent overwriting concurrent user replies.
+- Support attachments live under `/var/lib/pump-investments/support-attachments`, are re-encoded to metadata-free WebP, and are bounded by per-message/ticket quotas plus daily orphan cleanup. `SUPPORT_ADMIN_TOKEN` and `SUPPORT_NETWORK_HASH_KEY` are generated into the shared mode-600 VM environment during release.
 - V4.0.10 narrows legacy migration detection to definitive `raydium_pool`, `pump_swap_pool`, and concrete trade evidence. A generic Pump `pool_address` is compatible with an incomplete bonding curve. A narrowly scoped repair allows only `CURVE_COMPLETE + PUMP_BONDING + no PumpSwap pool` records to return to Bonding after Pump explicitly verifies them incomplete; the repair is prioritized at startup and every active reconciliation.
 - V4.0.9 coalesces public token revisions to one publication per second while dirty-mint rows retain every change kind. Snapshot reads now use one repeatable-read transaction and a bounded 100-entry, one-second single-flight cache keyed by normalized query plus observed revision.
 - Default Unique Buyers queries use buyer-minute aggregates plus the exact partial minute. Configured individual-buy thresholds continue to scan raw buy trades through the partial covering index `trades_recent_buy_filter_idx`.

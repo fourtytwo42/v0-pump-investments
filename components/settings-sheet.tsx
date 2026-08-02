@@ -22,6 +22,7 @@ import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import type { DashboardSettings } from "@/hooks/use-settings"
 import { db } from "@/lib/db"
+import { SupportTicketSection } from "@/components/support-ticket-section"
 
 interface SettingsSheetProps {
   open: boolean
@@ -90,6 +91,8 @@ export function SettingsSheet({
         </SheetHeader>
 
         <div className="py-4 space-y-6">
+          <SupportTicketSection />
+
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label>Tokens Per Page: {settings.tokensPerPage}</Label>

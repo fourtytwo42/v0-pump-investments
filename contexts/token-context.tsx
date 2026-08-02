@@ -6,6 +6,7 @@ import { db } from "@/lib/db"
 import { toast } from "@/components/ui/use-toast"
 import type { TokenData, TokenQueryOptions } from "@/types/token-data"
 import { useTokenStore } from "@/stores/token-store"
+import { ClientDiagnosticRecorder } from "@/components/client-diagnostic-recorder"
 
 interface TokenContextType {
   tokens: Map<string, TokenData>
@@ -352,7 +353,7 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
     ],
   )
 
-  return <TokenContext.Provider value={value}>{children}</TokenContext.Provider>
+  return <TokenContext.Provider value={value}><ClientDiagnosticRecorder />{children}</TokenContext.Provider>
 }
 
 export function useTokenContext() {
