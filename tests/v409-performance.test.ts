@@ -33,9 +33,12 @@ test("Nginx rate limits use the trusted real-IP result and overwrite forwarded h
 
 test("VM release stays manual and creates neither backups nor GitHub Actions", async () => {
   const script = await readFile(new URL("../deploy/vm-release.sh", import.meta.url), "utf8")
+  const support = await readFile(new URL("../lib/support-ticket.ts", import.meta.url), "utf8")
   assert.match(script, /git -C "\$CONTROL_REPO" fetch --prune origin main/)
   assert.match(script, /CANDIDATE_PORT=3002/)
-  assert.match(script, /SUPPORT_TURNSTILE_SECRET_KEY="" npm start/)
+  assert.match(script, /SUPPORT_TURNSTILE_LOOPBACK_TEST_BYPASS="1" npm start/)
+  assert.match(support, /SUPPORT_TURNSTILE_LOOPBACK_TEST_BYPASS === "1"/)
+  assert.match(support, /\["127\.0\.0\.1", "localhost", "::1"\]\.includes\(requestHostname\)/)
   assert.doesNotMatch(script, /pg_dump|github\/workflows|gh workflow/)
 })
 

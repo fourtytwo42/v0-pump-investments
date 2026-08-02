@@ -118,9 +118,9 @@ npx playwright install --with-deps chromium firefox webkit
 
 say "Starting candidate on port $CANDIDATE_PORT"
 # The candidate is reachable only on loopback and has no Nginx trusted-LAN
-# marker. Disable server-side Turnstile for this isolated browser-test process;
-# the public cutover runs with the shared production secret.
-PORT="$CANDIDATE_PORT" APP_VERSION="$VERSION" SUPPORT_TURNSTILE_SECRET_KEY="" npm start > "$SHARED_ROOT/logs/candidate-$COMMIT.log" 2>&1 &
+# marker. Allow a loopback-hostname bypass only in this isolated browser-test
+# process; the public cutover never receives this flag.
+PORT="$CANDIDATE_PORT" APP_VERSION="$VERSION" SUPPORT_TURNSTILE_LOOPBACK_TEST_BYPASS="1" npm start > "$SHARED_ROOT/logs/candidate-$COMMIT.log" 2>&1 &
 CANDIDATE_PID=$!
 for _ in {1..60}; do
   curl -fsS "http://127.0.0.1:$CANDIDATE_PORT/api/health" >/dev/null && break

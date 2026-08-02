@@ -210,6 +210,8 @@ export async function loadStoredImage(storageKey: string): Promise<Buffer> {
 }
 
 export async function verifyTurnstile(request: Request, token?: string): Promise<boolean> {
+  const requestHostname = new URL(request.url).hostname
+  if (process.env.SUPPORT_TURNSTILE_LOOPBACK_TEST_BYPASS === "1" && ["127.0.0.1", "localhost", "::1"].includes(requestHostname)) return true
   if (request.headers.get("x-pump-trusted-lan") === "1") return true
   const secret = process.env.SUPPORT_TURNSTILE_SECRET_KEY
   if (!secret) return true
