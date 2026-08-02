@@ -24,7 +24,8 @@ This file stores durable project memory for recovery after context compression o
   - `pump-investments-ingest`
 
 ## Current Operational State
-- Version 4.0.9 is deployed from immutable `main` release `5e31f414275d0383959909eb3a6068d726fa8c26` at both `http://192.168.50.237:3000` and `https://pump.investments`.
+- Version 4.0.10 is deployed from immutable `main` release `f7266aced8cb92e2943ee784adb5f78fa84b324a`. Pump's generic bonding `pool_address` no longer counts as graduation evidence, and a prioritized verified repair pass corrected active false graduates.
+- The previous v4.0.9 immutable release was `5e31f414275d0383959909eb3a6068d726fa8c26`.
 - `/home/hendo420/pumpInvestments/current` points to the immutable v4.0.9 release. Both PM2 services run from that directory, the three newest releases are retained, and shared environment/spool/image/log state remains under `/var/lib/pump-investments`.
 - V4.0.9 live query p95 was 60.2 ms LAN / 178.8 ms public for the common 10-minute snapshot and 286.0 ms LAN / 448.2 ms public for a 60-minute Unique Buyers query. All 20 requests in each sample returned 200.
 - The final five-minute CSP report-only soak produced zero violations after narrowly allowing the existing Cloudflare Web Analytics origins. CSP is enforced, HSTS is `max-age=31536000`, and the rate-limit zones are versioned so the trusted-real-IP key can reload without conflicting with legacy shared memory.
@@ -44,6 +45,7 @@ This file stores durable project memory for recovery after context compression o
 - The reconnect hardening commit was pushed to `main`.
 
 ## Important Recent Changes
+- V4.0.10 narrows legacy migration detection to definitive `raydium_pool`, `pump_swap_pool`, and concrete trade evidence. A generic Pump `pool_address` is compatible with an incomplete bonding curve. A narrowly scoped repair allows only `CURVE_COMPLETE + PUMP_BONDING + no PumpSwap pool` records to return to Bonding after Pump explicitly verifies them incomplete; the repair is prioritized at startup and every active reconciliation.
 - V4.0.9 coalesces public token revisions to one publication per second while dirty-mint rows retain every change kind. Snapshot reads now use one repeatable-read transaction and a bounded 100-entry, one-second single-flight cache keyed by normalized query plus observed revision.
 - Default Unique Buyers queries use buyer-minute aggregates plus the exact partial minute. Configured individual-buy thresholds continue to scan raw buy trades through the partial covering index `trades_recent_buy_filter_idx`.
 - Token and alert SSE work is shared per normalized query/mint set. The web process polls the public revision at most once per second, and failed token-group refreshes remain retryable at the same revision.
@@ -152,7 +154,6 @@ This file stores durable project memory for recovery after context compression o
   - `INGEST_METADATA_OVERLOAD_QUEUE_THRESHOLD`
 
 ## Known Problems
-- Pump's current frontend response includes a generic `pool_address` on incomplete bonding tokens. `lib/token-lifecycle.ts` currently treats it as legacy Raydium migration evidence, causing mass false `CURVE_COMPLETE` classifications. A 2026-08-01 ten-minute production cross-tab found 465 `CURVE_COMPLETE + PUMP_BONDING` records versus 89 `BONDING + PUMP_BONDING`. All ten directly checked suspects were still incomplete with no PumpSwap/Raydium pool. T35 must remove generic `pool_address` as completion proof and backfill affected tokens from authoritative fields.
 - Active lifecycle reconciliation can exceed its 75-second target under the complete trade feed. A 2026-08-01 audit found about 3,000 queued checks, 2,698 due, and a 151-second oldest-overdue age; the 50-token/2.2-second worker has less throughput than the one-minute active re-enqueue rate. Classification remains evidence-based and self-correcting, but API-only graduation may display as Bonding for two to three minutes until T34 is addressed.
 - PM2 env changes require `--update-env` on restart if `.env` has changed.
 - PI Bot shares the GPU45 appliance with other clients. A Qwen-to-Ornith model swap can take about a minute, so `/api/chat` sends non-buffered JSON whitespace heartbeats while it waits.

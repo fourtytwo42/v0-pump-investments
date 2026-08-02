@@ -5,7 +5,7 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 ### P0: False graduation classification
 
 #### T35. Stop treating Pump `pool_address` as migration evidence
-- Status: `in_progress`
+- Status: `done`
 - Goal:
   - Restore actively bonding Pump tokens that were falsely promoted to `CURVE_COMPLETE`, while retaining definitive `pump_swap_pool`, `raydium_pool`, and concrete trade-venue migration evidence.
 - Verification:
@@ -17,6 +17,9 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - `classifyPumpLifecycle()` currently aliases `pool_address` to legacy Raydium evidence. This is the false-graduation cause and must be narrowed to definitive migration fields/evidence.
   - The three tokens observed transitioning during the initial T34 audit were also falsely promoted from generic `pool_address`; they were not confirmed migrations.
   - The repair candidate enqueue runs at startup and with each active reconciliation so previously false-graduated tokens that become active later are also reverified promptly.
+  - Release v4.0.10 is live from commit `f7266ac`. The ten-minute cross-state reached zero after the startup repair. Subsequent samples contained only 0-7 old false records that had resumed trading within the preceding 51 seconds; the one-minute active repair prioritizes them on its next cycle.
+  - With the normal saved/default filters, the public Bonding result increased from roughly two pages to eight pages (89 current tokens at final verification). Public health reports v4.0.10/status ok and both PM2 services are online.
+  - Release gates passed: 53 unit tests with one intentional skip, the VM PostgreSQL integration test, TypeScript, ESLint, production build, zero production audit findings, two 15-test browser passes during candidate/public validation, SSE/health checks, and the enforced-CSP soak.
 
 ### P0: Lifecycle verifier throughput
 
