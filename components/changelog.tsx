@@ -31,6 +31,20 @@ interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: "4.0.10",
+    date: "August 1, 2026",
+    changes: [
+      {
+        type: "fixed",
+        description: "Stopped treating Pump's bonding pool address as graduation evidence, restoring actively bonding tokens to the Bonding feed.",
+      },
+      {
+        type: "fixed",
+        description: "Added a verified repair pass for tokens previously misclassified as graduated while still trading on Pump's bonding curve.",
+      },
+    ],
+  },
+  {
     version: "4.0.9",
     date: "August 1, 2026",
     changes: [

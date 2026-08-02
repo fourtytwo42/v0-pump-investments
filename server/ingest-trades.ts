@@ -36,7 +36,7 @@ import {
   classifyPumpSwapTradeEvidence,
   isCompletedLifecycle,
   lifecycleRetrySchedule,
-  reduceLifecycle,
+  reduceLifecycleWithVenueRepair,
 } from "@/lib/token-lifecycle"
 import { reduceTokenProvenance } from "@/lib/token-provenance"
 import { ingestRetryDelayMs } from "@/lib/ingest-retry"
@@ -346,6 +346,28 @@ async function enqueueLifecycleChecksByQuery(mode: "all" | "active"): Promise<vo
   `)
 }
 
+async function enqueueFalsePoolAddressRepairs(): Promise<void> {
+  if (!LIFECYCLE_VERIFIER_ENABLED) return
+  const activeCutoff = BigInt(Date.now() - LIFECYCLE_RECHECK_WINDOW_MS)
+  await prisma.$executeRawUnsafe(`
+    INSERT INTO token_lifecycle_checks
+      (token_id,requested_at,next_attempt_at,attempts,priority,reason,updated_at)
+    SELECT t.id,NOW(),NOW(),0,95,'false_pool_address_repair',NOW()
+    FROM tokens t
+    JOIN token_prices tp ON tp.token_id=t.id AND tp.last_trade_timestamp >= ${activeCutoff}
+    WHERE t.lifecycle_status='CURVE_COMPLETE'
+      AND t.trade_venue='PUMP_BONDING'
+      AND t.pump_swap_pool IS NULL
+    ON CONFLICT (token_id) DO UPDATE SET
+      requested_at=NOW(),
+      next_attempt_at=NOW(),
+      attempts=0,
+      priority=GREATEST(token_lifecycle_checks.priority,95),
+      reason='false_pool_address_repair',
+      updated_at=NOW()
+  `)
+}
+
 async function rescheduleLifecycleCheck(
   tokenId: string,
   attempts: number,
@@ -394,8 +416,16 @@ async function applyVerifiedLifecycle(
     return false
   }
 
-  const transition = reduceLifecycle(check.token.lifecycleStatus, verified)
+  const transition = reduceLifecycleWithVenueRepair(check.token.lifecycleStatus, verified, {
+    tradeVenue: check.token.tradeVenue,
+    pumpSwapPool: check.token.pumpSwapPool,
+  })
   const now = new Date()
+  if (transition.repairedFalseGraduation) {
+    console.warn(
+      `[lifecycle] event=false_graduation_repaired mint=${check.token.mintAddress} source=pool_address`,
+    )
+  }
   if (transition.conflict) {
     console.warn(
       `[lifecycle] event=conflict mint=${check.token.mintAddress} current=${check.token.lifecycleStatus} observed=${verified.status}`,
@@ -447,8 +477,9 @@ async function applyVerifiedLifecycle(
         bondingProgress: nextBondingProgress,
         completed: isCompletedLifecycle(transition.next),
         pumpSwapPool: nextPool,
-        graduatedAt:
-          isCompletedLifecycle(transition.next) && !check.token.graduatedAt
+        graduatedAt: transition.repairedFalseGraduation
+          ? null
+          : isCompletedLifecycle(transition.next) && !check.token.graduatedAt
             ? now
             : check.token.graduatedAt,
         bondingCurve: nextBondingCurve,
@@ -1983,6 +2014,7 @@ setInterval(() => void flushTokenRevision(), 1_000)
 if (LIFECYCLE_VERIFIER_ENABLED) {
   setTimeout(() => {
     void reconcileStoredRaydiumMigrations()
+      .then(() => enqueueFalsePoolAddressRepairs())
       .then(() => enqueueLifecycleChecksByQuery("all"))
       .then(() => processLifecycleChecks())
       .catch((error) => console.warn("[lifecycle] Initial backfill enqueue failed:", (error as Error).message))

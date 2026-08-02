@@ -2,6 +2,35 @@
 
 This file is the durable work queue for repo maintenance and recovery. If chat context is lost, start here.
 
+### P0: False graduation classification
+
+#### T35. Stop treating Pump `pool_address` as migration evidence
+- Status: `in_progress`
+- Goal:
+  - Restore actively bonding Pump tokens that were falsely promoted to `CURVE_COMPLETE`, while retaining definitive `pump_swap_pool`, `raydium_pool`, and concrete trade-venue migration evidence.
+- Verification:
+  - Reclassify the affected active set against Pump's live response, verify Bonding/Graduated filters against Pump, and ensure no completed token can downgrade.
+- Notes:
+  - A 2026-08-01 ten-minute production cross-tab found 465 tokens labeled `CURVE_COMPLETE` while their current venue remained `PUMP_BONDING`, versus only 89 labeled `BONDING` on that venue.
+  - Pump's current response supplies `pool_address` for incomplete bonding tokens. Examples returned `complete=false`, `program=pump`, no `pump_swap_pool`, no `raydium_pool`, and nearly full real-token reserves.
+  - All ten sampled `CURVE_COMPLETE + PUMP_BONDING` records were confirmed false graduates by Pump's single-token endpoint. With the current saved/default UI filters, 71 records were in that suspect group versus only 27 correctly visible Bonding records.
+  - `classifyPumpLifecycle()` currently aliases `pool_address` to legacy Raydium evidence. This is the false-graduation cause and must be narrowed to definitive migration fields/evidence.
+  - The three tokens observed transitioning during the initial T34 audit were also falsely promoted from generic `pool_address`; they were not confirmed migrations.
+
+### P0: Lifecycle verifier throughput
+
+#### T34. Keep active graduation verification within its 75-second target
+- Status: `open`
+- Goal:
+  - Prevent the active lifecycle queue from falling behind the one-minute reconciliation interval while preserving Pump API rate-limit handling and monotonic lifecycle transitions.
+- Verification:
+  - Compare every active `BONDING` token with Pump's batch response, keep the oldest overdue check below 75 seconds, and verify confirmed pool/completion transitions reach the public API and SSE promptly.
+- Notes:
+  - A 2026-08-01 live audit found 2,963 queued lifecycle checks, 2,698 already due, and an oldest-overdue age of about 151 seconds.
+  - The worker processes at most 50 tokens every 2.2 seconds (about 22.7 tokens/second), but the active reconciliation was re-enqueuing roughly 3,000 tokens every minute (about 50 tokens/second).
+  - Three active tokens labeled `BONDING` were promoted during the audit, but follow-up single-token responses proved their generic `pool_address` values were not migration evidence. T35 tracks that separate classification defect.
+  - Production had zero active `BONDING` rows with progress at or above 99%, a stored pool, or `PUMPSWAP` trade venue after the transitions.
+
 ### P0: v4.0.9 performance and VM operations release
 
 #### T33. Ship query, realtime, cache, security, accessibility, and immutable VM release improvements

@@ -152,6 +152,8 @@ This file stores durable project memory for recovery after context compression o
   - `INGEST_METADATA_OVERLOAD_QUEUE_THRESHOLD`
 
 ## Known Problems
+- Pump's current frontend response includes a generic `pool_address` on incomplete bonding tokens. `lib/token-lifecycle.ts` currently treats it as legacy Raydium migration evidence, causing mass false `CURVE_COMPLETE` classifications. A 2026-08-01 ten-minute production cross-tab found 465 `CURVE_COMPLETE + PUMP_BONDING` records versus 89 `BONDING + PUMP_BONDING`. All ten directly checked suspects were still incomplete with no PumpSwap/Raydium pool. T35 must remove generic `pool_address` as completion proof and backfill affected tokens from authoritative fields.
+- Active lifecycle reconciliation can exceed its 75-second target under the complete trade feed. A 2026-08-01 audit found about 3,000 queued checks, 2,698 due, and a 151-second oldest-overdue age; the 50-token/2.2-second worker has less throughput than the one-minute active re-enqueue rate. Classification remains evidence-based and self-correcting, but API-only graduation may display as Bonding for two to three minutes until T34 is addressed.
 - PM2 env changes require `--update-env` on restart if `.env` has changed.
 - PI Bot shares the GPU45 appliance with other clients. A Qwen-to-Ornith model swap can take about a minute, so `/api/chat` sends non-buffered JSON whitespace heartbeats while it waits.
 - Some third-party token metadata URLs return 403 or 404; the API continues serving token data and uses its existing fallback/cooldown behavior.

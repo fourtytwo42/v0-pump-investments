@@ -30,6 +30,12 @@ export interface VerifiedLifecycle {
   bondingProgress: number | null
 }
 
+export interface LifecycleTransition {
+  next: TokenLifecycleStatus
+  conflict: boolean
+  repairedFalseGraduation?: boolean
+}
+
 const COMPLETED_STATES = new Set<TokenLifecycleStatus>(["CURVE_COMPLETE", "PUMPSWAP"])
 const INITIAL_REAL_TOKEN_RATIO = 0.7931
 
@@ -108,7 +114,7 @@ export function toPublicLifecycle(status: TokenLifecycleStatus): PublicTokenLife
 
 export function classifyPumpLifecycle(payload: PumpLifecyclePayload): VerifiedLifecycle | null {
   const pumpSwapPool = optionalString(payload.pump_swap_pool)
-  const raydiumPool = optionalString(payload.raydium_pool) ?? optionalString(payload.pool_address)
+  const raydiumPool = optionalString(payload.raydium_pool)
   const program = optionalString(payload.program)?.toLowerCase() ?? null
   const bondingCurve = optionalString(payload.bonding_curve)
   const associatedBondingCurve = optionalString(payload.associated_bonding_curve)
@@ -171,7 +177,7 @@ export function classifyPumpLifecycle(payload: PumpLifecyclePayload): VerifiedLi
 export function reduceLifecycle(
   current: TokenLifecycleStatus,
   verified: VerifiedLifecycle,
-): { next: TokenLifecycleStatus; conflict: boolean } {
+): LifecycleTransition {
   if (current === "PUMPSWAP") {
     return { next: current, conflict: verified.status !== "PUMPSWAP" }
   }
@@ -191,6 +197,23 @@ export function reduceLifecycle(
   }
 
   return { next: verified.status, conflict: false }
+}
+
+export function reduceLifecycleWithVenueRepair(
+  current: TokenLifecycleStatus,
+  verified: VerifiedLifecycle,
+  evidence: { tradeVenue: string; pumpSwapPool: string | null },
+): LifecycleTransition {
+  if (
+    current === "CURVE_COMPLETE" &&
+    verified.status === "BONDING" &&
+    evidence.tradeVenue === "PUMP_BONDING" &&
+    !evidence.pumpSwapPool
+  ) {
+    return { next: "BONDING", conflict: false, repairedFalseGraduation: true }
+  }
+
+  return reduceLifecycle(current, verified)
 }
 
 export function lifecycleRetryDelayMs(attempts: number): number {

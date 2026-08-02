@@ -10,6 +10,7 @@ import {
   lifecycleRetryDelayMs,
   lifecycleRetrySchedule,
   reduceLifecycle,
+  reduceLifecycleWithVenueRepair,
 } from "@/lib/token-lifecycle"
 
 test("classifies a low-market-cap token with a PumpSwap pool as PumpSwap", () => {
@@ -94,9 +95,44 @@ test("recognizes Pump frontend legacy Raydium pool evidence even when complete i
     })?.status,
     "CURVE_COMPLETE",
   )
-  assert.equal(
-    classifyPumpLifecycle({ program: "pump", complete: false, pool_address: "legacy-pool" })?.status,
-    "CURVE_COMPLETE",
+})
+
+test("does not treat a bonding token pool_address as migration evidence", () => {
+  const result = classifyPumpLifecycle({
+    program: "pump",
+    complete: false,
+    pool_address: "bonding-pool-address",
+    pump_swap_pool: null,
+    raydium_pool: null,
+    real_token_reserves: 792_911_641_440_286,
+    total_supply: 1_000_000_000_000_000,
+  })
+  assert.equal(result?.status, "BONDING")
+  assert.ok(result?.bondingProgress !== null && result.bondingProgress < 1)
+})
+
+test("repairs only false curve completion on the verified Pump bonding venue", () => {
+  const bonding = classifyPumpLifecycle({ complete: false, program: "pump", pool_address: "curve-pool" })!
+  assert.deepEqual(
+    reduceLifecycleWithVenueRepair("CURVE_COMPLETE", bonding, {
+      tradeVenue: "PUMP_BONDING",
+      pumpSwapPool: null,
+    }),
+    { next: "BONDING", conflict: false, repairedFalseGraduation: true },
+  )
+  assert.deepEqual(
+    reduceLifecycleWithVenueRepair("CURVE_COMPLETE", bonding, {
+      tradeVenue: "RAYDIUM_V4",
+      pumpSwapPool: null,
+    }),
+    { next: "CURVE_COMPLETE", conflict: true },
+  )
+  assert.deepEqual(
+    reduceLifecycleWithVenueRepair("CURVE_COMPLETE", bonding, {
+      tradeVenue: "PUMP_BONDING",
+      pumpSwapPool: "confirmed-pumpswap-pool",
+    }),
+    { next: "CURVE_COMPLETE", conflict: true },
   )
 })
 
