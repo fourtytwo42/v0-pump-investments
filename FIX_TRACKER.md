@@ -17,6 +17,7 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - Browser ownership uses an opaque HttpOnly cookie plus a non-secret local installation ID. Support administration is bearer-protected on Next port 3001 and Nginx returns 404 for the admin route externally.
   - Screenshots are validated, metadata-stripped, resized WebP files under the shared VM support directory. Quotas, low-disk rejection, Turnstile support, daily orphan cleanup, and protected health counts are included.
   - Local verification passes 55 unit tests with two VM-only PostgreSQL tests skipped, TypeScript, ESLint, Prisma validation, production build, and zero production audit findings. VM migration, PostgreSQL support integration, three-engine browser flow, and live isolation checks remain.
+  - The first public soak exposed an ambiguous nested-dialog close selector after ticket create/reply; the ticket detail now has an explicit `Close ticket` action so Settings remains open for deletion.
 
 ### P0: False graduation classification
 
