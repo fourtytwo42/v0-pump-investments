@@ -18,7 +18,7 @@ die() { printf '\n[v409-release] ERROR: %s\n' "$*" >&2; exit 1; }
 
 cleanup_candidate() {
   if [[ -n "$CANDIDATE_PID" ]] && kill -0 "$CANDIDATE_PID" 2>/dev/null; then
-    kill "$CANDIDATE_PID" 2>/dev/null || true
+    kill -TERM -- "-$CANDIDATE_PID" 2>/dev/null || true
     wait "$CANDIDATE_PID" 2>/dev/null || true
   fi
 }
@@ -120,13 +120,20 @@ say "Starting candidate on port $CANDIDATE_PORT"
 # The candidate is reachable only on loopback and has no Nginx trusted-LAN
 # marker. Allow a loopback-hostname bypass only in this isolated browser-test
 # process; the public cutover never receives this flag.
-PORT="$CANDIDATE_PORT" APP_VERSION="$VERSION" SUPPORT_TURNSTILE_LOOPBACK_TEST_BYPASS="1" npm start > "$SHARED_ROOT/logs/candidate-$COMMIT.log" 2>&1 &
+if ss -H -ltn "sport = :$CANDIDATE_PORT" | grep -q .; then
+  die "Candidate port $CANDIDATE_PORT is already in use"
+fi
+setsid env PORT="$CANDIDATE_PORT" APP_VERSION="$VERSION" SUPPORT_TURNSTILE_LOOPBACK_TEST_BYPASS="1" npm start > "$SHARED_ROOT/logs/candidate-$COMMIT.log" 2>&1 &
 CANDIDATE_PID=$!
+candidate_is_ready() {
+  curl -fsS "http://127.0.0.1:$CANDIDATE_PORT/api/health" |
+    node -e 'let body=""; process.stdin.on("data", chunk => body += chunk).on("end", () => { const health = JSON.parse(body); process.exit(health.version === process.argv[1] ? 0 : 1) })' "$VERSION"
+}
 for _ in {1..60}; do
-  curl -fsS "http://127.0.0.1:$CANDIDATE_PORT/api/health" >/dev/null && break
+  candidate_is_ready && break
   sleep 1
 done
-curl -fsS "http://127.0.0.1:$CANDIDATE_PORT/api/health" >/dev/null || die "Candidate health check failed"
+candidate_is_ready || die "Candidate health/version check failed"
 PLAYWRIGHT_BASE_URL="http://127.0.0.1:$CANDIDATE_PORT" npm run test:browser
 cleanup_candidate
 CANDIDATE_PID=""

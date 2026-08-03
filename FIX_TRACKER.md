@@ -17,6 +17,18 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - The count sits beside Connected/Offline, keeps the number visible on narrow screens, and exposes the full meaning and active window in an accessible tooltip.
   - Local checks pass: 58 unit tests with two intentional VM-only skips, TypeScript, ESLint, production build, same-cookie heartbeat deduplication, cross-origin rejection, and zero production audit findings. VM candidate/browser/live checks remain before marking done.
 
+### P1: VM release isolation
+
+#### T38. Prevent stale candidate servers from contaminating release tests
+- Status: `in_progress`
+- Goal:
+  - Ensure the candidate browser suite can test only the intended immutable release and that cleanup terminates the complete candidate process tree.
+- Verification:
+  - Re-run the v4.0.12 VM release, confirm the health version matches before Playwright, and confirm port 3002 is empty after candidate cleanup.
+- Notes:
+  - The first v4.0.12 attempt correctly made no cutover, but an orphaned v4.0.11 `next-server` from release `c57ba516...` still owned port 3002. The new candidate failed with `EADDRINUSE` while the old health endpoint let Playwright continue against stale code.
+  - The release script now refuses an occupied candidate port, launches the candidate in a dedicated process group, terminates that group during cleanup, and requires `/api/health.version` to equal the intended package version before browser tests.
+
 ### P1: In-app problem reporting
 
 #### T36. Add anonymous support tickets with diagnostics and screenshots

@@ -160,6 +160,7 @@ This file stores durable project memory for recovery after context compression o
   - `INGEST_METADATA_OVERLOAD_QUEUE_THRESHOLD`
 
 ## Known Problems
+- The first v4.0.12 release attempt found an orphaned v4.0.11 candidate server on port 3002. Production was not cut over. Candidate launches now use a dedicated process group, reject occupied port 3002, and verify the exact health version before Playwright so stale builds cannot pass release gates.
 - Active lifecycle reconciliation can exceed its 75-second target under the complete trade feed. A 2026-08-01 audit found about 3,000 queued checks, 2,698 due, and a 151-second oldest-overdue age; the 50-token/2.2-second worker has less throughput than the one-minute active re-enqueue rate. Classification remains evidence-based and self-correcting, but API-only graduation may display as Bonding for two to three minutes until T34 is addressed.
 - PM2 env changes require `--update-env` on restart if `.env` has changed.
 - PI Bot shares the GPU45 appliance with other clients. A Qwen-to-Ornith model swap can take about a minute, so `/api/chat` sends non-buffered JSON whitespace heartbeats while it waits.
