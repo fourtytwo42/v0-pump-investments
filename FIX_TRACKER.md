@@ -5,7 +5,7 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 ### P2: Live audience visibility
 
 #### T37. Show active browser sessions in the header
-- Status: `in_progress`
+- Status: `done`
 - Goal:
   - Show how many distinct browser installations are actively using the app without collecting personal information or counting multiple tabs separately.
 - Verification:
@@ -15,19 +15,22 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 - Notes:
   - The implementation uses one host-only HttpOnly UUID per browser, a 25-second visible-only heartbeat, and a 75-second active window. Multiple tabs refresh the same bounded process-local record, so they count once and create no PostgreSQL write load.
   - The count sits beside Connected/Offline, keeps the number visible on narrow screens, and exposes the full meaning and active window in an accessible tooltip.
-  - Local checks pass: 58 unit tests with two intentional VM-only skips, TypeScript, ESLint, production build, same-cookie heartbeat deduplication, cross-origin rejection, and zero production audit findings. VM candidate/browser/live checks remain before marking done.
+  - Local checks pass: 58 unit tests with two intentional VM-only skips, TypeScript, ESLint, production build, same-cookie heartbeat deduplication, cross-origin rejection, and zero production audit findings.
+  - Release v4.0.12 is live from immutable commit `f194aa2c449abdd6195a59a857b0d57f6e40a9b2`. Candidate coverage passed 18/18; public coverage passed 15/15 with three intentional managed-Turnstile skips; the five-minute CSP soak was clean and CSP is enforced.
+  - Live browser verification shows `v4.0.12`, Connected, and `1 online` together in the public header with the accessible name `1 active browser`. Public health is `ok` and both PM2 services are online from the v4.0.12 release.
 
 ### P1: VM release isolation
 
 #### T38. Prevent stale candidate servers from contaminating release tests
-- Status: `in_progress`
+- Status: `done`
 - Goal:
   - Ensure the candidate browser suite can test only the intended immutable release and that cleanup terminates the complete candidate process tree.
 - Verification:
   - Re-run the v4.0.12 VM release, confirm the health version matches before Playwright, and confirm port 3002 is empty after candidate cleanup.
 - Notes:
   - The first v4.0.12 attempt correctly made no cutover, but an orphaned v4.0.11 `next-server` from release `c57ba516...` still owned port 3002. The new candidate failed with `EADDRINUSE` while the old health endpoint let Playwright continue against stale code.
-  - The release script now refuses an occupied candidate port, launches the candidate in a dedicated process group, terminates that group during cleanup, and requires `/api/health.version` to equal the intended package version before browser tests.
+  - A process-group attempt still allowed `npm start` to orphan its Next child. The final implementation launches Next's CLI directly, records that exact server PID, requires `/api/health.version` to equal the intended package version, and fails unless port 3002 is empty after cleanup.
+  - VM verification launched the direct Next candidate as PID 284935, confirmed `4.0.12:ok`, terminated the recorded PID, and measured zero listeners on port 3002 afterward.
 
 ### P1: In-app problem reporting
 

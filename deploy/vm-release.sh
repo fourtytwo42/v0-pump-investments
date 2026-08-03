@@ -18,9 +18,13 @@ die() { printf '\n[v409-release] ERROR: %s\n' "$*" >&2; exit 1; }
 
 cleanup_candidate() {
   if [[ -n "$CANDIDATE_PID" ]] && kill -0 "$CANDIDATE_PID" 2>/dev/null; then
-    kill -TERM -- "-$CANDIDATE_PID" 2>/dev/null || true
+    kill -TERM "$CANDIDATE_PID" 2>/dev/null || true
     wait "$CANDIDATE_PID" 2>/dev/null || true
   fi
+}
+
+candidate_port_in_use() {
+  ss -H -ltn "sport = :$CANDIDATE_PORT" | grep -q .
 }
 
 cleanup_sudo_keepalive() {
@@ -120,10 +124,11 @@ say "Starting candidate on port $CANDIDATE_PORT"
 # The candidate is reachable only on loopback and has no Nginx trusted-LAN
 # marker. Allow a loopback-hostname bypass only in this isolated browser-test
 # process; the public cutover never receives this flag.
-if ss -H -ltn "sport = :$CANDIDATE_PORT" | grep -q .; then
+if candidate_port_in_use; then
   die "Candidate port $CANDIDATE_PORT is already in use"
 fi
-setsid env PORT="$CANDIDATE_PORT" APP_VERSION="$VERSION" SUPPORT_TURNSTILE_LOOPBACK_TEST_BYPASS="1" npm start > "$SHARED_ROOT/logs/candidate-$COMMIT.log" 2>&1 &
+env PORT="$CANDIDATE_PORT" APP_VERSION="$VERSION" SUPPORT_TURNSTILE_LOOPBACK_TEST_BYPASS="1" \
+  node node_modules/next/dist/bin/next start > "$SHARED_ROOT/logs/candidate-$COMMIT.log" 2>&1 &
 CANDIDATE_PID=$!
 candidate_is_ready() {
   curl -fsS "http://127.0.0.1:$CANDIDATE_PORT/api/health" |
@@ -136,6 +141,11 @@ done
 candidate_is_ready || die "Candidate health/version check failed"
 PLAYWRIGHT_BASE_URL="http://127.0.0.1:$CANDIDATE_PORT" npm run test:browser
 cleanup_candidate
+for _ in {1..50}; do
+  candidate_port_in_use || break
+  sleep 0.1
+done
+candidate_port_in_use && die "Candidate did not release port $CANDIDATE_PORT"
 CANDIDATE_PID=""
 
 say "Installing validated host configuration"

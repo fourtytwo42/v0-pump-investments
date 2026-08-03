@@ -24,7 +24,7 @@ This file stores durable project memory for recovery after context compression o
   - `pump-investments-ingest`
 
 ## Current Operational State
-- Version 4.0.11 is deployed from immutable `main` release `a82936b969a742544549c115d9d38ef157972dc7`. Anonymous support tickets, protected images, diagnostics, replies, deletion, VM-local administration, and Cloudflare Turnstile are live.
+- Version 4.0.12 is deployed from immutable `main` release `f194aa2c449abdd6195a59a857b0d57f6e40a9b2`. The privacy-preserving active-browser header count is live alongside the v4.0.11 support system.
 - The previous lifecycle-correction v4.0.10 release was `f7266aced8cb92e2943ee784adb5f78fa84b324a`.
 - `/home/hendo420/pumpInvestments/current` points to the immutable v4.0.11 release. Both PM2 services are online from that directory, exactly three releases are retained, and shared environment/spool/image/support/log state remains under `/var/lib/pump-investments`.
 - V4.0.9 live query p95 was 60.2 ms LAN / 178.8 ms public for the common 10-minute snapshot and 286.0 ms LAN / 448.2 ms public for a 60-minute Unique Buyers query. All 20 requests in each sample returned 200.
@@ -160,7 +160,7 @@ This file stores durable project memory for recovery after context compression o
   - `INGEST_METADATA_OVERLOAD_QUEUE_THRESHOLD`
 
 ## Known Problems
-- The first v4.0.12 release attempt found an orphaned v4.0.11 candidate server on port 3002. Production was not cut over. Candidate launches now use a dedicated process group, reject occupied port 3002, and verify the exact health version before Playwright so stale builds cannot pass release gates.
+- The first v4.0.12 release attempt found an orphaned v4.0.11 candidate server on port 3002. Production was not cut over. Candidate launches now invoke Next directly with an exact tracked PID, reject occupied port 3002, verify the exact health version before Playwright, and require the port to be empty after cleanup.
 - Active lifecycle reconciliation can exceed its 75-second target under the complete trade feed. A 2026-08-01 audit found about 3,000 queued checks, 2,698 due, and a 151-second oldest-overdue age; the 50-token/2.2-second worker has less throughput than the one-minute active re-enqueue rate. Classification remains evidence-based and self-correcting, but API-only graduation may display as Bonding for two to three minutes until T34 is addressed.
 - PM2 env changes require `--update-env` on restart if `.env` has changed.
 - PI Bot shares the GPU45 appliance with other clients. A Qwen-to-Ornith model swap can take about a minute, so `/api/chat` sends non-buffered JSON whitespace heartbeats while it waits.
