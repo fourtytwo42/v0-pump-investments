@@ -45,6 +45,8 @@ This file stores durable project memory for recovery after context compression o
 - The reconnect hardening commit was pushed to `main`.
 
 ## Important Recent Changes
+- V4.0.12 candidate adds a privacy-preserving active-browser count beside the header connection indicator. A host-only HttpOnly browser ID deduplicates tabs; visible clients heartbeat every 25 seconds and expire after 75 seconds. Presence stays process-local and bounded at 100,000 entries, avoiding database write churn and collecting no IP or user data.
+- The v4.0.12 lockfile also advances patched transitive `brace-expansion` and `fast-uri` releases after new high-severity advisories appeared; `npm audit --omit=dev` returns zero findings.
 - V4.0.11 adds anonymous in-app problem reports under Settings. Browser-scoped support sessions can create, revisit, reply to, reopen, and permanently delete tickets with safe frontend/backend diagnostics and authenticated screenshot attachments.
 - Support administration is available only on the VM-local Next port through bearer-protected `/api/admin/support/tickets` routes; Nginx returns 404 externally. Admin mutations require the current ticket revision to prevent overwriting concurrent user replies.
 - Support attachments live under `/var/lib/pump-investments/support-attachments`, are re-encoded to metadata-free WebP, and are bounded by per-message/ticket quotas plus daily orphan cleanup. `SUPPORT_ADMIN_TOKEN` and `SUPPORT_NETWORK_HASH_KEY` are generated into the shared mode-600 VM environment during release.

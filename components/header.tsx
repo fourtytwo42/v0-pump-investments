@@ -13,6 +13,7 @@ import { useState, useEffect } from "react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { changelogData } from "./changelog"
 import { useLocalStorage } from "@/hooks/use-local-storage"
+import { ActiveBrowserCount } from "./active-browser-count"
 
 const Changelog = dynamic(
   () => import("./changelog").then((module) => module.Changelog),
@@ -115,6 +116,8 @@ export default function Header() {
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
+
+          <ActiveBrowserCount />
 
           {/* Telegram Group Link */}
           <a

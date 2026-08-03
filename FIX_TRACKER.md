@@ -2,6 +2,21 @@
 
 This file is the durable work queue for repo maintenance and recovery. If chat context is lost, start here.
 
+### P2: Live audience visibility
+
+#### T37. Show active browser sessions in the header
+- Status: `in_progress`
+- Goal:
+  - Show how many distinct browser installations are actively using the app without collecting personal information or counting multiple tabs separately.
+- Verification:
+  - Unit tests for presence expiry/deduplication/bounds, TypeScript, ESLint, production build, and live LAN/public heartbeat checks.
+- Constraints:
+  - Keep the existing header styling, avoid database write churn, and count only recently visible browser sessions.
+- Notes:
+  - The implementation uses one host-only HttpOnly UUID per browser, a 25-second visible-only heartbeat, and a 75-second active window. Multiple tabs refresh the same bounded process-local record, so they count once and create no PostgreSQL write load.
+  - The count sits beside Connected/Offline, keeps the number visible on narrow screens, and exposes the full meaning and active window in an accessible tooltip.
+  - Local checks pass: 58 unit tests with two intentional VM-only skips, TypeScript, ESLint, production build, same-cookie heartbeat deduplication, cross-origin rejection, and zero production audit findings. VM candidate/browser/live checks remain before marking done.
+
 ### P1: In-app problem reporting
 
 #### T36. Add anonymous support tickets with diagnostics and screenshots

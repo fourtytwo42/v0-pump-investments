@@ -31,6 +31,20 @@ interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: "4.0.12",
+    date: "August 3, 2026",
+    changes: [
+      {
+        type: "new",
+        description: "Added a live header count showing how many distinct browsers are actively using Pump.Investments.",
+      },
+      {
+        type: "improved",
+        description: "Active browser counting is privacy-preserving, ignores duplicate tabs, and stops counting hidden or inactive sessions automatically.",
+      },
+    ],
+  },
+  {
     version: "4.0.11",
     date: "August 1, 2026",
     changes: [
