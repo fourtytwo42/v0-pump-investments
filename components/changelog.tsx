@@ -31,6 +31,16 @@ interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: "4.0.13",
+    date: "August 3, 2026",
+    changes: [
+      {
+        type: "improved",
+        description: "Added private five-minute active-browser history for later audience trend analysis without storing browser identities or IP addresses.",
+      },
+    ],
+  },
+  {
     version: "4.0.12",
     date: "August 3, 2026",
     changes: [

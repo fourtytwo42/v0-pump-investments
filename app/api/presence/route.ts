@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto"
 import { NextRequest, NextResponse } from "next/server"
 
 import { ACTIVE_BROWSER_WINDOW_MS, browserPresence } from "@/lib/browser-presence"
+import { recordBrowserPresenceHistory } from "@/lib/browser-presence-history"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -24,6 +25,11 @@ export async function POST(request: NextRequest): Promise<Response> {
     const supplied = request.cookies.get(PRESENCE_COOKIE)?.value
     const browserId = supplied && BROWSER_ID_PATTERN.test(supplied) ? supplied : randomUUID()
     const activeBrowsers = browserPresence.touch(browserId)
+    try {
+      await recordBrowserPresenceHistory(activeBrowsers)
+    } catch (error) {
+      console.error("[presence] historical sample write failed", error)
+    }
     const response = NextResponse.json({
       activeBrowsers,
       activeWindowSeconds: ACTIVE_BROWSER_WINDOW_MS / 1_000,

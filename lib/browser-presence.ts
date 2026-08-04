@@ -1,5 +1,38 @@
 export const ACTIVE_BROWSER_WINDOW_MS = 75_000
 export const MAX_TRACKED_BROWSERS = 100_000
+export const PRESENCE_HISTORY_INTERVAL_MS = 5 * 60_000
+
+export interface BrowserPresenceIntervalSample {
+  intervalStartedAt: number
+  peakActiveBrowsers: number
+}
+
+export class BrowserPresenceHistorySampler {
+  private intervalStartedAt: number | null = null
+  private peakActiveBrowsers = 0
+
+  constructor(private readonly intervalMs = PRESENCE_HISTORY_INTERVAL_MS) {}
+
+  observe(activeBrowsers: number, now = Date.now()): BrowserPresenceIntervalSample | null {
+    const intervalStartedAt = Math.floor(now / this.intervalMs) * this.intervalMs
+    if (this.intervalStartedAt === null) {
+      this.intervalStartedAt = intervalStartedAt
+      this.peakActiveBrowsers = activeBrowsers
+      return null
+    }
+    if (intervalStartedAt <= this.intervalStartedAt) {
+      this.peakActiveBrowsers = Math.max(this.peakActiveBrowsers, activeBrowsers)
+      return null
+    }
+    const completed = {
+      intervalStartedAt: this.intervalStartedAt,
+      peakActiveBrowsers: this.peakActiveBrowsers,
+    }
+    this.intervalStartedAt = intervalStartedAt
+    this.peakActiveBrowsers = activeBrowsers
+    return completed
+  }
+}
 
 export class BrowserPresenceTracker {
   private readonly lastSeen = new Map<string, number>()

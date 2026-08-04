@@ -223,6 +223,16 @@ model RuntimeHealthState {
   @@map("runtime_health_state")
 }
 
+model BrowserPresenceSnapshot {
+  intervalStartedAt   DateTime @id @map("interval_started_at")
+  activeBrowsers      Int      @map("active_browsers")
+  activeWindowSeconds Int      @map("active_window_seconds")
+  createdAt           DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@map("browser_presence_snapshots")
+}
+
 model SupportClient {
   id               String          @id @default(cuid())
   publicId         String          @unique @map("public_id")

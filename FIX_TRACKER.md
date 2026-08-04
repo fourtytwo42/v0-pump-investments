@@ -2,6 +2,20 @@
 
 This file is the durable work queue for repo maintenance and recovery. If chat context is lost, start here.
 
+### P2: Historical audience metrics
+
+#### T39. Persist periodic active-browser history
+- Status: `in_progress`
+- Goal:
+  - Retain low-frequency active-browser counts for later trend analysis without exposing them in the UI or writing on every heartbeat.
+- Verification:
+  - Unit-test interval bucketing/peak sampling, validate the additive migration, run release gates, and confirm historical rows accumulate on the VM.
+- Constraints:
+  - No personal data, browser identifiers, or IP addresses may be persisted. Store at most one aggregate row per five-minute interval.
+- Notes:
+  - Each completed UTC-aligned five-minute interval persists its peak concurrent count, not every heartbeat. Failed writes stay queued in memory and retry on later heartbeats; the idempotent upsert retains the largest value for an interval.
+  - The browser suite fulfills `/api/presence` locally so candidate/public release automation cannot inflate production audience history.
+
 ### P2: Live audience visibility
 
 #### T37. Show active browser sessions in the header

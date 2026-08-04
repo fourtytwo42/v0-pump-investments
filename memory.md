@@ -45,6 +45,7 @@ This file stores durable project memory for recovery after context compression o
 - The reconnect hardening commit was pushed to `main`.
 
 ## Important Recent Changes
+- V4.0.13 candidate persists only aggregate audience history: the peak active-browser count for each completed UTC-aligned five-minute interval, plus the 75-second active-window definition. Browser IDs and IP addresses remain unpersisted, failed writes retry idempotently, and Playwright stubs the presence route so release automation does not inflate production history.
 - V4.0.12 candidate adds a privacy-preserving active-browser count beside the header connection indicator. A host-only HttpOnly browser ID deduplicates tabs; visible clients heartbeat every 25 seconds and expire after 75 seconds. Presence stays process-local and bounded at 100,000 entries, avoiding database write churn and collecting no IP or user data.
 - The v4.0.12 lockfile also advances patched transitive `brace-expansion` and `fast-uri` releases after new high-severity advisories appeared; `npm audit --omit=dev` returns zero findings.
 - V4.0.11 adds anonymous in-app problem reports under Settings. Browser-scoped support sessions can create, revisit, reply to, reopen, and permanently delete tickets with safe frontend/backend diagnostics and authenticated screenshot attachments.

@@ -13,6 +13,16 @@ async function dismissOnboarding(page: import("@playwright/test").Page) {
   }
 }
 
+test.beforeEach(async ({ page }) => {
+  await page.route("**/api/presence", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ activeBrowsers: 1, activeWindowSeconds: 75 }),
+    })
+  })
+})
+
 test("dashboard preserves controls and removes obsolete KOTH surfaces", async ({ page }) => {
   await page.goto("/")
   await dismissOnboarding(page)
