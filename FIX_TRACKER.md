@@ -5,7 +5,7 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 ### P2: Historical audience metrics
 
 #### T39. Persist periodic active-browser history
-- Status: `in_progress`
+- Status: `done`
 - Goal:
   - Retain low-frequency active-browser counts for later trend analysis without exposing them in the UI or writing on every heartbeat.
 - Verification:
@@ -15,6 +15,8 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 - Notes:
   - Each completed UTC-aligned five-minute interval persists its peak concurrent count, not every heartbeat. Failed writes stay queued in memory and retry on later heartbeats; the idempotent upsert retains the largest value for an interval.
   - The browser suite fulfills `/api/presence` locally so candidate/public release automation cannot inflate production audience history.
+  - Release v4.0.13 is live from immutable commit `d2edfce1eeb33de7195a2b5015459e96d69972f8`. The additive migration applied successfully, candidate coverage passed 18/18, and public coverage passed with one transient Firefox retry plus three intentional managed-Turnstile skips.
+  - The first production row stored interval `2026-08-04 00:05:00`, peak `1`, active window `75` seconds, and creation time `00:10:09.721`. Public health is `ok`, both PM2 services are online, CSP is enforced after a clean five-minute soak, and candidate port 3002 is empty.
 
 ### P2: Live audience visibility
 

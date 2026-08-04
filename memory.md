@@ -24,7 +24,7 @@ This file stores durable project memory for recovery after context compression o
   - `pump-investments-ingest`
 
 ## Current Operational State
-- Version 4.0.12 is deployed from immutable `main` release `f194aa2c449abdd6195a59a857b0d57f6e40a9b2`. The privacy-preserving active-browser header count is live alongside the v4.0.11 support system.
+- Version 4.0.13 is deployed from immutable `main` release `d2edfce1eeb33de7195a2b5015459e96d69972f8`. The privacy-preserving active-browser header count and five-minute aggregate history are live alongside the v4.0.11 support system.
 - The previous lifecycle-correction v4.0.10 release was `f7266aced8cb92e2943ee784adb5f78fa84b324a`.
 - `/home/hendo420/pumpInvestments/current` points to the immutable v4.0.11 release. Both PM2 services are online from that directory, exactly three releases are retained, and shared environment/spool/image/support/log state remains under `/var/lib/pump-investments`.
 - V4.0.9 live query p95 was 60.2 ms LAN / 178.8 ms public for the common 10-minute snapshot and 286.0 ms LAN / 448.2 ms public for a 60-minute Unique Buyers query. All 20 requests in each sample returned 200.
@@ -45,7 +45,7 @@ This file stores durable project memory for recovery after context compression o
 - The reconnect hardening commit was pushed to `main`.
 
 ## Important Recent Changes
-- V4.0.13 candidate persists only aggregate audience history: the peak active-browser count for each completed UTC-aligned five-minute interval, plus the 75-second active-window definition. Browser IDs and IP addresses remain unpersisted, failed writes retry idempotently, and Playwright stubs the presence route so release automation does not inflate production history.
+- V4.0.13 persists only aggregate audience history in `browser_presence_snapshots`: the peak active-browser count for each completed UTC-aligned five-minute interval, plus the 75-second active-window definition. Browser IDs and IP addresses remain unpersisted, failed writes retry idempotently, and Playwright stubs the presence route so release automation does not inflate production history. The first live row stored the 00:05 UTC interval with peak 1 at 00:10:09.
 - V4.0.12 candidate adds a privacy-preserving active-browser count beside the header connection indicator. A host-only HttpOnly browser ID deduplicates tabs; visible clients heartbeat every 25 seconds and expire after 75 seconds. Presence stays process-local and bounded at 100,000 entries, avoiding database write churn and collecting no IP or user data.
 - The v4.0.12 lockfile also advances patched transitive `brace-expansion` and `fast-uri` releases after new high-severity advisories appeared; `npm audit --omit=dev` returns zero findings.
 - V4.0.11 adds anonymous in-app problem reports under Settings. Browser-scoped support sessions can create, revisit, reply to, reopen, and permanently delete tickets with safe frontend/backend diagnostics and authenticated screenshot attachments.
