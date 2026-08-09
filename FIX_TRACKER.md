@@ -5,7 +5,7 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
 ### P0: One-minute Bonding feed completeness
 
 #### T40. Prevent lifecycle backlog from hiding newly active Pump tokens
-- Status: `in_progress`
+- Status: `done`
 - Problem:
   - The 1-minute Bonding view shows materially fewer tokens than the ingester receives because recently created Pump tokens remain `UNKNOWN` while lifecycle verification is backlogged; verified-only Bonding filtering intentionally excludes them.
 - Evidence:
@@ -20,6 +20,12 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - Add backlog/oldest-overdue acceptance alerts and tests proving new active mints resolve within 10 seconds while the full reconciliation backlog is saturated.
 - Verification required:
   - Live 1-minute comparison against raw trades and Pump single responses, lifecycle queue drain/throughput measurements, API/SSE checks, and browser confirmation that verified Bonding counts no longer lag newly active Pump tokens.
+- Notes:
+  - Release v4.0.14 (`9cb21305e30fb900cb96924fa0f00660c3fe51bf`) makes atomic ingestion enqueue newly active unknown Pump tokens immediately, gives them priority over recurring reconciliation, preserves retry backoff on duplicate queue requests, and uses a bounded single-token fallback when the batch endpoint omits a hot mint.
+  - Active reconciliation is limited to recently traded tokens with stale verification; full reconciliation remains a lower-priority two-hour lane. Startup and periodic cleanup remove final-state, no-price, and retention-expired work instead of letting it occupy the hot queue.
+  - Production verification found zero recently traded Pump/Pump-bonding tokens still `UNKNOWN`, versus roughly 40 before deployment. The raw one-minute Bonding query increased from 18 to 125 in comparable live samples; the normal default filters returned 43 instead of 8. Counts remain naturally time-dependent.
+  - Protected health reported about 1.4-second persisted lag, 14 high-priority checks due, zero dead-letter files, and batches resolving 48-50 of 50 checks. Both PM2 services are online with zero restarts and candidate port 3002 is closed.
+  - Release gates passed with zero dependency vulnerabilities. The Chromium alert-dialog test required one retry during the public suite; Firefox/WebKit and the retry passed, so this is recorded as non-blocking test timing rather than a feed regression.
 
 ### P2: Historical audience metrics
 
