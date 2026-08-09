@@ -38,6 +38,11 @@ import {
   lifecycleRetrySchedule,
   reduceLifecycleWithVenueRepair,
 } from "@/lib/token-lifecycle"
+import {
+  LIFECYCLE_QUEUE_PRIORITY,
+  lifecycleTradeRequest,
+  selectLifecycleSingleFallbacks,
+} from "@/lib/lifecycle-queue"
 import { reduceTokenProvenance } from "@/lib/token-provenance"
 import { ingestRetryDelayMs } from "@/lib/ingest-retry"
 import { startRuntimeHealthPublisher } from "@/server/ingest/runtime-health"
@@ -143,6 +148,16 @@ const LIFECYCLE_BATCH_SIZE = parseEnvNumber("LIFECYCLE_BATCH_SIZE", DEFAULT_LIFE
 const LIFECYCLE_ACTIVE_RECHECK_MS = parseEnvNumber("LIFECYCLE_ACTIVE_RECHECK_MS", 60_000)
 const LIFECYCLE_FULL_RECHECK_MS = parseEnvNumber("LIFECYCLE_FULL_RECHECK_MS", 15 * 60_000)
 const LIFECYCLE_RECHECK_WINDOW_MS = parseEnvNumber("LIFECYCLE_RECHECK_WINDOW_MS", 2 * 60 * 60 * 1000)
+const LIFECYCLE_HOT_WINDOW_MS = parseEnvNumber("LIFECYCLE_HOT_WINDOW_MS", 30 * 60 * 1000)
+const LIFECYCLE_SINGLE_FALLBACK_CONCURRENCY = parseEnvNumber(
+  "LIFECYCLE_SINGLE_FALLBACK_CONCURRENCY",
+  4,
+)
+const LIFECYCLE_SINGLE_FALLBACK_MAX = parseEnvNumber("LIFECYCLE_SINGLE_FALLBACK_MAX", 20)
+const LIFECYCLE_SINGLE_FALLBACK_TIMEOUT_MS = parseEnvNumber(
+  "LIFECYCLE_SINGLE_FALLBACK_TIMEOUT_MS",
+  5_000,
+)
 const LIFECYCLE_MAX_ATTEMPTS = parseEnvNumber("LIFECYCLE_MAX_ATTEMPTS", 10)
 const LIFECYCLE_UNRESOLVED_COOLDOWN_MS = parseEnvNumber(
   "LIFECYCLE_UNRESOLVED_COOLDOWN_MS",
@@ -293,57 +308,160 @@ async function enqueueLifecycleChecks(requests: LifecycleCheckRequest[]): Promis
       (token_id,requested_at,next_attempt_at,attempts,priority,reason,updated_at)
     VALUES ${values}
     ON CONFLICT (token_id) DO UPDATE SET
-      requested_at = NOW(),
+      requested_at = CASE
+        WHEN EXCLUDED.priority > token_lifecycle_checks.priority
+          AND EXCLUDED.reason IS DISTINCT FROM token_lifecycle_checks.reason
+          THEN NOW()
+        ELSE token_lifecycle_checks.requested_at
+      END,
       next_attempt_at = CASE
-        WHEN EXCLUDED.priority >= 90 OR token_lifecycle_checks.attempts < ${LIFECYCLE_MAX_ATTEMPTS}
+        WHEN EXCLUDED.priority > token_lifecycle_checks.priority
+          AND EXCLUDED.reason IS DISTINCT FROM token_lifecycle_checks.reason
           THEN LEAST(token_lifecycle_checks.next_attempt_at, NOW())
         ELSE token_lifecycle_checks.next_attempt_at
       END,
       priority = GREATEST(token_lifecycle_checks.priority, EXCLUDED.priority),
-      reason = EXCLUDED.reason,
+      reason = CASE
+        WHEN EXCLUDED.priority > token_lifecycle_checks.priority THEN EXCLUDED.reason
+        ELSE token_lifecycle_checks.reason
+      END,
       updated_at = NOW()
   `)
 }
 
 async function enqueueLifecycleChecksByQuery(mode: "all" | "active"): Promise<void> {
   if (!LIFECYCLE_VERIFIER_ENABLED) return
-  const activeCutoff = BigInt(Date.now() - LIFECYCLE_RECHECK_WINDOW_MS)
+  const activeCutoff = BigInt(Date.now() - LIFECYCLE_HOT_WINDOW_MS)
   if (mode === "active") {
     await prisma.$executeRawUnsafe(`
       INSERT INTO token_lifecycle_checks
         (token_id,requested_at,next_attempt_at,attempts,priority,reason,updated_at)
-      SELECT t.id,NOW(),NOW(),0,40,'active_recheck',NOW()
+      SELECT t.id,NOW(),NOW(),0,
+        CASE WHEN t.lifecycle_status='UNKNOWN' THEN ${LIFECYCLE_QUEUE_PRIORITY.hotUnknown}
+          ELSE ${LIFECYCLE_QUEUE_PRIORITY.hotBonding} END,
+        CASE WHEN t.lifecycle_status='UNKNOWN' THEN 'hot_unknown_recheck'
+          ELSE 'hot_bonding_recheck' END,
+        NOW()
       FROM tokens t
       JOIN token_prices tp ON tp.token_id=t.id AND tp.last_trade_timestamp >= ${activeCutoff}
       WHERE t.lifecycle_status IN ('UNKNOWN','BONDING')
+        AND (t.lifecycle_verified_at IS NULL
+          OR t.lifecycle_verified_at <= NOW() - (${LIFECYCLE_ACTIVE_RECHECK_MS} * interval '1 millisecond'))
       ON CONFLICT (token_id) DO UPDATE SET
-        requested_at=NOW(),
-        next_attempt_at=CASE WHEN token_lifecycle_checks.attempts < ${LIFECYCLE_MAX_ATTEMPTS}
-          THEN LEAST(token_lifecycle_checks.next_attempt_at,NOW())
+        requested_at=CASE
+          WHEN EXCLUDED.priority > token_lifecycle_checks.priority
+            AND EXCLUDED.reason IS DISTINCT FROM token_lifecycle_checks.reason
+            THEN NOW()
+          ELSE token_lifecycle_checks.requested_at END,
+        next_attempt_at=CASE
+          WHEN EXCLUDED.priority > token_lifecycle_checks.priority
+            AND EXCLUDED.reason IS DISTINCT FROM token_lifecycle_checks.reason
+            AND token_lifecycle_checks.attempts < ${LIFECYCLE_MAX_ATTEMPTS}
+            THEN LEAST(token_lifecycle_checks.next_attempt_at,NOW())
           ELSE token_lifecycle_checks.next_attempt_at END,
-        priority=GREATEST(token_lifecycle_checks.priority,40),
-        reason='active_recheck',
+        priority=GREATEST(token_lifecycle_checks.priority,EXCLUDED.priority),
+        reason=CASE WHEN EXCLUDED.priority > token_lifecycle_checks.priority
+          THEN EXCLUDED.reason ELSE token_lifecycle_checks.reason END,
         updated_at=NOW()
     `)
     return
   }
 
+  const fullCutoff = BigInt(Date.now() - LIFECYCLE_RECHECK_WINDOW_MS)
   await prisma.$executeRawUnsafe(`
     INSERT INTO token_lifecycle_checks
       (token_id,requested_at,next_attempt_at,attempts,priority,reason,updated_at)
-    SELECT t.id,NOW(),NOW(),0,10,'full_recheck',NOW()
+    SELECT t.id,NOW(),NOW(),0,
+      CASE
+        WHEN t.lifecycle_status='UNKNOWN' THEN ${LIFECYCLE_QUEUE_PRIORITY.fullUnknown}
+        WHEN t.lifecycle_status='BONDING' THEN ${LIFECYCLE_QUEUE_PRIORITY.fullBonding}
+        ELSE ${LIFECYCLE_QUEUE_PRIORITY.curveCompleteFollowup}
+      END,
+      CASE
+        WHEN t.lifecycle_status='UNKNOWN' THEN 'full_unknown_recheck'
+        WHEN t.lifecycle_status='BONDING' THEN 'full_bonding_recheck'
+        ELSE 'curve_complete_followup'
+      END,
+      NOW()
     FROM tokens t
-    JOIN token_prices tp ON tp.token_id=t.id AND tp.last_trade_timestamp >= ${activeCutoff}
+    JOIN token_prices tp ON tp.token_id=t.id AND tp.last_trade_timestamp >= ${fullCutoff}
     WHERE t.lifecycle_status IN ('UNKNOWN','BONDING','CURVE_COMPLETE')
+      AND (t.lifecycle_verified_at IS NULL
+        OR t.lifecycle_verified_at <= NOW() - (${LIFECYCLE_FULL_RECHECK_MS} * interval '1 millisecond'))
     ON CONFLICT (token_id) DO UPDATE SET
-      requested_at=NOW(),
-      next_attempt_at=CASE WHEN token_lifecycle_checks.attempts < ${LIFECYCLE_MAX_ATTEMPTS}
-        THEN LEAST(token_lifecycle_checks.next_attempt_at,NOW())
+      requested_at=CASE
+        WHEN EXCLUDED.priority > token_lifecycle_checks.priority
+          AND EXCLUDED.reason IS DISTINCT FROM token_lifecycle_checks.reason
+          THEN NOW()
+        ELSE token_lifecycle_checks.requested_at END,
+      next_attempt_at=CASE
+        WHEN EXCLUDED.priority > token_lifecycle_checks.priority
+          AND EXCLUDED.reason IS DISTINCT FROM token_lifecycle_checks.reason
+          AND token_lifecycle_checks.attempts < ${LIFECYCLE_MAX_ATTEMPTS}
+          THEN LEAST(token_lifecycle_checks.next_attempt_at,NOW())
         ELSE token_lifecycle_checks.next_attempt_at END,
-      priority=GREATEST(token_lifecycle_checks.priority,10),
-      reason='full_recheck',
+      priority=GREATEST(token_lifecycle_checks.priority,EXCLUDED.priority),
+      reason=CASE WHEN EXCLUDED.priority > token_lifecycle_checks.priority
+        THEN EXCLUDED.reason ELSE token_lifecycle_checks.reason END,
       updated_at=NOW()
   `)
+}
+
+async function cleanupLifecycleQueue(normalize = false): Promise<void> {
+  if (!LIFECYCLE_VERIFIER_ENABLED) return
+  const fullCutoff = BigInt(Date.now() - LIFECYCLE_RECHECK_WINDOW_MS)
+  const hotCutoff = BigInt(Date.now() - LIFECYCLE_HOT_WINDOW_MS)
+  const removed = await prisma.$executeRawUnsafe(`
+    DELETE FROM token_lifecycle_checks AS lifecycle_check
+    WHERE EXISTS (
+      SELECT 1 FROM tokens t
+      LEFT JOIN token_prices tp ON tp.token_id=t.id
+      WHERE t.id=lifecycle_check.token_id
+        AND (t.lifecycle_status IN ('PUMPSWAP','NON_LAUNCHPAD')
+          OR tp.token_id IS NULL
+          OR tp.last_trade_timestamp < ${fullCutoff})
+    )
+  `)
+
+  if (normalize) {
+    await prisma.$executeRawUnsafe(`
+      UPDATE token_lifecycle_checks AS lifecycle_check
+      SET priority=CASE
+            WHEN lifecycle_check.attempts >= ${LIFECYCLE_MAX_ATTEMPTS} THEN 0
+            WHEN lifecycle_check.reason='trade_graduation_hint' THEN ${LIFECYCLE_QUEUE_PRIORITY.graduationHint}
+            WHEN lifecycle_check.reason IN ('new_token','active_unknown_trade')
+              THEN ${LIFECYCLE_QUEUE_PRIORITY.activeUnknownTrade}
+            WHEN tp.last_trade_timestamp >= ${hotCutoff} AND t.lifecycle_status='UNKNOWN'
+              THEN ${LIFECYCLE_QUEUE_PRIORITY.hotUnknown}
+            WHEN tp.last_trade_timestamp >= ${hotCutoff} AND t.lifecycle_status='BONDING'
+              THEN ${LIFECYCLE_QUEUE_PRIORITY.hotBonding}
+            WHEN t.lifecycle_status='UNKNOWN' THEN ${LIFECYCLE_QUEUE_PRIORITY.fullUnknown}
+            WHEN t.lifecycle_status='BONDING' THEN ${LIFECYCLE_QUEUE_PRIORITY.fullBonding}
+            ELSE ${LIFECYCLE_QUEUE_PRIORITY.curveCompleteFollowup}
+          END,
+          reason=CASE
+            WHEN lifecycle_check.reason='trade_graduation_hint' THEN lifecycle_check.reason
+            WHEN lifecycle_check.reason IN ('new_token','active_unknown_trade') THEN 'active_unknown_trade'
+            WHEN tp.last_trade_timestamp >= ${hotCutoff} AND t.lifecycle_status='UNKNOWN' THEN 'hot_unknown_recheck'
+            WHEN tp.last_trade_timestamp >= ${hotCutoff} AND t.lifecycle_status='BONDING' THEN 'hot_bonding_recheck'
+            WHEN t.lifecycle_status='UNKNOWN' THEN 'full_unknown_recheck'
+            WHEN t.lifecycle_status='BONDING' THEN 'full_bonding_recheck'
+            ELSE 'curve_complete_followup'
+          END,
+          next_attempt_at=CASE
+            WHEN lifecycle_check.attempts < ${LIFECYCLE_MAX_ATTEMPTS}
+              AND tp.last_trade_timestamp >= ${hotCutoff}
+              THEN LEAST(lifecycle_check.next_attempt_at,NOW())
+            ELSE lifecycle_check.next_attempt_at
+          END,
+          updated_at=NOW()
+      FROM tokens t
+      JOIN token_prices tp ON tp.token_id=t.id
+      WHERE lifecycle_check.token_id=t.id
+        AND t.lifecycle_status IN ('UNKNOWN','BONDING','CURVE_COMPLETE')
+    `)
+  }
+  if (removed > 0) console.log(`[lifecycle] event=queue_cleanup removed=${removed}`)
 }
 
 async function enqueueFalsePoolAddressRepairs(): Promise<void> {
@@ -521,6 +639,52 @@ async function getLifecycleChecks() {
   })
 }
 
+async function fillLifecycleSingleFallbacks(
+  checks: Awaited<ReturnType<typeof getLifecycleChecks>>,
+  byMint: Map<string, Record<string, unknown>>,
+): Promise<number> {
+  const selected = selectLifecycleSingleFallbacks(
+    checks,
+    (check) => !byMint.has(check.token.mintAddress),
+    LIFECYCLE_SINGLE_FALLBACK_MAX,
+  )
+  if (selected.length === 0) return 0
+
+  let cursor = 0
+  let resolved = 0
+  const worker = async () => {
+    while (cursor < selected.length) {
+      const check = selected[cursor]
+      cursor += 1
+      try {
+        const payload = await fetchPumpLifecycleSingle(
+          check.token.mintAddress,
+          AbortSignal.timeout(LIFECYCLE_SINGLE_FALLBACK_TIMEOUT_MS),
+        )
+        if (payload) {
+          byMint.set(check.token.mintAddress, payload as Record<string, unknown>)
+          resolved += 1
+        }
+      } catch (error) {
+        console.warn(
+          `[lifecycle] event=single_fallback_failed mint=${check.token.mintAddress} message=${JSON.stringify((error as Error).message)}`,
+        )
+      }
+    }
+  }
+
+  await Promise.all(
+    Array.from(
+      { length: Math.min(LIFECYCLE_SINGLE_FALLBACK_CONCURRENCY, selected.length) },
+      () => worker(),
+    ),
+  )
+  console.log(
+    `[lifecycle] event=single_fallback checked=${selected.length} verified=${resolved}`,
+  )
+  return resolved
+}
+
 async function processLifecycleChecks(): Promise<void> {
   if (!LIFECYCLE_VERIFIER_ENABLED || lifecycleWorkerRunning) return
   lifecycleWorkerRunning = true
@@ -533,16 +697,11 @@ async function processLifecycleChecks(): Promise<void> {
     for (const payload of payloads) {
       if (typeof payload.mint === "string") byMint.set(payload.mint, payload as Record<string, unknown>)
     }
+    await fillLifecycleSingleFallbacks(checks, byMint)
 
-    let singleFallbackUsed = false
     let verifiedCount = 0
     for (const check of checks) {
-      let payload = byMint.get(check.token.mintAddress)
-      if (!payload && check.attempts >= 2 && !singleFallbackUsed) {
-        singleFallbackUsed = true
-        const single = await fetchPumpLifecycleSingle(check.token.mintAddress)
-        if (single) payload = single as Record<string, unknown>
-      }
+      const payload = byMint.get(check.token.mintAddress)
       if (!payload) {
         await rescheduleLifecycleCheck(
           check.tokenId,
@@ -972,7 +1131,15 @@ async function persistTradesAtomic(trades: PreparedTrade[]): Promise<void> {
 
     const tokenRows = await tx.token.findMany({
       where: { mintAddress: { in: uniqueTokens.map((trade) => trade.mint) } },
-      select: { id: true, mintAddress: true, metadataUri: true, imageUri: true, name: true, symbol: true },
+      select: {
+        id: true,
+        mintAddress: true,
+        metadataUri: true,
+        imageUri: true,
+        name: true,
+        symbol: true,
+        lifecycleStatus: true,
+      },
     })
     const ids = new Map(tokenRows.map((row) => [row.mintAddress, row.id]))
     const validTrades = trades.filter((trade) => ids.has(trade.mint))
@@ -1078,6 +1245,23 @@ async function persistTradesAtomic(trades: PreparedTrade[]): Promise<void> {
     tokenIdCache.set(row.mintAddress, row.id)
     if (!row.metadataUri || !row.imageUri || !row.name?.trim() || !row.symbol?.trim()) {
       scheduleMetadataRetry(row.mintAddress)
+    }
+  }
+  if (LIFECYCLE_VERIFIER_ENABLED) {
+    const lifecycleRequests = result.tokenRows.flatMap((row) => {
+      const trade = latestByMint.get(row.mintAddress)
+      if (!trade) return []
+      const hasGraduationHint =
+        trade.program === "pump_amm" || trade.isBondingCurve === false || Boolean(trade.poolAddress)
+      const request = lifecycleTradeRequest(row.lifecycleStatus, hasGraduationHint)
+      return request ? [{ tokenId: row.id, ...request }] : []
+    })
+    try {
+      await enqueueLifecycleChecks(lifecycleRequests)
+    } catch (error) {
+      console.warn(
+        `[lifecycle] Failed to enqueue active trade checks: ${(error as Error).message}`,
+      )
     }
   }
   if (result.inserted.length > 0) {
@@ -1334,20 +1518,22 @@ async function persistTradesBulkLegacy(trades: PreparedTrade[]): Promise<void> {
 
     if (LIFECYCLE_VERIFIER_ENABLED) {
       const newMintSet = new Set(uncachedTokens.map((token) => token.mint))
-      const lifecycleRequests = uniqueTokens
-        .map((token) => {
-          const tokenId = mintToId.get(token.mint)
-          if (!tokenId) return null
-          const highPriority =
-            token.program === "pump_amm" || token.isBondingCurve === false || Boolean(token.poolAddress)
-          if (!newMintSet.has(token.mint) && !highPriority) return null
-          return {
+      const lifecycleRequests: LifecycleCheckRequest[] = []
+      for (const token of uniqueTokens) {
+        const tokenId = mintToId.get(token.mint)
+        if (!tokenId) continue
+        const highPriority =
+          token.program === "pump_amm" || token.isBondingCurve === false || Boolean(token.poolAddress)
+        if (newMintSet.has(token.mint) || highPriority) {
+          lifecycleRequests.push({
             tokenId,
             reason: highPriority ? "trade_graduation_hint" : "new_token",
-            priority: highPriority ? 100 : 20,
-          }
-        })
-        .filter((request): request is { tokenId: string; reason: string; priority: number } => request !== null)
+            priority: highPriority
+              ? LIFECYCLE_QUEUE_PRIORITY.graduationHint
+              : LIFECYCLE_QUEUE_PRIORITY.activeUnknownTrade,
+          })
+        }
+      }
       await enqueueLifecycleChecks(lifecycleRequests)
     }
 
@@ -2013,8 +2199,10 @@ setInterval(() => void flushTokenRevision(), 1_000)
 
 if (LIFECYCLE_VERIFIER_ENABLED) {
   setTimeout(() => {
-    void reconcileStoredRaydiumMigrations()
+    void cleanupLifecycleQueue(true)
+      .then(() => reconcileStoredRaydiumMigrations())
       .then(() => enqueueFalsePoolAddressRepairs())
+      .then(() => enqueueLifecycleChecksByQuery("active"))
       .then(() => enqueueLifecycleChecksByQuery("all"))
       .then(() => processLifecycleChecks())
       .catch((error) => console.warn("[lifecycle] Initial backfill enqueue failed:", (error as Error).message))
@@ -2031,9 +2219,11 @@ if (LIFECYCLE_VERIFIER_ENABLED) {
   )
   setInterval(
     () =>
-      void enqueueLifecycleChecksByQuery("all").catch((error) =>
-        console.warn("[lifecycle] Full reconciliation enqueue failed:", (error as Error).message),
-      ),
+      void cleanupLifecycleQueue()
+        .then(() => enqueueLifecycleChecksByQuery("all"))
+        .catch((error) =>
+          console.warn("[lifecycle] Full reconciliation enqueue failed:", (error as Error).message),
+        ),
     LIFECYCLE_FULL_RECHECK_MS,
   )
 }

@@ -2,6 +2,25 @@
 
 This file is the durable work queue for repo maintenance and recovery. If chat context is lost, start here.
 
+### P0: One-minute Bonding feed completeness
+
+#### T40. Prevent lifecycle backlog from hiding newly active Pump tokens
+- Status: `in_progress`
+- Problem:
+  - The 1-minute Bonding view shows materially fewer tokens than the ingester receives because recently created Pump tokens remain `UNKNOWN` while lifecycle verification is backlogged; verified-only Bonding filtering intentionally excludes them.
+- Evidence:
+  - A live 2026-08-08 audit found about 553 trades across 144 distinct tokens in 60 seconds with roughly 1.6-second feed freshness, so trade ingestion was not dropping the activity.
+  - The same window contained 12 verified Bonding tokens and about 40 `UNKNOWN` Pump/Pump-bonding tokens. Eight of eight sampled unknown mints were immediately returned by Pump's single-token endpoint as `program=pump`, `complete=false`, while the batch endpoint returned only one of 40 newly active mints.
+  - The lifecycle table held about 10,112 checks, 9,773 due, including 4,786 priority-40 active rechecks. The worker can process only about 1,364 checks per minute (`50` every `2.2s`), while the one-minute active reconciliation re-enqueues roughly 4,786 checks and starves priority-20 new-token checks.
+  - About 4,614 queued checks were outside the active two-hour window and should not remain in the hot queue. Default UI filters further reduce the verified count by requiring a qualifying buy, $3K-$1M market cap, and age under seven days; during one sample, 6 verified tokens matched defaults while 12 additional unknown Pump-bonding tokens would also have matched.
+- Recommended fix:
+  - Give new active `UNKNOWN` Pump tokens a dedicated highest-priority lane and use bounded-concurrency single-token fallback immediately when Pump's batch response omits a new mint.
+  - Schedule successful active rechecks from `lifecycle_verified_at`/`next_attempt_at` instead of bulk re-enqueuing every active token each minute; do not overwrite `requested_at` for already queued work.
+  - Move PumpSwap follow-up for `CURVE_COMPLETE` tokens to a lower-frequency lane and purge or park stale checks outside the active retention window.
+  - Add backlog/oldest-overdue acceptance alerts and tests proving new active mints resolve within 10 seconds while the full reconciliation backlog is saturated.
+- Verification required:
+  - Live 1-minute comparison against raw trades and Pump single responses, lifecycle queue drain/throughput measurements, API/SSE checks, and browser confirmation that verified Bonding counts no longer lag newly active Pump tokens.
+
 ### P2: Historical audience metrics
 
 #### T39. Persist periodic active-browser history
@@ -17,6 +36,7 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - The browser suite fulfills `/api/presence` locally so candidate/public release automation cannot inflate production audience history.
   - Release v4.0.13 is live from immutable commit `d2edfce1eeb33de7195a2b5015459e96d69972f8`. The additive migration applied successfully, candidate coverage passed 18/18, and public coverage passed with one transient Firefox retry plus three intentional managed-Turnstile skips.
   - The first production row stored interval `2026-08-04 00:05:00`, peak `1`, active window `75` seconds, and creation time `00:10:09.721`. Public health is `ok`, both PM2 services are online, CSP is enforced after a clean five-minute soak, and candidate port 3002 is empty.
+  - Live re-verification on 2026-08-04 found 193 persisted intervals through 16:05 UTC: 185 peaked at 1 browser and 8 peaked at 2. A second tab in the same browser continued to report 1, confirming same-browser tab deduplication, and no presence-related browser or web errors were found.
 
 ### P2: Live audience visibility
 
@@ -34,6 +54,7 @@ This file is the durable work queue for repo maintenance and recovery. If chat c
   - Local checks pass: 58 unit tests with two intentional VM-only skips, TypeScript, ESLint, production build, same-cookie heartbeat deduplication, cross-origin rejection, and zero production audit findings.
   - Release v4.0.12 is live from immutable commit `f194aa2c449abdd6195a59a857b0d57f6e40a9b2`. Candidate coverage passed 18/18; public coverage passed 15/15 with three intentional managed-Turnstile skips; the five-minute CSP soak was clean and CSP is enforced.
   - Live browser verification shows `v4.0.12`, Connected, and `1 online` together in the public header with the accessible name `1 active browser`. Public health is `ok` and both PM2 services are online from the v4.0.12 release.
+  - Live v4.0.13 re-verification confirmed the public header heartbeat, same-browser multi-tab deduplication, 75-second expiry configuration, and historical production peaks of 2 distinct browsers.
 
 ### P1: VM release isolation
 

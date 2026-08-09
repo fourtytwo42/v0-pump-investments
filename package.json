@@ -1,6 +1,6 @@
 {
   "name": "pump-investments",
-  "version": "4.0.13",
+  "version": "4.0.14",
   "private": true,
   "type": "module",
   "scripts": {
@@ -84,6 +84,8 @@
   },
   "overrides": {
     "diff": "4.0.4",
+    "js-yaml": "4.3.1",
+    "nanoid": "3.3.18",
     "picomatch": "4.0.4",
     "postcss": "8.5.25",
     "next": {

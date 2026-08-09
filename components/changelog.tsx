@@ -31,6 +31,24 @@ interface ChangelogEntry {
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: "4.0.14",
+    date: "August 8, 2026",
+    changes: [
+      {
+        type: "fixed",
+        description: "Prioritized newly active Pump tokens so verified Bonding results appear promptly even while older lifecycle checks are pending.",
+      },
+      {
+        type: "improved",
+        description: "Added fast single-token verification when Pump's batch response has not indexed a new mint yet, while keeping API requests bounded.",
+      },
+      {
+        type: "improved",
+        description: "Made lifecycle reconciliation sustainable by separating hot and background checks and removing stale queue work.",
+      },
+    ],
+  },
+  {
     version: "4.0.13",
     date: "August 3, 2026",
     changes: [

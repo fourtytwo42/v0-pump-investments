@@ -43,3 +43,58 @@ test("PostgreSQL revision coalescing and repeatable-read characterization", { sk
     await Promise.all([first.end(), second.end()])
   }
 })
+
+test("PostgreSQL lifecycle queue promotion preserves retry backoff", { skip: !enabled }, async () => {
+  assert.ok(databaseUrl, "DATABASE_URL is required for PostgreSQL integration tests")
+  const schema = `lifecycle_${randomUUID().replaceAll("-", "")}`
+  const client = new pg.Client({ connectionString: databaseUrl })
+  await client.connect()
+  try {
+    await client.query(`CREATE SCHEMA "${schema}"`)
+    await client.query(`
+      CREATE TABLE "${schema}".checks (
+        token_id text PRIMARY KEY,
+        requested_at timestamptz NOT NULL,
+        next_attempt_at timestamptz NOT NULL,
+        attempts integer NOT NULL,
+        priority integer NOT NULL,
+        reason text NOT NULL,
+        updated_at timestamptz NOT NULL
+      )
+    `)
+    await client.query(`
+      INSERT INTO "${schema}".checks
+      VALUES ('mint',NOW()-interval '1 minute',NOW()+interval '5 minutes',1,99,'active_unknown_trade',NOW())
+    `)
+
+    const upsert = async (priority: number, reason: string) => client.query(`
+      INSERT INTO "${schema}".checks
+        (token_id,requested_at,next_attempt_at,attempts,priority,reason,updated_at)
+      VALUES ('mint',NOW(),NOW(),0,$1,$2,NOW())
+      ON CONFLICT (token_id) DO UPDATE SET
+        requested_at=CASE
+          WHEN EXCLUDED.priority>checks.priority AND EXCLUDED.reason IS DISTINCT FROM checks.reason
+            THEN NOW() ELSE checks.requested_at END,
+        next_attempt_at=CASE
+          WHEN EXCLUDED.priority>checks.priority AND EXCLUDED.reason IS DISTINCT FROM checks.reason
+            THEN LEAST(checks.next_attempt_at,NOW()) ELSE checks.next_attempt_at END,
+        priority=GREATEST(checks.priority,EXCLUDED.priority),
+        reason=CASE WHEN EXCLUDED.priority>checks.priority THEN EXCLUDED.reason ELSE checks.reason END,
+        updated_at=NOW()
+      RETURNING requested_at,next_attempt_at,priority,reason
+    `, [priority, reason])
+
+    const sameReason = await upsert(110, "active_unknown_trade")
+    assert.equal(sameReason.rows[0].priority, 110)
+    assert.equal(sameReason.rows[0].reason, "active_unknown_trade")
+    assert.ok(new Date(sameReason.rows[0].next_attempt_at).getTime() > Date.now())
+
+    const promoted = await upsert(120, "trade_graduation_hint")
+    assert.equal(promoted.rows[0].priority, 120)
+    assert.equal(promoted.rows[0].reason, "trade_graduation_hint")
+    assert.ok(new Date(promoted.rows[0].next_attempt_at).getTime() <= Date.now() + 1_000)
+  } finally {
+    await client.query(`DROP SCHEMA IF EXISTS "${schema}" CASCADE`).catch(() => undefined)
+    await client.end()
+  }
+})

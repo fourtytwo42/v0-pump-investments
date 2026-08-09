@@ -68,10 +68,17 @@ export async function GET(request: Request): Promise<Response> {
       orderBy: { createdAt: "desc" },
       select: { timestamp: true, createdAt: true },
     }),
-    prisma.$queryRaw<Array<{ total: bigint; due: bigint; cooling: bigint; oldest_overdue_ms: number | null }>>`
+    prisma.$queryRaw<Array<{
+      total: bigint
+      due: bigint
+      cooling: bigint
+      high_priority_due: bigint
+      oldest_overdue_ms: number | null
+    }>>`
       SELECT COUNT(*)::bigint AS total,
         COUNT(*) FILTER (WHERE next_attempt_at <= NOW())::bigint AS due,
         COUNT(*) FILTER (WHERE next_attempt_at > NOW())::bigint AS cooling,
+        COUNT(*) FILTER (WHERE next_attempt_at <= NOW() AND priority >= 80)::bigint AS high_priority_due,
         MAX(EXTRACT(EPOCH FROM (NOW() - next_attempt_at)) * 1000)
           FILTER (WHERE next_attempt_at <= NOW())::double precision AS oldest_overdue_ms
       FROM token_lifecycle_checks
@@ -139,6 +146,7 @@ export async function GET(request: Request): Promise<Response> {
       backlog: Number(lifecycleCounts[0]?.total ?? 0),
       due: Number(lifecycleCounts[0]?.due ?? 0),
       cooling: Number(lifecycleCounts[0]?.cooling ?? 0),
+      high_priority_due: Number(lifecycleCounts[0]?.high_priority_due ?? 0),
       oldest_overdue_ms: lifecycleCounts[0]?.oldest_overdue_ms ?? null,
     },
     metadata: {
